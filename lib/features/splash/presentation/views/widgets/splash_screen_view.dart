@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../../shared/constants/language_manager.dart';
 
 class SplashScreenView extends StatefulWidget {
@@ -27,8 +28,8 @@ class _SplashScreenViewState extends State<SplashScreenView>
     // Navigate after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        // TODO: Navigate to onboarding or home screen
-        print('Navigate to next screen');
+        // Navigate to onboarding screen
+        context.go('/onboarding');
       }
     });
   }

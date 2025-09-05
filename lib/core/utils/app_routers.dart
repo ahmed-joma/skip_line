@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../features/splash/splash_screen.dart';
+import '../../features/onboarding/onboarding_screen.dart';
 import '../../shared/constants/app_constants.dart';
 
 class AppRouters {
@@ -27,8 +28,7 @@ class AppRouters {
       // Onboarding Screen
       GoRoute(
         path: kOnboardingView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Onboarding Screen'))),
+        builder: (context, state) => const OnboardingScreen(),
       ),
 
       // Login Screen
