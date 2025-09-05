@@ -1,0 +1,84 @@
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import '../../features/splash/splash_screen.dart';
+import '../../shared/constants/app_constants.dart';
+
+class AppRouters {
+  // Route Constants
+  static const String kSplashView = '/splash';
+  static const String kOnboardingView = '/onboarding';
+  static const String kLoginView = '/login';
+  static const String kRegisterView = '/register';
+  static const String kHomeView = '/home';
+  static const String kScanView = '/scan';
+  static const String kCartView = '/cart';
+  static const String kPaymentView = '/payment';
+  static const String kProfileView = '/profile';
+
+  static final router = GoRouter(
+    initialLocation: kSplashView,
+    routes: [
+      // Splash Screen
+      GoRoute(
+        path: kSplashView,
+        builder: (context, state) => const SplashScreen(),
+      ),
+
+      // Onboarding Screen
+      GoRoute(
+        path: kOnboardingView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Onboarding Screen'))),
+      ),
+
+      // Login Screen
+      GoRoute(
+        path: kLoginView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Login Screen'))),
+      ),
+
+      // Register Screen
+      GoRoute(
+        path: kRegisterView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Register Screen'))),
+      ),
+
+      // Home Screen
+      GoRoute(
+        path: kHomeView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Home Screen'))),
+      ),
+
+      // Scan Screen
+      GoRoute(
+        path: kScanView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Scan Screen'))),
+      ),
+
+      // Cart Screen
+      GoRoute(
+        path: kCartView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Cart Screen'))),
+      ),
+
+      // Payment Screen
+      GoRoute(
+        path: kPaymentView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Payment Screen'))),
+      ),
+
+      // Profile Screen
+      GoRoute(
+        path: kProfileView,
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Profile Screen'))),
+      ),
+    ],
+  );
+}

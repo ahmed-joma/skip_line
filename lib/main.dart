@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'features/splash/splash_screen.dart';
+import 'package:provider/provider.dart';
+import 'core/utils/app_routers.dart';
+import 'shared/themes/app_theme.dart';
+import 'shared/constants/language_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set system UI overlay style
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF123459),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+  SystemChrome.setSystemUIOverlayStyle(AppTheme.systemUiOverlayStyle);
 
   runApp(const SkipLineApp());
 }
@@ -23,16 +19,21 @@ class SkipLineApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SkipLine',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        primaryColor: const Color(0xFF123459),
-        scaffoldBackgroundColor: const Color(0xFF123459),
-        fontFamily: 'Roboto',
+    return ChangeNotifierProvider(
+      create: (context) => LanguageManager()..initializeLanguage(),
+      child: Consumer<LanguageManager>(
+        builder: (context, languageManager, child) {
+          return MaterialApp.router(
+            title: 'SkipLine',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            locale: languageManager.isArabic
+                ? const Locale('ar', 'SA')
+                : const Locale('en', 'US'),
+            routerConfig: AppRouters.router,
+          );
+        },
       ),
-      home: const SplashScreen(),
     );
   }
 }
