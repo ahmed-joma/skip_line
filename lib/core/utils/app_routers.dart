@@ -2,13 +2,13 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
-import '../../shared/constants/app_constants.dart';
+import '../../features/sign_in/sign_in_screen.dart';
 
 class AppRouters {
   // Route Constants
   static const String kSplashView = '/splash';
   static const String kOnboardingView = '/onboarding';
-  static const String kLoginView = '/login';
+  static const String kLoginView = '/signin';
   static const String kRegisterView = '/register';
   static const String kHomeView = '/home';
   static const String kScanView = '/scan';
@@ -34,8 +34,7 @@ class AppRouters {
       // Login Screen
       GoRoute(
         path: kLoginView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Login Screen'))),
+        builder: (context, state) => const SignInScreen(),
       ),
 
       // Register Screen

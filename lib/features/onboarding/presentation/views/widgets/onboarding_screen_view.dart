@@ -78,7 +78,7 @@ class OnboardingScreenView extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Navigate to login screen
-                        context.go('/login');
+                        context.go('/signin');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF123459), // Custom blue
