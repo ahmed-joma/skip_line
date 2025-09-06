@@ -33,7 +33,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
           backgroundColor: const Color(0xFF123459),
         ),
       );
-      context.go('/signin');
+      context.go('/verification-code');
     }
   }
 

@@ -5,6 +5,7 @@ import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/sign_in/sign_in_screen.dart';
 import '../../features/sign_up/sign_up_screen.dart';
 import '../../features/reset_password/reset_password_screen.dart';
+import '../../features/reset_password/verification_code_screen.dart';
 
 class AppRouters {
   // Route Constants
@@ -13,6 +14,7 @@ class AppRouters {
   static const String kLoginView = '/signin';
   static const String kRegisterView = '/signup';
   static const String kResetPasswordView = '/reset-password';
+  static const String kVerificationCodeView = '/verification-code';
   static const String kHomeView = '/home';
   static const String kScanView = '/scan';
   static const String kCartView = '/cart';
@@ -50,6 +52,12 @@ class AppRouters {
       GoRoute(
         path: kResetPasswordView,
         builder: (context, state) => const ResetPasswordScreen(),
+      ),
+
+      // Verification Code Screen
+      GoRoute(
+        path: kVerificationCodeView,
+        builder: (context, state) => const VerificationCodeScreen(),
       ),
 
       // Home Screen
