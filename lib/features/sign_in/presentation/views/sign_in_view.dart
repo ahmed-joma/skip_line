@@ -192,8 +192,7 @@ class _SignInViewState extends State<SignInView> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // TODO: Navigate to forgot password
-                              print('Forgot Password pressed');
+                              context.go('/reset-password');
                             },
                             child: const Text(
                               'Forgot Password?',

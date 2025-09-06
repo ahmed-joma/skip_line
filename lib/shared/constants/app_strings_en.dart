@@ -37,6 +37,17 @@ class AppStringsEn {
   static const String signUp = 'Sign Up';
   static const String signIn = 'Sign In';
 
+  // Reset Password
+  static const String resetPassword = 'Reset Password';
+  static const String resetPasswordDescription =
+      'Enter your email address and we\'ll send you a link to reset your password';
+  static const String confirm = 'Confirm';
+  static const String rememberPassword = 'Remember your password?';
+  static const String enterEmail = 'Please enter your email';
+  static const String validEmail = 'Please enter a valid email';
+  static const String resetLinkSent =
+      'Password reset link has been sent to your email';
+
   // Home Screen
   static const String home = 'Home';
   static const String scan = 'Scan';

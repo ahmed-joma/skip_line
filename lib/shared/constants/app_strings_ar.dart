@@ -37,6 +37,17 @@ class AppStringsAr {
   static const String signUp = 'إنشاء حساب';
   static const String signIn = 'تسجيل الدخول';
 
+  // Reset Password
+  static const String resetPassword = 'إعادة تعيين كلمة المرور';
+  static const String resetPasswordDescription =
+      'أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور';
+  static const String confirm = 'تأكيد';
+  static const String rememberPassword = 'تذكرت كلمة المرور؟';
+  static const String enterEmail = 'يرجى إدخال البريد الإلكتروني';
+  static const String validEmail = 'يرجى إدخال بريد إلكتروني صحيح';
+  static const String resetLinkSent =
+      'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني';
+
   // Home Screen
   static const String home = 'الرئيسية';
   static const String scan = 'مسح';
