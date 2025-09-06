@@ -267,8 +267,7 @@ class _SignInViewState extends State<SignInView> {
                                 WidgetSpan(
                                   child: GestureDetector(
                                     onTap: () {
-                                      // TODO: Navigate to signup
-                                      print('Signup pressed');
+                                      context.go('/signup');
                                     },
                                     child: Text(
                                       languageManager.isArabic

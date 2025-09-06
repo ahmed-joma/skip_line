@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/sign_in/sign_in_screen.dart';
+import '../../features/sign_up/sign_up_screen.dart';
 
 class AppRouters {
   // Route Constants
   static const String kSplashView = '/splash';
   static const String kOnboardingView = '/onboarding';
   static const String kLoginView = '/signin';
-  static const String kRegisterView = '/register';
+  static const String kRegisterView = '/signup';
   static const String kHomeView = '/home';
   static const String kScanView = '/scan';
   static const String kCartView = '/cart';
@@ -37,11 +38,10 @@ class AppRouters {
         builder: (context, state) => const SignInScreen(),
       ),
 
-      // Register Screen
+      // Sign Up Screen
       GoRoute(
         path: kRegisterView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Register Screen'))),
+        builder: (context, state) => const SignUpScreen(),
       ),
 
       // Home Screen
