@@ -87,8 +87,8 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
     } catch (e) {
       _showTopNotification(
         languageManager.isArabic
-            ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
-            : 'Connection error. Please try again',
+            ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى'
+            : 'Unexpected error occurred. Please try again',
         isError: true,
       );
     }

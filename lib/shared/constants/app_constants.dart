@@ -12,8 +12,7 @@ class AppConstants {
 
   // API
   static const String baseUrl = 'http://127.0.0.1:8000';
-  static const String apiKey =
-      'your-api-key-here'; // Replace with actual API key
+  static const String apiKey = 'Password Reset'; // API Key from documentation
 
   // Storage Keys
   static const String userTokenKey = 'user_token';
