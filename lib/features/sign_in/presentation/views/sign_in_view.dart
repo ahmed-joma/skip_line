@@ -47,6 +47,9 @@ class _SignInViewState extends State<SignInView> {
 
     // TODO: Handle actual login logic
     print('Login with email: ${_emailController.text}');
+
+    // Navigate to home screen after successful login
+    context.go('/home');
   }
 
   void _showTopNotification(String message, {bool isError = false}) {

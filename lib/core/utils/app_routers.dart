@@ -7,6 +7,7 @@ import '../../features/sign_up/sign_up_screen.dart';
 import '../../features/reset_password/reset_password_screen.dart';
 import '../../features/reset_password/verification_code_screen.dart';
 import '../../features/sign_up/verification_code_screen.dart' as signup;
+import '../../features/home/presentation/views/home_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -69,11 +70,7 @@ class AppRouters {
       ),
 
       // Home Screen
-      GoRoute(
-        path: kHomeView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Home Screen'))),
-      ),
+      GoRoute(path: kHomeView, builder: (context, state) => const HomeView()),
 
       // Scan Screen
       GoRoute(
