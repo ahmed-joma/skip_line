@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/constants/language_manager.dart';
+import '../../../../shared/widgets/password_requirements_widget.dart';
+import '../../../../shared/utils/password_validator.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/email_manager.dart';
 
@@ -32,6 +34,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   bool _isConfirmPasswordVisible = false;
   bool _newPasswordError = false;
   bool _confirmPasswordError = false;
+  bool _isNewPasswordValid = false;
   Timer? _timer;
 
   @override
@@ -136,6 +139,16 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
         languageManager.isArabic
             ? 'يرجى ملء جميع الحقول المطلوبة'
             : 'Please fill in all required fields',
+        isError: true,
+      );
+      return;
+    }
+
+    if (!_isNewPasswordValid) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'كلمة المرور لا تلبي المتطلبات'
+            : 'Password does not meet requirements',
         isError: true,
       );
       return;
@@ -491,6 +504,10 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                                     _newPasswordError = false;
                                   });
                                 }
+                                setState(() {
+                                  _isNewPasswordValid =
+                                      PasswordValidator.isValidPassword(value);
+                                });
                               },
                               style: const TextStyle(
                                 fontSize: 16,
@@ -541,6 +558,14 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                           ],
                         );
                       },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Password Requirements
+                    PasswordRequirementsWidget(
+                      password: _newPasswordController.text,
+                      showRequirements: _newPasswordController.text.isNotEmpty,
                     ),
 
                     const SizedBox(height: 30),

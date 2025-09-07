@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../shared/constants/language_manager.dart';
+import '../../../../../shared/widgets/password_requirements_widget.dart';
+import '../../../../../shared/utils/password_validator.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -23,6 +25,7 @@ class _SignUpViewState extends State<SignUpView> {
   bool _emailError = false;
   bool _passwordError = false;
   bool _confirmPasswordError = false;
+  bool _isPasswordValid = false;
 
   @override
   void dispose() {
@@ -60,6 +63,16 @@ class _SignUpViewState extends State<SignUpView> {
     }
 
     // Check if passwords match
+    if (!_isPasswordValid) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'كلمة المرور لا تلبي المتطلبات'
+            : 'Password does not meet requirements',
+        isError: true,
+      );
+      return;
+    }
+
     if (_passwordController.text != _confirmPasswordController.text) {
       _showTopNotification(
         languageManager.isArabic
@@ -377,6 +390,10 @@ class _SignUpViewState extends State<SignUpView> {
                                   _passwordError = false;
                                 });
                               }
+                              setState(() {
+                                _isPasswordValid =
+                                    PasswordValidator.isValidPassword(value);
+                              });
                             },
                             style: const TextStyle(
                               fontSize: 16,
@@ -577,6 +594,14 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                       );
                     },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Password Requirements
+                  PasswordRequirementsWidget(
+                    password: _passwordController.text,
+                    showRequirements: _passwordController.text.isNotEmpty,
                   ),
 
                   const SizedBox(height: 30),
