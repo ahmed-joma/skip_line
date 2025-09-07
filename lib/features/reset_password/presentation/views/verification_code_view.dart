@@ -18,9 +18,16 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     (index) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   int _remainingTime = 300; // 5 minutes in seconds
   bool _isTimerActive = true;
+  bool _isCodeVerified = false;
+  bool _isNewPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+  bool _newPasswordError = false;
+  bool _confirmPasswordError = false;
   Timer? _timer;
 
   @override
@@ -37,6 +44,8 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     for (var focusNode in _focusNodes) {
       focusNode.dispose();
     }
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -78,11 +87,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
         _focusNodes[index + 1].requestFocus();
       } else {
         _focusNodes[index].unfocus();
-        // Check if all fields are filled
-        String code = _controllers.map((controller) => controller.text).join();
-        if (code.length == 4) {
-          _verifyCode(code);
-        }
+        // Don't auto-verify, wait for Confirm button
       }
     } else if (index > 0) {
       _focusNodes[index - 1].requestFocus();
@@ -90,15 +95,63 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   }
 
   void _verifyCode(String code) {
+    setState(() {
+      _isCodeVerified = true;
+      _isTimerActive = false; // Stop the timer
+    });
+
+    // Cancel the timer
+    _timer?.cancel();
+
     _showTopNotification(
       Provider.of<LanguageManager>(context, listen: false).isArabic
           ? 'تم التحقق من الرمز بنجاح'
           : 'Code verified successfully',
       isError: false,
     );
+  }
 
-    // Navigate to next screen
-    context.go('/new-password');
+  void _changePassword() {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      _newPasswordError = _newPasswordController.text.trim().isEmpty;
+      _confirmPasswordError = _confirmPasswordController.text.trim().isEmpty;
+    });
+
+    if (_newPasswordError || _confirmPasswordError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى ملء جميع الحقول المطلوبة'
+            : 'Please fill in all required fields',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_newPasswordController.text != _confirmPasswordController.text) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'كلمة المرور غير متطابقة'
+            : 'Passwords do not match',
+        isError: true,
+      );
+      return;
+    }
+
+    // TODO: Implement password change logic
+    _showTopNotification(
+      languageManager.isArabic
+          ? 'تم تغيير كلمة المرور بنجاح'
+          : 'Password changed successfully',
+      isError: false,
+    );
+
+    // Navigate to sign in screen
+    context.go('/signin');
   }
 
   void _showTopNotification(String message, {bool isError = false}) {
@@ -311,45 +364,239 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                     ),
                   const SizedBox(height: 40),
 
-                  // Confirm Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        String code = _controllers
-                            .map((controller) => controller.text)
-                            .join();
-                        if (code.length == 4) {
-                          _verifyCode(code);
-                        } else {
-                          _showTopNotification(
-                            languageManager.isArabic
-                                ? 'يرجى إدخال الرمز كاملاً'
-                                : 'Please enter the complete code',
-                            isError: true,
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF123459),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  // Confirm Button (only show when code is not verified)
+                  if (!_isCodeVerified)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          String code = _controllers
+                              .map((controller) => controller.text)
+                              .join();
+                          if (code.length == 4) {
+                            _verifyCode(code);
+                          } else {
+                            _showTopNotification(
+                              languageManager.isArabic
+                                  ? 'يرجى إدخال الرمز كاملاً'
+                                  : 'Please enter the complete code',
+                              isError: true,
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF123459),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        languageManager.isArabic ? 'تأكيد' : 'Confirm',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        child: Text(
+                          languageManager.isArabic ? 'تأكيد' : 'Confirm',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
                   const SizedBox(height: 30),
+
+                  // New Password Fields (shown after code verification)
+                  if (_isCodeVerified) ...[
+                    // New Password Field
+                    Consumer<LanguageManager>(
+                      builder: (context, languageManager, child) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              languageManager.isArabic
+                                  ? 'كلمة المرور الجديدة'
+                                  : 'New Password',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            TextFormField(
+                              controller: _newPasswordController,
+                              obscureText: !_isNewPasswordVisible,
+                              onChanged: (value) {
+                                if (_newPasswordError &&
+                                    value.trim().isNotEmpty) {
+                                  setState(() {
+                                    _newPasswordError = false;
+                                  });
+                                }
+                              },
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _newPasswordError
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _newPasswordError
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _newPasswordError
+                                        ? Colors.red
+                                        : Color(0xFF123459),
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: Icon(
+                                      _isNewPasswordVisible
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      key: ValueKey(_isNewPasswordVisible),
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isNewPasswordVisible =
+                                          !_isNewPasswordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // Confirm Password Field
+                    Consumer<LanguageManager>(
+                      builder: (context, languageManager, child) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              languageManager.isArabic
+                                  ? 'تأكيد كلمة المرور'
+                                  : 'Confirm Password',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: !_isConfirmPasswordVisible,
+                              onChanged: (value) {
+                                if (_confirmPasswordError &&
+                                    value.trim().isNotEmpty) {
+                                  setState(() {
+                                    _confirmPasswordError = false;
+                                  });
+                                }
+                              },
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _confirmPasswordError
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _confirmPasswordError
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _confirmPasswordError
+                                        ? Colors.red
+                                        : Color(0xFF123459),
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: Icon(
+                                      _isConfirmPasswordVisible
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      key: ValueKey(_isConfirmPasswordVisible),
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isConfirmPasswordVisible =
+                                          !_isConfirmPasswordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // Change Password Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: _changePassword,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF123459),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          languageManager.isArabic
+                              ? 'تغيير كلمة المرور'
+                              : 'Change Password',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
+                  ],
 
                   // Back to Sign In
                   TextButton(
