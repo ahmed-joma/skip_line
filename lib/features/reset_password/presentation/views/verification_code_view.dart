@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/constants/language_manager.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/services/email_manager.dart';
 
 class VerificationCodeView extends StatefulWidget {
   const VerificationCodeView({super.key});
@@ -21,6 +23,8 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  String _userEmail = ''; // Store email from previous screen
+
   int _remainingTime = 300; // 5 minutes in seconds
   bool _isTimerActive = true;
   bool _isCodeVerified = false;
@@ -34,6 +38,11 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   void initState() {
     super.initState();
     _startTimer();
+    _loadEmail();
+  }
+
+  void _loadEmail() {
+    _userEmail = EmailManager().resetEmail ?? '';
   }
 
   @override
@@ -111,7 +120,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     );
   }
 
-  void _changePassword() {
+  void _changePassword() async {
     final languageManager = Provider.of<LanguageManager>(
       context,
       listen: false,
@@ -142,16 +151,64 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
       return;
     }
 
-    // TODO: Implement password change logic
+    // Show loading
     _showTopNotification(
       languageManager.isArabic
-          ? 'تم تغيير كلمة المرور بنجاح'
-          : 'Password changed successfully',
+          ? 'جاري تغيير كلمة المرور...'
+          : 'Changing password...',
       isError: false,
     );
 
-    // Navigate to sign in screen
-    context.go('/signin');
+    try {
+      final apiService = ApiService();
+      String code = _controllers.map((controller) => controller.text).join();
+
+      final response = await apiService.resetPassword(
+        email: _userEmail,
+        code: code,
+        password: _newPasswordController.text.trim(),
+        passwordConfirmation: _confirmPasswordController.text.trim(),
+      );
+
+      if (response.isSuccess) {
+        // Clear saved email
+        EmailManager().clearResetEmail();
+
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم تغيير كلمة المرور بنجاح'
+              : 'Password changed successfully',
+          isError: false,
+        );
+
+        // Navigate to sign in screen after a short delay
+        Future.delayed(const Duration(seconds: 2), () {
+          context.go('/signin');
+        });
+      } else {
+        String errorMessage = response.msg;
+
+        // Handle specific error cases
+        if (response.isNotFound) {
+          errorMessage = languageManager.isArabic
+              ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
+              : 'Verification code is invalid or expired';
+        } else if (response.isValidationError) {
+          errorMessage = languageManager.isArabic
+              ? 'كلمة المرور لا تلبي المتطلبات'
+              : 'Password does not meet requirements';
+        }
+
+        _showTopNotification(errorMessage, isError: true);
+      }
+    } catch (e) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
+            : 'Connection error. Please try again',
+        isError: true,
+      );
+    }
   }
 
   void _showTopNotification(String message, {bool isError = false}) {

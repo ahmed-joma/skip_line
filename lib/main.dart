@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/utils/app_routers.dart';
+import 'core/services/api_service.dart';
 import 'shared/themes/app_theme.dart';
 import 'shared/constants/language_manager.dart';
 
@@ -10,6 +11,9 @@ void main() {
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemUiOverlayStyle);
+
+  // Initialize API service
+  ApiService().init();
 
   runApp(const SkipLineApp());
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/constants/language_manager.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/services/email_manager.dart';
 import 'package:go_router/go_router.dart';
 
 class ResetPasswordView extends StatefulWidget {
@@ -21,7 +23,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
     super.dispose();
   }
 
-  void _handleResetPassword() {
+  void _handleResetPassword() async {
     final languageManager = Provider.of<LanguageManager>(
       context,
       listen: false,
@@ -41,14 +43,55 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
       return;
     }
 
-    // TODO: Implement reset password logic
+    // Show loading
     _showTopNotification(
       languageManager.isArabic
-          ? 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'
-          : 'Password reset link has been sent to your email',
+          ? 'جاري إرسال رمز التحقق...'
+          : 'Sending verification code...',
       isError: false,
     );
-    context.go('/verification-code');
+
+    try {
+      final apiService = ApiService();
+      final response = await apiService.sendPasswordResetCode(
+        _emailController.text.trim(),
+      );
+
+      if (response.isSuccess) {
+        // Save email for verification screen
+        EmailManager().setResetEmail(_emailController.text.trim());
+
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم إرسال رمز التحقق إلى بريدك الإلكتروني'
+              : 'Verification code has been sent to your email',
+          isError: false,
+        );
+        context.go('/verification-code');
+      } else {
+        String errorMessage = response.msg;
+
+        // Handle specific error cases
+        if (response.isNotFound) {
+          errorMessage = languageManager.isArabic
+              ? 'لا يوجد مستخدم بهذا البريد الإلكتروني'
+              : 'No user found with this email address';
+        } else if (response.isValidationError) {
+          errorMessage = languageManager.isArabic
+              ? 'البريد الإلكتروني غير صحيح'
+              : 'Invalid email address';
+        }
+
+        _showTopNotification(errorMessage, isError: true);
+      }
+    } catch (e) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
+            : 'Connection error. Please try again',
+        isError: true,
+      );
+    }
   }
 
   void _showTopNotification(String message, {bool isError = false}) {
