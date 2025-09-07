@@ -90,19 +90,80 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   }
 
   void _verifyCode(String code) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          Provider.of<LanguageManager>(context, listen: false).isArabic
-              ? 'تم التحقق من الرمز بنجاح'
-              : 'Code verified successfully',
-        ),
-        backgroundColor: const Color(0xFF123459),
-      ),
+    _showTopNotification(
+      Provider.of<LanguageManager>(context, listen: false).isArabic
+          ? 'تم التحقق من الرمز بنجاح'
+          : 'Code verified successfully',
+      isError: false,
     );
 
     // Navigate to next screen
     context.go('/new-password');
+  }
+
+  void _showTopNotification(String message, {bool isError = false}) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: isError ? Colors.red.shade600 : const Color(0xFF123459),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isError ? Icons.error_outline : Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    // Auto remove after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
+      }
+    });
   }
 
   @override
@@ -262,15 +323,11 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                         if (code.length == 4) {
                           _verifyCode(code);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                languageManager.isArabic
-                                    ? 'يرجى إدخال الرمز كاملاً'
-                                    : 'Please enter the complete code',
-                              ),
-                              backgroundColor: const Color(0xFF123459),
-                            ),
+                          _showTopNotification(
+                            languageManager.isArabic
+                                ? 'يرجى إدخال الرمز كاملاً'
+                                : 'Please enter the complete code',
+                            isError: true,
                           );
                         }
                       },

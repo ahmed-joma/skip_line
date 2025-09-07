@@ -14,12 +14,104 @@ class _SignInViewState extends State<SignInView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _emailError = false;
+  bool _passwordError = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _validateAndLogin() {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      _emailError = _emailController.text.trim().isEmpty;
+      _passwordError = _passwordController.text.trim().isEmpty;
+    });
+
+    if (_emailError || _passwordError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور'
+            : 'Please enter your email and password',
+        isError: true,
+      );
+      return;
+    }
+
+    // TODO: Handle actual login logic
+    print('Login with email: ${_emailController.text}');
+  }
+
+  void _showTopNotification(String message, {bool isError = false}) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: isError ? Colors.red.shade600 : const Color(0xFF123459),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isError ? Icons.error_outline : Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    // Auto remove after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
+      }
+    });
   }
 
   @override
@@ -117,19 +209,34 @@ class _SignInViewState extends State<SignInView> {
                         const SizedBox(height: 4),
                         TextFormField(
                           controller: _emailController,
+                          onChanged: (value) {
+                            if (_emailError && value.trim().isNotEmpty) {
+                              setState(() {
+                                _emailError = false;
+                              });
+                            }
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
+                              borderSide: BorderSide(
+                                color: _emailError ? Colors.red : Colors.grey,
+                              ),
                             ),
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
+                              borderSide: BorderSide(
+                                color: _emailError ? Colors.red : Colors.grey,
+                              ),
                             ),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF123459)),
+                              borderSide: BorderSide(
+                                color: _emailError
+                                    ? Colors.red
+                                    : Color(0xFF123459),
+                              ),
                             ),
                           ),
                         ),
@@ -154,19 +261,38 @@ class _SignInViewState extends State<SignInView> {
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
+                          onChanged: (value) {
+                            if (_passwordError && value.trim().isNotEmpty) {
+                              setState(() {
+                                _passwordError = false;
+                              });
+                            }
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
                           ),
                           decoration: InputDecoration(
-                            border: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: _passwordError
+                                    ? Colors.red
+                                    : Colors.grey,
+                              ),
                             ),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: _passwordError
+                                    ? Colors.red
+                                    : Colors.grey,
+                              ),
                             ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF123459)),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: _passwordError
+                                    ? Colors.red
+                                    : Color(0xFF123459),
+                              ),
                             ),
                             suffixIcon: IconButton(
                               icon: AnimatedSwitcher(
@@ -215,10 +341,7 @@ class _SignInViewState extends State<SignInView> {
                         width: 350,
                         height: 63,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: Handle login
-                            print('Login pressed');
-                          },
+                          onPressed: _validateAndLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF123459),
                             foregroundColor: Colors.white,

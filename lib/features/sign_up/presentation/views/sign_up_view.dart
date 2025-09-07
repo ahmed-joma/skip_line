@@ -19,6 +19,10 @@ class _SignUpViewState extends State<SignUpView> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isEmailValid = false;
+  bool _usernameError = false;
+  bool _emailError = false;
+  bool _passwordError = false;
+  bool _confirmPasswordError = false;
 
   @override
   void dispose() {
@@ -27,6 +31,112 @@ class _SignUpViewState extends State<SignUpView> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _validateAndSignUp() {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      _usernameError = _usernameController.text.trim().isEmpty;
+      _emailError = _emailController.text.trim().isEmpty;
+      _passwordError = _passwordController.text.trim().isEmpty;
+      _confirmPasswordError = _confirmPasswordController.text.trim().isEmpty;
+    });
+
+    if (_usernameError ||
+        _emailError ||
+        _passwordError ||
+        _confirmPasswordError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى ملء جميع الحقول المطلوبة'
+            : 'Please fill in all required fields',
+        isError: true,
+      );
+      return;
+    }
+
+    // Check if passwords match
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'كلمة المرور غير متطابقة'
+            : 'Passwords do not match',
+        isError: true,
+      );
+      return;
+    }
+
+    // Navigate to verification code screen
+    context.go('/signup-verification');
+  }
+
+  void _showTopNotification(String message, {bool isError = false}) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: isError ? Colors.red.shade600 : const Color(0xFF123459),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isError ? Icons.error_outline : Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    // Auto remove after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
+      }
+    });
   }
 
   void _validateEmail(String email) {
@@ -134,20 +244,37 @@ class _SignUpViewState extends State<SignUpView> {
                           const SizedBox(height: 4),
                           TextFormField(
                             controller: _usernameController,
+                            onChanged: (value) {
+                              if (_usernameError && value.trim().isNotEmpty) {
+                                setState(() {
+                                  _usernameError = false;
+                                });
+                              }
+                            },
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                             ),
-                            decoration: const InputDecoration(
-                              border: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: const UnderlineInputBorder(
+                            decoration: InputDecoration(
+                              border: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Color(0xFF123459),
+                                  color: _usernameError
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _usernameError
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _usernameError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
                                 ),
                               ),
                             ),
@@ -179,21 +306,34 @@ class _SignUpViewState extends State<SignUpView> {
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            onChanged: _validateEmail,
+                            onChanged: (value) {
+                              _validateEmail(value);
+                              if (_emailError && value.trim().isNotEmpty) {
+                                setState(() {
+                                  _emailError = false;
+                                });
+                              }
+                            },
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                             ),
                             decoration: InputDecoration(
-                              border: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: const UnderlineInputBorder(
+                              border: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Color(0xFF123459),
+                                  color: _emailError ? Colors.red : Colors.grey,
+                                ),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _emailError ? Colors.red : Colors.grey,
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _emailError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
                                 ),
                               ),
                               suffixIcon: _isEmailValid
@@ -231,20 +371,37 @@ class _SignUpViewState extends State<SignUpView> {
                           TextFormField(
                             controller: _passwordController,
                             obscureText: !_isPasswordVisible,
+                            onChanged: (value) {
+                              if (_passwordError && value.trim().isNotEmpty) {
+                                setState(() {
+                                  _passwordError = false;
+                                });
+                              }
+                            },
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                             ),
                             decoration: InputDecoration(
-                              border: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: const UnderlineInputBorder(
+                              border: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Color(0xFF123459),
+                                  color: _passwordError
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _passwordError
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _passwordError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
                                 ),
                               ),
                               suffixIcon: IconButton(
@@ -293,20 +450,38 @@ class _SignUpViewState extends State<SignUpView> {
                           TextFormField(
                             controller: _confirmPasswordController,
                             obscureText: !_isConfirmPasswordVisible,
+                            onChanged: (value) {
+                              if (_confirmPasswordError &&
+                                  value.trim().isNotEmpty) {
+                                setState(() {
+                                  _confirmPasswordError = false;
+                                });
+                              }
+                            },
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                             ),
                             decoration: InputDecoration(
-                              border: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: const UnderlineInputBorder(
+                              border: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Color(0xFF123459),
+                                  color: _confirmPasswordError
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _confirmPasswordError
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _confirmPasswordError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
                                 ),
                               ),
                               suffixIcon: IconButton(
@@ -412,10 +587,7 @@ class _SignUpViewState extends State<SignUpView> {
                       width: 320,
                       height: 63,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: Handle sign up
-                          print('Sign Up pressed');
-                        },
+                        onPressed: _validateAndSignUp,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF123459),
                           shape: RoundedRectangleBorder(

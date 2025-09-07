@@ -13,6 +13,7 @@ class ResetPasswordView extends StatefulWidget {
 class _ResetPasswordViewState extends State<ResetPasswordView> {
   final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _emailError = false;
 
   @override
   void dispose() {
@@ -21,20 +22,98 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
   }
 
   void _handleResetPassword() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement reset password logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            Provider.of<LanguageManager>(context, listen: false).isArabic
-                ? 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'
-                : 'Password reset link has been sent to your email',
-          ),
-          backgroundColor: const Color(0xFF123459),
-        ),
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      _emailError = _emailController.text.trim().isEmpty;
+    });
+
+    if (_emailError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى إدخال البريد الإلكتروني'
+            : 'Please enter your email',
+        isError: true,
       );
-      context.go('/verification-code');
+      return;
     }
+
+    // TODO: Implement reset password logic
+    _showTopNotification(
+      languageManager.isArabic
+          ? 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'
+          : 'Password reset link has been sent to your email',
+      isError: false,
+    );
+    context.go('/verification-code');
+  }
+
+  void _showTopNotification(String message, {bool isError = false}) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: isError ? Colors.red.shade600 : const Color(0xFF123459),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isError ? Icons.error_outline : Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    // Auto remove after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
+      }
+    });
   }
 
   @override
@@ -144,20 +223,37 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                               textDirection: languageManager.isArabic
                                   ? TextDirection.rtl
                                   : TextDirection.ltr,
+                              onChanged: (value) {
+                                if (_emailError && value.trim().isNotEmpty) {
+                                  setState(() {
+                                    _emailError = false;
+                                  });
+                                }
+                              },
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
                               ),
                               decoration: InputDecoration(
-                                border: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.grey),
-                                ),
-                                enabledBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.grey),
-                                ),
-                                focusedBorder: const UnderlineInputBorder(
+                                border: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Color(0xFF123459),
+                                    color: _emailError
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _emailError
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: _emailError
+                                        ? Colors.red
+                                        : Color(0xFF123459),
                                   ),
                                 ),
                               ),
