@@ -11,6 +11,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _selectedIndex = 0;
+  int _currentPage = 0;
   final PageController _pageController = PageController();
 
   @override
@@ -48,6 +49,11 @@ class _HomeViewState extends State<HomeView> {
                     // Exclusive Offers Section
                     _buildExclusiveOffersSection(),
 
+                    const SizedBox(height: 20),
+
+                    // Second Exclusive Offers Section
+                    _buildSecondExclusiveOffersSection(),
+
                     const SizedBox(height: 100), // Space for bottom navigation
                   ],
                 ),
@@ -73,8 +79,8 @@ class _HomeViewState extends State<HomeView> {
                 children: [
                   Image.asset(
                     'assets/images/logo.png',
-                    width: 60,
-                    height: 60,
+                    width: 50,
+                    height: 50,
                     fit: BoxFit.contain,
                   ),
                 ],
@@ -87,8 +93,8 @@ class _HomeViewState extends State<HomeView> {
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                   decoration: BoxDecoration(
                     color: languageManager.isArabic
@@ -132,11 +138,7 @@ class _HomeViewState extends State<HomeView> {
                     ? 'البحث في المتجر'
                     : 'Search Store',
                 hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey[600],
-                  size: 24,
-                ),
+                prefixIcon: Icon(Icons.search, color: Colors.black, size: 30),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -153,66 +155,140 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildAdvertisementBanner() {
     return Consumer<LanguageManager>(
       builder: (context, languageManager, child) {
-        return Container(
-          height: 150,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.grey.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // QR Code Icon - Left side
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      child: Image.asset(
-                        'assets/images/qr.png',
-                        width: 150,
-                        height: 180,
-                      ),
+        return Column(
+          children: [
+            Container(
+              height: 150,
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: 3,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  // محتوى مختلف لكل صفحة
+                  String title;
+                  String subtitle;
+                  Color backgroundColor;
+
+                  switch (index) {
+                    case 0:
+                      title = languageManager.isArabic
+                          ? 'تسوق بمسح المنتجات'
+                          : 'Shop by\nscanning\nproducts';
+                      subtitle = languageManager.isArabic
+                          ? 'مسح سريع وآمن'
+                          : 'Quick & Safe\nScanning';
+                      backgroundColor = const Color(0xFFF8F9FA);
+                      break;
+                    case 1:
+                      title = languageManager.isArabic
+                          ? 'عروض حصرية'
+                          : 'Exclusive\nOffers';
+                      subtitle = languageManager.isArabic
+                          ? 'خصومات كبيرة'
+                          : 'Big\nDiscounts';
+                      backgroundColor = const Color(0xFFF8F9FA);
+                      break;
+                    case 2:
+                      title = languageManager.isArabic
+                          ? 'توصيل سريع'
+                          : 'Fast\nDelivery';
+                      subtitle = languageManager.isArabic
+                          ? 'خلال 30 دقيقة'
+                          : 'Within 30\nMinutes';
+                      backgroundColor = const Color(0xFFF8F9FA);
+                      break;
+                    default:
+                      title = languageManager.isArabic
+                          ? 'تسوق بمسح المنتجات'
+                          : 'Shop by\nscanning\nproducts';
+                      subtitle = languageManager.isArabic
+                          ? 'مسح سريع وآمن'
+                          : 'Quick & Safe\nScanning';
+                      backgroundColor = const Color(0xFFF8F9FA);
+                  }
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-
-                    // Spacer between QR and text
-                    const SizedBox(width: 30),
-
-                    // Text Section - Right side
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              languageManager.isArabic
-                                  ? 'تسوق بمسح المنتجات'
-                                  : 'Shop by\nscanning\nproducts',
-                              style: const TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                letterSpacing: 0.5,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
+                    child: Row(
+                      children: [
+                        // QR Code Icon - Left side
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          child: Image.asset(
+                            'assets/images/qr.png',
+                            width: 150,
+                            height: 180,
+                          ),
                         ),
-                      ),
+
+                        // Spacer between QR and text
+                        const SizedBox(width: 30),
+
+                        // Text Section - Right side
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    letterSpacing: 0.5,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  subtitle,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey[600],
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  );
+                },
+              ),
+            ),
+            // Page Indicators
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentPage == index ? 12 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == index
+                        ? const Color(0xFF123459)
+                        : Colors.grey.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 8),
+          ],
         );
       },
     );
@@ -325,6 +401,47 @@ class _HomeViewState extends State<HomeView> {
                       languageManager.isArabic ? 'لبن طبيعي' : 'Natural Yogurt',
                       '500g, Natural',
                       'SR9',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSecondExclusiveOffersSection() {
+    return Consumer<LanguageManager>(
+      builder: (context, languageManager, child) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildProductCard(
+                      'assets/images/Egge.png',
+                      languageManager.isArabic
+                          ? 'بيض دجاج أحمر'
+                          : 'Egg Chicken Red',
+                      '4pcs, Price',
+                      'SR1.99',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildProductCard(
+                      'assets/images/Egge2.png',
+                      languageManager.isArabic
+                          ? 'بيض دجاج أبيض'
+                          : 'Egg Chicken White',
+                      '180g, Price',
+                      'SR1.50',
                     ),
                   ),
                 ],
