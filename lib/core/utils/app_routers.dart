@@ -10,6 +10,8 @@ import '../../features/sign_up/verification_code_screen.dart' as signup;
 import '../../features/home/presentation/views/home_view.dart';
 import '../../features/account/account_screen.dart';
 import '../../features/chat_bot/presentation/views/chat_bot_view.dart';
+import '../../features/Product_Detail/presentation/views/Product_Detail_view.dart';
+import '../../features/Product_Detail/data/models/product_model.dart';
 
 class AppRouters {
   // Route Constants
@@ -23,6 +25,7 @@ class AppRouters {
   static const String kHomeView = '/home';
   static const String kAccountView = '/account';
   static const String kChatBotView = '/chatbot';
+  static const String kProductDetailView = '/product-detail';
   static const String kScanView = '/scan';
   static const String kCartView = '/cart';
   static const String kPaymentView = '/payment';
@@ -86,6 +89,19 @@ class AppRouters {
       GoRoute(
         path: kChatBotView,
         builder: (context, state) => const ChatBotView(),
+      ),
+
+      // Product Detail Screen
+      GoRoute(
+        path: kProductDetailView,
+        builder: (context, state) {
+          final productData = state.extra as Map<String, dynamic>?;
+          if (productData != null) {
+            final product = ProductModel.fromJson(productData);
+            return ProductDetailView(product: product);
+          }
+          return const Scaffold(body: Center(child: Text('Product not found')));
+        },
       ),
 
       // Scan Screen

@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../data/models/chat_message.dart';
-import '../../../data/models/chat_response.dart';
 import '../../../data/services/chat_bot_service.dart';
 
 import 'chat_bot_state.dart';
