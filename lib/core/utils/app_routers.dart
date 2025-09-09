@@ -8,6 +8,7 @@ import '../../features/reset_password/reset_password_screen.dart';
 import '../../features/reset_password/verification_code_screen.dart';
 import '../../features/sign_up/verification_code_screen.dart' as signup;
 import '../../features/home/presentation/views/home_view.dart';
+import '../../features/account/account_screen.dart';
 
 class AppRouters {
   // Route Constants
@@ -19,6 +20,7 @@ class AppRouters {
   static const String kVerificationCodeView = '/verification-code';
   static const String kSignUpVerificationView = '/signup-verification';
   static const String kHomeView = '/home';
+  static const String kAccountView = '/account';
   static const String kScanView = '/scan';
   static const String kCartView = '/cart';
   static const String kPaymentView = '/payment';
@@ -71,6 +73,12 @@ class AppRouters {
 
       // Home Screen
       GoRoute(path: kHomeView, builder: (context, state) => const HomeView()),
+
+      // Account Screen
+      GoRoute(
+        path: kAccountView,
+        builder: (context, state) => const AccountScreen(),
+      ),
 
       // Scan Screen
       GoRoute(

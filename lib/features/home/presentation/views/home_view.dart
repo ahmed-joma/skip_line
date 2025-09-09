@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../shared/constants/language_manager.dart';
 import '../../../search/presentation/views/search_view.dart';
 
@@ -621,6 +622,11 @@ class _HomeViewState extends State<HomeView> {
         setState(() {
           _selectedIndex = index;
         });
+
+        // Navigate to Account page when Account is tapped
+        if (index == 4) {
+          context.go('/account');
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
