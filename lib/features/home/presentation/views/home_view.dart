@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/constants/language_manager.dart';
+import '../../../search/presentation/views/search_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -126,24 +127,33 @@ class _HomeViewState extends State<HomeView> {
       builder: (context, languageManager, child) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: languageManager.isArabic
-                    ? 'البحث في المتجر'
-                    : 'Search Store',
-                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
-                prefixIcon: Icon(Icons.search, color: Colors.black, size: 30),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchView()),
+              );
+            },
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Icon(Icons.search, color: Colors.black, size: 30),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    languageManager.isArabic
+                        ? 'البحث في المتجر'
+                        : 'Search Store',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                  ),
+                ],
               ),
             ),
           ),
