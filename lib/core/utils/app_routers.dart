@@ -9,6 +9,7 @@ import '../../features/reset_password/verification_code_screen.dart';
 import '../../features/sign_up/verification_code_screen.dart' as signup;
 import '../../features/home/presentation/views/home_view.dart';
 import '../../features/account/account_screen.dart';
+import '../../features/chat_bot/presentation/views/chat_bot_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -21,6 +22,7 @@ class AppRouters {
   static const String kSignUpVerificationView = '/signup-verification';
   static const String kHomeView = '/home';
   static const String kAccountView = '/account';
+  static const String kChatBotView = '/chatbot';
   static const String kScanView = '/scan';
   static const String kCartView = '/cart';
   static const String kPaymentView = '/payment';
@@ -78,6 +80,12 @@ class AppRouters {
       GoRoute(
         path: kAccountView,
         builder: (context, state) => const AccountScreen(),
+      ),
+
+      // Chat Bot Screen
+      GoRoute(
+        path: kChatBotView,
+        builder: (context, state) => const ChatBotView(),
       ),
 
       // Scan Screen

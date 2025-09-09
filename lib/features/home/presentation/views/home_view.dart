@@ -623,8 +623,10 @@ class _HomeViewState extends State<HomeView> {
           _selectedIndex = index;
         });
 
-        // Navigate to Account page when Account is tapped
-        if (index == 4) {
+        // Navigate to different pages based on selection
+        if (index == 3) {
+          context.go('/chatbot');
+        } else if (index == 4) {
           context.go('/account');
         }
       },

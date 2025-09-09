@@ -128,7 +128,7 @@ class _AccountViewState extends State<AccountView> {
         icon: Icons.smart_toy_outlined,
         title: languageManager.isArabic ? 'المساعد الذكي' : 'Chatbot',
         onTap: () {
-          // TODO: Navigate to chatbot
+          context.go('/chatbot');
         },
       ),
       AccountOption(
