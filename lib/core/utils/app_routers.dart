@@ -12,6 +12,7 @@ import '../../features/account/account_screen.dart';
 import '../../features/chat_bot/presentation/views/chat_bot_view.dart';
 import '../../features/Product_Detail/presentation/views/Product_Detail_view.dart';
 import '../../features/Product_Detail/data/models/product_model.dart';
+import '../../features/my_cart/presentation/views/my_cart_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -112,11 +113,7 @@ class AppRouters {
       ),
 
       // Cart Screen
-      GoRoute(
-        path: kCartView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Cart Screen'))),
-      ),
+      GoRoute(path: kCartView, builder: (context, state) => const MyCartView()),
 
       // Payment Screen
       GoRoute(
