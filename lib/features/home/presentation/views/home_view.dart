@@ -651,7 +651,9 @@ class _HomeViewState extends State<HomeView> {
         });
 
         // Navigate to different pages based on selection
-        if (index == 2) {
+        if (index == 1) {
+          context.go('/scan');
+        } else if (index == 2) {
           context.go('/cart');
         } else if (index == 3) {
           context.go('/chatbot');

@@ -13,6 +13,7 @@ import '../../features/chat_bot/presentation/views/chat_bot_view.dart';
 import '../../features/Product_Detail/presentation/views/Product_Detail_view.dart';
 import '../../features/Product_Detail/data/models/product_model.dart';
 import '../../features/my_cart/presentation/views/my_cart_view.dart';
+import '../../features/scan/presentation/views/scan_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -106,11 +107,7 @@ class AppRouters {
       ),
 
       // Scan Screen
-      GoRoute(
-        path: kScanView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Scan Screen'))),
-      ),
+      GoRoute(path: kScanView, builder: (context, state) => const ScanView()),
 
       // Cart Screen
       GoRoute(path: kCartView, builder: (context, state) => const MyCartView()),
