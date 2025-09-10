@@ -12,7 +12,7 @@ import 'widgets/product_detail_section.dart';
 import 'widgets/nutrition_section.dart';
 import 'widgets/review_section.dart';
 import 'widgets/add_to_cart_button.dart';
-import '../../../my_cart/presentation/manager/cart/cart_cubit.dart';
+
 
 class ProductDetailView extends StatelessWidget {
   final ProductModel product;

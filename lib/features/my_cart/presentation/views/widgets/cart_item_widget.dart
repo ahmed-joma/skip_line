@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/models/cart_item.dart';
 import '../../manager/cart/cart_cubit.dart';
-import '../../manager/cart/cart_state.dart';
 import '../../../../../shared/widgets/top_notification.dart';
 
 class CartItemWidget extends StatelessWidget {
@@ -13,37 +12,7 @@ class CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CartCubit, CartState>(
-      builder: (context, state) {
-        // التحقق من وجود العنصر في القائمة
-        if (state is CartLoaded) {
-          final itemExists = state.items.any(
-            (cartItem) => cartItem.productId == item.productId,
-          );
-
-          // إذا لم يعد العنصر موجود، إرجاع Container فارغ مع انيميشن
-          if (!itemExists) {
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: 0,
-              child: const SizedBox.shrink(),
-            );
-          }
-
-          // البحث عن العنصر المحدث في القائمة
-          final updatedItem = state.items.firstWhere(
-            (cartItem) => cartItem.productId == item.productId,
-          );
-
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            child: _buildCartItem(context, updatedItem),
-          );
-        }
-
-        return _buildCartItem(context, item);
-      },
-    );
+    return _buildCartItem(context, item);
   }
 
   Widget _buildCartItem(BuildContext context, CartItem currentItem) {
@@ -150,7 +119,7 @@ class CartItemWidget extends StatelessWidget {
         _buildQuantityButton(
           context,
           icon: Icons.remove,
-          onPressed: () => _decrementQuantity(context, currentItem),
+          onPressed: () => _decrementQuantity(context),
         ),
         const SizedBox(width: 8),
         Container(
@@ -175,7 +144,7 @@ class CartItemWidget extends StatelessWidget {
         _buildQuantityButton(
           context,
           icon: Icons.add,
-          onPressed: () => _incrementQuantity(context, currentItem),
+          onPressed: () => _incrementQuantity(context),
         ),
       ],
     );
@@ -187,15 +156,15 @@ class CartItemWidget extends StatelessWidget {
       children: [
         // زر الحذف
         GestureDetector(
-          onTap: () => _removeItem(context, currentItem),
+          onTap: () => _removeItem(context),
           child: Container(
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.blue[100],
+              color: Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.close, size: 16, color: Colors.blue[600]),
+            child: Icon(Icons.close, size: 16, color: Colors.blueGrey),
           ),
         ),
         const SizedBox(height: 8),
@@ -236,17 +205,17 @@ class CartItemWidget extends StatelessWidget {
     );
   }
 
-  void _incrementQuantity(BuildContext context, CartItem currentItem) {
-    context.read<CartCubit>().incrementQuantity(currentItem.productId);
+  void _incrementQuantity(BuildContext context) {
+    context.read<CartCubit>().incrementQuantity(item.productId);
   }
 
-  void _decrementQuantity(BuildContext context, CartItem currentItem) {
-    context.read<CartCubit>().decrementQuantity(currentItem.productId);
+  void _decrementQuantity(BuildContext context) {
+    context.read<CartCubit>().decrementQuantity(item.productId);
   }
 
-  void _removeItem(BuildContext context, CartItem currentItem) {
+  void _removeItem(BuildContext context) {
     // حذف فوري من السلة
-    context.read<CartCubit>().removeFromCart(currentItem.productId);
+    context.read<CartCubit>().removeFromCart(item.productId);
 
     // إظهار إشعار تأكيد فوري
     TopNotification.show(
