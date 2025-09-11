@@ -9,6 +9,7 @@ import '../manager/scan_cubit.dart';
 import '../manager/scan_state.dart';
 import 'widgets/scan_overlay.dart';
 import 'widgets/scan_result_dialog.dart';
+import 'widgets/scan_product_card.dart';
 
 class ScanView extends StatelessWidget {
   const ScanView({super.key});
@@ -108,6 +109,8 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               _showScanResult(context, state.result, isArabic);
             } else if (state is ScanError) {
               _showError(context, state.message, isArabic);
+            } else if (state is ProductScanned) {
+              // لا نحتاج لعمل شيء هنا، البطاقة ستظهر تلقائياً
             }
           },
           builder: (context, state) {
@@ -124,6 +127,28 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
 
                 // مؤشر التحميل
                 if (state is ScanLoading) _buildLoadingIndicator(isArabic),
+
+                // بطاقة المنتج الممسوح
+                if (state is ProductScanned)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: ScanProductCard(
+                      productName: state.productName,
+                      productCategory: state.productCategory,
+                      productImage: state.productImage,
+                      onAddPressed: () {
+                        // TODO: سيتم تحديد الصفحة المستقبلية
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('سيتم إضافة التنقل مستقبلاً'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
               ],
             );
           },
@@ -166,7 +191,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         if (barcodes.isNotEmpty) {
           final barcode = barcodes.first;
           if (barcode.rawValue != null) {
-            context.read<ScanCubit>().processScanResult(barcode.rawValue!);
+            context.read<ScanCubit>().processProductScan(barcode.rawValue!);
           }
         }
       },

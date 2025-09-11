@@ -28,3 +28,18 @@ class ScanError extends ScanState {
   @override
   List<Object?> get props => [message];
 }
+
+class ProductScanned extends ScanState {
+  final String productName;
+  final String productCategory;
+  final String productImage;
+
+  const ProductScanned({
+    required this.productName,
+    required this.productCategory,
+    required this.productImage,
+  });
+
+  @override
+  List<Object?> get props => [productName, productCategory, productImage];
+}
