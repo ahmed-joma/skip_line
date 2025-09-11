@@ -139,12 +139,24 @@ class ProductInfoSection extends StatelessWidget {
                   const Spacer(),
 
                   // السعر
-                  Text(
-                    'SR${(product.price * cubit.quantity).toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green[200]!),
+                    ),
+                    child: Text(
+                      'SR${(product.price * cubit.quantity).toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green[800],
+                      ),
                     ),
                   ),
                 ],

@@ -38,19 +38,21 @@ class AddToCartButton extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               height: 56,
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: () {
                   _addToCart(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1E3A8A),
                   foregroundColor: Colors.white,
-                  elevation: 0,
+                  elevation: 2,
+                  shadowColor: const Color(0xFF1E3A8A).withOpacity(0.3),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Text(
+                icon: const Icon(Icons.shopping_cart, size: 20),
+                label: Text(
                   isArabic ? 'أضف للسلة' : 'Add To Basket',
                   style: const TextStyle(
                     fontSize: 18,

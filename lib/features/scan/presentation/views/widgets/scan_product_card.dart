@@ -18,6 +18,62 @@ class ScanProductCard extends StatelessWidget {
     required this.onAddPressed,
   });
 
+  // ترجمة عربية للمنتجات الشائعة
+  String _getArabicName(String englishName) {
+    String lowerName = englishName.toLowerCase();
+
+    if (lowerName.contains('banana')) return 'موز';
+    if (lowerName.contains('apple')) return 'تفاح';
+    if (lowerName.contains('milk')) return 'حليب طازج';
+    if (lowerName.contains('bread')) return 'خبز';
+    if (lowerName.contains('cheese')) return 'جبن';
+    if (lowerName.contains('yogurt')) return 'زبادي';
+    if (lowerName.contains('orange')) return 'برتقال';
+    if (lowerName.contains('tomato')) return 'طماطم';
+    if (lowerName.contains('potato')) return 'بطاطس';
+    if (lowerName.contains('onion')) return 'بصل';
+    if (lowerName.contains('saudi')) return 'حليب السعودية';
+    if (lowerName.contains('chicken')) return 'دجاج';
+    if (lowerName.contains('beef')) return 'لحم بقري';
+    if (lowerName.contains('fish')) return 'سمك';
+    if (lowerName.contains('rice')) return 'أرز';
+    if (lowerName.contains('pasta')) return 'معكرونة';
+    if (lowerName.contains('sugar')) return 'سكر';
+    if (lowerName.contains('salt')) return 'ملح';
+    if (lowerName.contains('oil')) return 'زيت';
+    if (lowerName.contains('water')) return 'ماء';
+
+    return englishName;
+  }
+
+  String _getArabicCategory(String englishCategory) {
+    String lowerCategory = englishCategory.toLowerCase();
+
+    if (lowerCategory.contains('fruits') || lowerCategory.contains('fruit'))
+      return 'فواكه';
+    if (lowerCategory.contains('vegetables') ||
+        lowerCategory.contains('vegetable'))
+      return 'خضروات';
+    if (lowerCategory.contains('dairy')) return 'ألبان';
+    if (lowerCategory.contains('bakery')) return 'مخبوزات';
+    if (lowerCategory.contains('beverages') ||
+        lowerCategory.contains('beverage'))
+      return 'مشروبات';
+    if (lowerCategory.contains('snacks') || lowerCategory.contains('snack'))
+      return 'وجبات خفيفة';
+    if (lowerCategory.contains('meat')) return 'لحوم';
+    if (lowerCategory.contains('seafood')) return 'مأكولات بحرية';
+    if (lowerCategory.contains('grains')) return 'حبوب';
+    if (lowerCategory.contains('spices')) return 'توابل';
+    if (lowerCategory.contains('frozen')) return 'مجمدات';
+    if (lowerCategory.contains('canned')) return 'معلبات';
+    if (lowerCategory.contains('organic')) return 'عضوي';
+    if (lowerCategory.contains('fresh')) return 'طازج';
+    if (lowerCategory.contains('milk')) return 'ألبان';
+
+    return englishCategory;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<LanguageManager>(
@@ -75,7 +131,7 @@ class ScanProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      productCategory,
+                      isArabic ? 'فئة المنتج' : 'Product Category',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -84,11 +140,22 @@ class ScanProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      productName,
+                      isArabic ? _getArabicName(productName) : productName,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      isArabic
+                          ? _getArabicCategory(productCategory)
+                          : productCategory,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

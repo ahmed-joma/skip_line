@@ -119,10 +119,72 @@ class AppRouters {
           final productData = state.extra as Map<String, dynamic>?;
           if (productData != null) {
             // إنشاء ProductDetails2Model من البيانات المرسلة
+            final productName = productData['productName'] ?? '';
+            final productCategory = productData['productCategory'] ?? '';
+
+            // ترجمة عربية افتراضية للمنتجات الشائعة
+            String getArabicName(String englishName) {
+              String lowerName = englishName.toLowerCase();
+
+              // ترجمة المنتجات الشائعة
+              if (lowerName.contains('banana')) return 'موز';
+              if (lowerName.contains('apple')) return 'تفاح';
+              if (lowerName.contains('milk')) return 'حليب طازج';
+              if (lowerName.contains('bread')) return 'خبز';
+              if (lowerName.contains('cheese')) return 'جبن';
+              if (lowerName.contains('yogurt')) return 'زبادي';
+              if (lowerName.contains('orange')) return 'برتقال';
+              if (lowerName.contains('tomato')) return 'طماطم';
+              if (lowerName.contains('potato')) return 'بطاطس';
+              if (lowerName.contains('onion')) return 'بصل';
+              if (lowerName.contains('saudi')) return 'حليب السعودية';
+              if (lowerName.contains('chicken')) return 'دجاج';
+              if (lowerName.contains('beef')) return 'لحم بقري';
+              if (lowerName.contains('fish')) return 'سمك';
+              if (lowerName.contains('rice')) return 'أرز';
+              if (lowerName.contains('pasta')) return 'معكرونة';
+              if (lowerName.contains('sugar')) return 'سكر';
+              if (lowerName.contains('salt')) return 'ملح';
+              if (lowerName.contains('oil')) return 'زيت';
+              if (lowerName.contains('water')) return 'ماء';
+
+              return englishName; // إذا لم توجد ترجمة، استخدم الاسم الإنجليزي
+            }
+
+            String getArabicCategory(String englishCategory) {
+              String lowerCategory = englishCategory.toLowerCase();
+
+              // ترجمة الفئات الشائعة
+              if (lowerCategory.contains('fruits') ||
+                  lowerCategory.contains('fruit'))
+                return 'فواكه';
+              if (lowerCategory.contains('vegetables') ||
+                  lowerCategory.contains('vegetable'))
+                return 'خضروات';
+              if (lowerCategory.contains('dairy')) return 'ألبان';
+              if (lowerCategory.contains('bakery')) return 'مخبوزات';
+              if (lowerCategory.contains('beverages') ||
+                  lowerCategory.contains('beverage'))
+                return 'مشروبات';
+              if (lowerCategory.contains('snacks') ||
+                  lowerCategory.contains('snack'))
+                return 'وجبات خفيفة';
+              if (lowerCategory.contains('meat')) return 'لحوم';
+              if (lowerCategory.contains('seafood')) return 'مأكولات بحرية';
+              if (lowerCategory.contains('grains')) return 'حبوب';
+              if (lowerCategory.contains('spices')) return 'توابل';
+              if (lowerCategory.contains('frozen')) return 'مجمدات';
+              if (lowerCategory.contains('canned')) return 'معلبات';
+              if (lowerCategory.contains('organic')) return 'عضوي';
+              if (lowerCategory.contains('fresh')) return 'طازج';
+
+              return englishCategory; // إذا لم توجد ترجمة، استخدم الفئة الإنجليزية
+            }
+
             final product = ProductDetails2Model(
               id: '1',
-              name: productData['productName'] ?? '',
-              nameAr: productData['productName'] ?? '',
+              name: productName,
+              nameAr: getArabicName(productName),
               description:
                   'Saudi Milk Is One Of The Finest Types Of Long-Life Milk That Can Be Kept At Room Temperature.',
               descriptionAr:
@@ -137,8 +199,8 @@ class AppRouters {
               nutritionInfo: '100gr',
               rating: 5.0,
               reviewCount: 128,
-              category: productData['productCategory'] ?? '',
-              categoryAr: productData['productCategory'] ?? '',
+              category: productCategory,
+              categoryAr: getArabicCategory(productCategory),
             );
             return ProductDetails2View(product: product);
           }
