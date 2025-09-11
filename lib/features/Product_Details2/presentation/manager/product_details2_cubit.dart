@@ -38,13 +38,13 @@ class ProductDetails2Cubit extends Cubit<ProductDetails2State> {
 
   void incrementQuantity() {
     _quantity++;
-    emit(ProductDetails2QuantityChanged());
+    emit(ProductDetails2QuantityChanged(_quantity));
   }
 
   void decrementQuantity() {
     if (_quantity > 1) {
       _quantity--;
-      emit(ProductDetails2QuantityChanged());
+      emit(ProductDetails2QuantityChanged(_quantity));
     }
   }
 

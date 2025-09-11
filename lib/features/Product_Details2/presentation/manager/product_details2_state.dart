@@ -19,7 +19,14 @@ class ProductDetails2Loaded extends ProductDetails2State {
   List<Object?> get props => [product];
 }
 
-class ProductDetails2QuantityChanged extends ProductDetails2State {}
+class ProductDetails2QuantityChanged extends ProductDetails2State {
+  final int quantity;
+
+  const ProductDetails2QuantityChanged(this.quantity);
+
+  @override
+  List<Object?> get props => [quantity];
+}
 
 class ProductDetails2ImageChanged extends ProductDetails2State {}
 

@@ -76,22 +76,38 @@ class ProductInfoSection2 extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // زر النقص
-                        GestureDetector(
-                          onTap: () {
-                            cubit.decrementQuantity();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.remove,
-                              size: 20,
-                              color: Colors.grey,
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              cubit.decrementQuantity();
+                            },
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.remove,
+                                size: 20,
+                                color: cubit.quantity > 1
+                                    ? Colors.grey[700]
+                                    : Colors.grey[400],
+                              ),
                             ),
                           ),
                         ),
@@ -99,7 +115,7 @@ class ProductInfoSection2 extends StatelessWidget {
                         // العدد
                         Container(
                           width: 60,
-                          height: 40,
+                          height: 44,
                           decoration: BoxDecoration(
                             color: Colors.grey[50],
                             border: Border.symmetric(
@@ -110,8 +126,8 @@ class ProductInfoSection2 extends StatelessWidget {
                             child: Text(
                               '${cubit.quantity}',
                               style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
@@ -119,16 +135,23 @@ class ProductInfoSection2 extends StatelessWidget {
                         ),
 
                         // زر الزيادة
-                        GestureDetector(
-                          onTap: () {
-                            cubit.incrementQuantity();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.add,
-                              size: 20,
-                              color: Colors.grey,
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              cubit.incrementQuantity();
+                            },
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.add,
+                                size: 20,
+                                color: Colors.grey[700],
+                              ),
                             ),
                           ),
                         ),
@@ -139,12 +162,24 @@ class ProductInfoSection2 extends StatelessWidget {
                   const Spacer(),
 
                   // السعر
-                  Text(
-                    'SR${(product.price * cubit.quantity).toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green[200]!),
+                    ),
+                    child: Text(
+                      'SR${(product.price * cubit.quantity).toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green[800],
+                      ),
                     ),
                   ),
                 ],

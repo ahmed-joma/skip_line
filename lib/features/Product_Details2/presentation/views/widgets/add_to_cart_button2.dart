@@ -39,10 +39,10 @@ class AddToCartButton2 extends StatelessWidget {
               children: [
                 // زر Re-scan
                 Expanded(
-                  flex: 1,
+                  flex: 2,
                   child: SizedBox(
                     height: 56,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         context.go('/scan');
                       },
@@ -54,7 +54,12 @@ class AddToCartButton2 extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      child: Text(
+                      icon: Icon(
+                        Icons.qr_code_scanner,
+                        size: 20,
+                        color: Colors.grey[700],
+                      ),
+                      label: Text(
                         isArabic ? 'إعادة المسح' : 'Re-scan',
                         style: const TextStyle(
                           fontSize: 16,
@@ -69,22 +74,24 @@ class AddToCartButton2 extends StatelessWidget {
 
                 // زر Add to Cart
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: SizedBox(
                     height: 56,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         _addToCart(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E3A8A),
                         foregroundColor: Colors.white,
-                        elevation: 0,
+                        elevation: 2,
+                        shadowColor: const Color(0xFF1E3A8A).withOpacity(0.3),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      child: Text(
+                      icon: const Icon(Icons.shopping_cart, size: 20),
+                      label: Text(
                         isArabic ? 'أضف للسلة' : 'Add To Basket',
                         style: const TextStyle(
                           fontSize: 18,
