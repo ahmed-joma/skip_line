@@ -19,11 +19,16 @@ class CreditCardForm extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CreditCardForm> createState() => _CreditCardFormState();
+  State<CreditCardForm> createState() => CreditCardFormState();
 }
 
-class _CreditCardFormState extends State<CreditCardForm> {
+class CreditCardFormState extends State<CreditCardForm> {
   Map<String, bool> _fieldErrors = {};
+  late TextEditingController _cardNumberController;
+  late TextEditingController _cardholderController;
+  late TextEditingController _expiryMonthController;
+  late TextEditingController _expiryYearController;
+  late TextEditingController _cvvController;
 
   @override
   void initState() {
@@ -35,12 +40,39 @@ class _CreditCardFormState extends State<CreditCardForm> {
       'expiryYear': false,
       'cvv': false,
     };
+
+    _cardNumberController = TextEditingController();
+    _cardholderController = TextEditingController();
+    _expiryMonthController = TextEditingController();
+    _expiryYearController = TextEditingController();
+    _cvvController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _cardNumberController.dispose();
+    _cardholderController.dispose();
+    _expiryMonthController.dispose();
+    _expiryYearController.dispose();
+    _cvvController.dispose();
+    super.dispose();
   }
 
   void _validateField(String fieldName, String value) {
     setState(() {
       _fieldErrors[fieldName] = value.isEmpty;
     });
+  }
+
+  // دالة للحصول على القيم الحالية من الـ controllers
+  Map<String, String> getCurrentValues() {
+    return {
+      'cardNumber': _cardNumberController.text,
+      'cardholderName': _cardholderController.text,
+      'expiryMonth': _expiryMonthController.text,
+      'expiryYear': _expiryYearController.text,
+      'cvv': _cvvController.text,
+    };
   }
 
   @override
@@ -70,7 +102,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
               children: [
                 Expanded(
                   child: TextFormField(
-                    initialValue: '',
+                    controller: _cardNumberController,
                     onChanged: (value) {
                       widget.onCardNumberChanged(value);
                       _validateField('cardNumber', value);
@@ -139,7 +171,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
           _buildFormField(
             label: 'Cardholder name',
             child: TextFormField(
-              initialValue: '',
+              controller: _cardholderController,
               onChanged: (value) {
                 widget.onCardholderChanged(value);
                 _validateField('cardholderName', value);
@@ -177,7 +209,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     children: [
                       Expanded(
                         child: TextFormField(
-                          initialValue: '',
+                          controller: _expiryMonthController,
                           onChanged: (value) {
                             widget.onExpiryChanged(
                               value,
@@ -218,7 +250,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       ),
                       Expanded(
                         child: TextFormField(
-                          initialValue: '',
+                          controller: _expiryYearController,
                           onChanged: (value) {
                             widget.onExpiryChanged(
                               widget.payment.expiryMonth,
@@ -264,7 +296,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     children: [
                       Expanded(
                         child: TextFormField(
-                          initialValue: '',
+                          controller: _cvvController,
                           onChanged: (value) {
                             widget.onCVVChanged(value);
                             _validateField('cvv', value);

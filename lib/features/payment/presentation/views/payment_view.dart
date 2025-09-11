@@ -25,11 +25,19 @@ class PaymentView extends StatelessWidget {
   }
 }
 
-class PaymentViewContent extends StatelessWidget {
+class PaymentViewContent extends StatefulWidget {
   final double totalAmount;
 
   const PaymentViewContent({Key? key, required this.totalAmount})
     : super(key: key);
+
+  @override
+  State<PaymentViewContent> createState() => _PaymentViewContentState();
+}
+
+class _PaymentViewContentState extends State<PaymentViewContent> {
+  final GlobalKey<CreditCardFormState> _creditCardFormKey =
+      GlobalKey<CreditCardFormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +61,7 @@ class PaymentViewContent extends StatelessWidget {
                   children: [
                     // Header with back button and title
                     PaymentHeader(
-                      totalAmount: totalAmount,
+                      totalAmount: widget.totalAmount,
                       currency: state.payment.currency,
                       gstRate: 15,
                     ),
@@ -75,6 +83,7 @@ class PaymentViewContent extends StatelessWidget {
                     // Credit card form
                     if (state.payment.paymentMethod == 'Credit card')
                       CreditCardForm(
+                        key: _creditCardFormKey,
                         payment: state.payment,
                         onCardNumberChanged: (cardNumber) {
                           context.read<PaymentCubit>().updateCardNumber(
@@ -99,7 +108,7 @@ class PaymentViewContent extends StatelessWidget {
 
                     // Apple Pay section
                     if (state.payment.paymentMethod == 'Apple Pay')
-                      _buildApplePaySection(context, totalAmount),
+                      _buildApplePaySection(context, widget.totalAmount),
 
                     const SizedBox(height: 20),
 
@@ -120,7 +129,7 @@ class PaymentViewContent extends StatelessWidget {
 
                     // Payment button
                     PaymentButton(
-                      totalAmount: totalAmount,
+                      totalAmount: widget.totalAmount,
                       currency: state.payment.currency,
                       onPressed: () {
                         _validateAndProcessPayment(context, state.payment);
@@ -336,30 +345,50 @@ class PaymentViewContent extends StatelessWidget {
   }
 
   void _validateAndProcessPayment(BuildContext context, payment) {
+    // الحصول على القيم الحالية من CreditCardForm
+    Map<String, String> currentValues = {};
+    if (_creditCardFormKey.currentState != null) {
+      currentValues = _creditCardFormKey.currentState!.getCurrentValues();
+    }
+
     // التحقق من صحة البيانات
     bool isValid = true;
     List<String> missingFields = [];
 
-    if (payment.cardNumber.isEmpty) {
+    String cardNumber = currentValues['cardNumber'] ?? '';
+    String cardholderName = currentValues['cardholderName'] ?? '';
+    String expiryMonth = currentValues['expiryMonth'] ?? '';
+    String expiryYear = currentValues['expiryYear'] ?? '';
+    String cvv = currentValues['cvv'] ?? '';
+
+    if (cardNumber.isEmpty || cardNumber.trim().isEmpty) {
       missingFields.add('Card Number');
       isValid = false;
     }
-    if (payment.cardholderName.isEmpty) {
+    if (cardholderName.isEmpty || cardholderName.trim().isEmpty) {
       missingFields.add('Cardholder Name');
       isValid = false;
     }
-    if (payment.expiryMonth.isEmpty) {
+    if (expiryMonth.isEmpty || expiryMonth.trim().isEmpty) {
       missingFields.add('Expiry Month');
       isValid = false;
     }
-    if (payment.expiryYear.isEmpty) {
+    if (expiryYear.isEmpty || expiryYear.trim().isEmpty) {
       missingFields.add('Expiry Year');
       isValid = false;
     }
-    if (payment.cvv.isEmpty) {
+    if (cvv.isEmpty || cvv.trim().isEmpty) {
       missingFields.add('CVV');
       isValid = false;
     }
+
+    print('Validation check:');
+    print('Card Number: "$cardNumber"');
+    print('Cardholder: "$cardholderName"');
+    print('Expiry Month: "$expiryMonth"');
+    print('Expiry Year: "$expiryYear"');
+    print('CVV: "$cvv"');
+    print('Is Valid: $isValid');
 
     if (!isValid) {
       // إظهار إشعار الخطأ
@@ -385,6 +414,7 @@ class PaymentViewContent extends StatelessWidget {
     }
 
     // إذا كانت البيانات صحيحة، تابع عملية الدفع
+    print('All fields valid, processing payment...');
     context.read<PaymentCubit>().processPayment();
   }
 
