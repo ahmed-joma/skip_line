@@ -90,6 +90,16 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            context.go('/home');
+          },
+        ),
+      ),
       body: BlocProvider(
         create: (context) => ScanCubit(),
         child: BlocConsumer<ScanCubit, ScanState>(
@@ -184,25 +194,6 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // زر الرجوع
-          GestureDetector(
-            onTap: () {
-              context.go('/home');
-            },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ),
-
           const Spacer(),
 
           // زر الفلاش
