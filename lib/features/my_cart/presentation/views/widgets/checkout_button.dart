@@ -176,16 +176,14 @@ class CheckoutButton extends StatelessWidget {
   }
 
   void _handleCheckout(BuildContext context) {
-    // TODO: تنفيذ عملية الدفع
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isArabic
-              ? 'سيتم تنفيذ عملية الدفع قريباً'
-              : 'Checkout will be implemented soon',
-        ),
-        backgroundColor: const Color(0xFF123459),
-      ),
-    );
+    // الحصول على السعر الإجمالي من الحالة الحالية
+    final cartState = context.read<CartCubit>().state;
+    double totalPrice = 0.0;
+    if (cartState is CartLoaded) {
+      totalPrice = cartState.totalPrice;
+    }
+
+    // التنقل إلى صفحة الدفع مع السعر
+    context.go('/payment', extra: totalPrice);
   }
 }

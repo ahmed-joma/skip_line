@@ -16,6 +16,7 @@ import '../../features/my_cart/presentation/views/my_cart_view.dart';
 import '../../features/scan/presentation/views/scan_view.dart';
 import '../../features/Product_Details2/presentation/views/product_details2_view.dart';
 import '../../features/Product_Details2/data/models/product_details2_model.dart';
+import '../../features/payment/presentation/views/payment_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -214,8 +215,10 @@ class AppRouters {
       // Payment Screen
       GoRoute(
         path: kPaymentView,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Payment Screen'))),
+        builder: (context, state) {
+          final totalAmount = state.extra as double? ?? 0.0;
+          return PaymentView(totalAmount: totalAmount);
+        },
       ),
 
       // Profile Screen
