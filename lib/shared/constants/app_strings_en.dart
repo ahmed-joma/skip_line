@@ -116,6 +116,7 @@ class AppStringsEn {
   static const String subtotal = 'Subtotal';
   static const String tax = 'Tax (15%)';
   static const String otherFees = 'Other hidden fee';
+  static const String totalAmount = 'Total';
   static const String thanksForBeingCustomer =
       'Thanks for being a great customer.';
   static const String viewMyAccount = 'View My Account';

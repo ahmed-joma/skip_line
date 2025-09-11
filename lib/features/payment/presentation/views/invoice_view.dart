@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../../../../shared/constants/language_manager.dart';
 
 class InvoiceView extends StatelessWidget {
   final double totalAmount;
@@ -19,10 +17,6 @@ class InvoiceView extends StatelessWidget {
   Widget build(BuildContext context) {
     // طباعة السعر للتأكد من وصوله
     print('InvoiceView received totalAmount: $totalAmount');
-
-    // Get language manager
-    final languageManager = Provider.of<LanguageManager>(context);
-    final strings = languageManager.strings;
 
     // Calculate subtotal, tax, and total
     double subtotal = 0.0;
@@ -75,8 +69,8 @@ class InvoiceView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Thank you message
-                  Text(
-                    strings.thankYouForUsing,
+                  const Text(
+                    'Thank you for using\nSkipLine!',
                     style: TextStyle(fontSize: 30, color: Colors.black87),
                     textAlign: TextAlign.center,
                   ),
@@ -84,8 +78,8 @@ class InvoiceView extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Order title
-                  Text(
-                    strings.yourOrder,
+                  const Text(
+                    'Your Order',
                     style: TextStyle(fontSize: 22, color: Colors.black87),
                     textAlign: TextAlign.center,
                   ),
@@ -94,7 +88,7 @@ class InvoiceView extends StatelessWidget {
 
                   // Order date and time
                   Text(
-                    strings.orderDate,
+                    'Monday, Dec 28 2025 at 4:13pm',
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     textAlign: TextAlign.center,
                   ),
@@ -113,15 +107,15 @@ class InvoiceView extends StatelessWidget {
                   const Divider(height: 24),
 
                   // Subtotal
-                  _buildPriceRow(strings.subtotal, subtotal),
+                  _buildPriceRow('Subtotal', subtotal),
                   const SizedBox(height: 8),
 
                   // Tax
-                  _buildPriceRow(strings.tax, tax),
+                  _buildPriceRow('Tax (15%)', tax),
                   const SizedBox(height: 8),
 
                   // Other fees
-                  _buildPriceRow(strings.otherFees, otherFees),
+                  _buildPriceRow('Other hidden fee', otherFees),
 
                   const Divider(height: 24),
 
@@ -129,9 +123,9 @@ class InvoiceView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        strings.total,
-                        style: const TextStyle(
+                      const Text(
+                        'Total',
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -151,12 +145,9 @@ class InvoiceView extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Center text under total
-                  Text(
-                    strings.thanksForBeingCustomer,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF123459),
-                    ),
+                  const Text(
+                    'Thanks for being a great customer.',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF123459)),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -180,9 +171,9 @@ class InvoiceView extends StatelessWidget {
                   ),
                   elevation: 4,
                 ),
-                child: Text(
-                  strings.viewMyAccount,
-                  style: const TextStyle(
+                child: const Text(
+                  'View My Account',
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -198,7 +189,7 @@ class InvoiceView extends StatelessWidget {
 
             // Company info
             Text(
-              strings.companyInfo,
+              'Company, Self-Payment Services',
               style: TextStyle(fontSize: 12, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
@@ -206,7 +197,7 @@ class InvoiceView extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              strings.unsubscribe,
+              "Don't like these messages? Unsubscribe.",
               style: TextStyle(fontSize: 12, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
@@ -214,7 +205,7 @@ class InvoiceView extends StatelessWidget {
             const SizedBox(height: 19),
 
             Text(
-              strings.poweredBy,
+              'Powered by HTMLemail.io',
               style: TextStyle(fontSize: 12, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),

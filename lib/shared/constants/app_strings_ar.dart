@@ -116,6 +116,7 @@ class AppStringsAr {
   static const String subtotal = 'المجموع الفرعي';
   static const String tax = 'الضريبة (15%)';
   static const String otherFees = 'رسوم أخرى مخفية';
+  static const String totalAmount = 'المجموع الكلي';
   static const String thanksForBeingCustomer = 'شكراً لكونك عميلاً رائعاً.';
   static const String viewMyAccount = 'عرض حسابي';
   static const String companyInfo = 'الشركة، خدمات الدفع الذاتي';
