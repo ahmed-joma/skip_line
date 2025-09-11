@@ -17,6 +17,7 @@ import '../../features/scan/presentation/views/scan_view.dart';
 import '../../features/Product_Details2/presentation/views/product_details2_view.dart';
 import '../../features/Product_Details2/data/models/product_details2_model.dart';
 import '../../features/payment/presentation/views/payment_view.dart';
+import '../../features/payment/presentation/views/payment_success_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -35,6 +36,7 @@ class AppRouters {
   static const String kProductDetails2View = '/product-details2';
   static const String kCartView = '/cart';
   static const String kPaymentView = '/payment';
+  static const String kPaymentSuccessView = '/payment-success';
   static const String kProfileView = '/profile';
 
   static final router = GoRouter(
@@ -218,6 +220,20 @@ class AppRouters {
         builder: (context, state) {
           final totalAmount = state.extra as double? ?? 0.0;
           return PaymentView(totalAmount: totalAmount);
+        },
+      ),
+
+      // Payment Success Screen
+      GoRoute(
+        path: kPaymentSuccessView,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final totalAmount = extra['totalAmount'] as double? ?? 0.0;
+          final currency = extra['currency'] as String? ?? 'SAR';
+          return PaymentSuccessView(
+            totalAmount: totalAmount,
+            currency: currency,
+          );
         },
       ),
 

@@ -71,14 +71,17 @@ class PaymentCubit extends Cubit<PaymentState> {
     }
   }
 
-  void processPayment() {
+  Future<void> processPayment() async {
     if (state is PaymentLoaded) {
       emit(PaymentProcessing());
 
       // محاكاة عملية الدفع
-      Future.delayed(const Duration(seconds: 2), () {
+      await Future.delayed(const Duration(seconds: 2));
+
+      // التحقق من أن الـ cubit لا يزال نشطاً
+      if (!isClosed) {
         emit(PaymentSuccess());
-      });
+      }
     }
   }
 

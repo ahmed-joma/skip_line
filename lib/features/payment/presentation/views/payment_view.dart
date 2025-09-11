@@ -47,7 +47,11 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
         child: BlocConsumer<PaymentCubit, PaymentState>(
           listener: (context, state) {
             if (state is PaymentSuccess) {
-              _showSuccessDialog(context);
+              // Navigate to payment success page
+              context.go(
+                '/payment-success',
+                extra: {'totalAmount': widget.totalAmount, 'currency': 'SAR'},
+              );
             } else if (state is PaymentError) {
               _showErrorDialog(context, state.message);
             }
@@ -78,7 +82,7 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
                       },
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
 
                     // Credit card form
                     if (state.payment.paymentMethod == 'Credit card')
@@ -110,7 +114,7 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
                     if (state.payment.paymentMethod == 'Apple Pay')
                       _buildApplePaySection(context, widget.totalAmount),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
 
                     // Order details message
                     Center(
@@ -125,7 +129,7 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 35),
 
                     // Payment button
                     PaymentButton(
@@ -160,35 +164,6 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
             return const Center(child: CircularProgressIndicator());
           },
         ),
-      ),
-    );
-  }
-
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 30),
-            const SizedBox(width: 10),
-            const Text('Payment Successful!'),
-          ],
-        ),
-        content: const Text(
-          'Your payment has been processed successfully. You will receive an order confirmation email shortly.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.go('/home');
-            },
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
   }
