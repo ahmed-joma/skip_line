@@ -107,4 +107,19 @@ class AppStringsEn {
   static const String arabic = 'العربية';
   static const String english = 'English';
   static const String selectLanguage = 'Select Language';
+
+  // Invoice
+  static const String invoice = 'Invoice';
+  static const String thankYouForUsing = 'Thank you for using\nSkipLine!';
+  static const String yourOrder = 'Your Order';
+  static const String orderDate = 'Monday, Dec 28 2025 at 4:13pm';
+  static const String subtotal = 'Subtotal';
+  static const String tax = 'Tax (15%)';
+  static const String otherFees = 'Other hidden fee';
+  static const String thanksForBeingCustomer =
+      'Thanks for being a great customer.';
+  static const String viewMyAccount = 'View My Account';
+  static const String companyInfo = 'Company, Self-Payment Services';
+  static const String unsubscribe = "Don't like these messages? Unsubscribe.";
+  static const String poweredBy = 'Powered by HTMLemail.io';
 }

@@ -107,4 +107,18 @@ class AppStringsAr {
   static const String arabic = 'العربية';
   static const String english = 'English';
   static const String selectLanguage = 'اختر اللغة';
+
+  // Invoice
+  static const String invoice = 'الفاتورة';
+  static const String thankYouForUsing = 'شكراً لاستخدامك\nسكيب لاين!';
+  static const String yourOrder = 'طلبك';
+  static const String orderDate = 'الاثنين، 28 ديسمبر 2025 في 4:13 مساءً';
+  static const String subtotal = 'المجموع الفرعي';
+  static const String tax = 'الضريبة (15%)';
+  static const String otherFees = 'رسوم أخرى مخفية';
+  static const String thanksForBeingCustomer = 'شكراً لكونك عميلاً رائعاً.';
+  static const String viewMyAccount = 'عرض حسابي';
+  static const String companyInfo = 'الشركة، خدمات الدفع الذاتي';
+  static const String unsubscribe = 'لا تحب هذه الرسائل؟ إلغاء الاشتراك.';
+  static const String poweredBy = 'مدعوم من HTMLemail.io';
 }

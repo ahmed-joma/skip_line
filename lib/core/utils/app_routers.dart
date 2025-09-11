@@ -18,6 +18,7 @@ import '../../features/Product_Details2/presentation/views/product_details2_view
 import '../../features/Product_Details2/data/models/product_details2_model.dart';
 import '../../features/payment/presentation/views/payment_view.dart';
 import '../../features/payment/presentation/views/payment_success_view.dart';
+import '../../features/payment/presentation/views/invoice_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -37,6 +38,7 @@ class AppRouters {
   static const String kCartView = '/cart';
   static const String kPaymentView = '/payment';
   static const String kPaymentSuccessView = '/payment-success';
+  static const String kInvoiceView = '/invoice';
   static const String kProfileView = '/profile';
 
   static final router = GoRouter(
@@ -233,6 +235,23 @@ class AppRouters {
           return PaymentSuccessView(
             totalAmount: totalAmount,
             currency: currency,
+          );
+        },
+      ),
+
+      // Invoice Screen
+      GoRoute(
+        path: kInvoiceView,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final totalAmount = extra['totalAmount'] as double? ?? 0.0;
+          final currency = extra['currency'] as String? ?? 'SAR';
+          final cartItems =
+              extra['cartItems'] as List<Map<String, dynamic>>? ?? [];
+          return InvoiceView(
+            totalAmount: totalAmount,
+            currency: currency,
+            cartItems: cartItems,
           );
         },
       ),

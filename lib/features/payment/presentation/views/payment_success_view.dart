@@ -151,15 +151,37 @@ class PaymentSuccessView extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
-                            // Handle download invoice
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Invoice downloaded successfully!',
-                                ),
-                                backgroundColor: Colors.green,
-                                duration: Duration(seconds: 2),
-                              ),
+                            // Navigate to invoice page
+                            final cartItems = [
+                              {
+                                'name': 'Saudi Milk',
+                                'price': totalAmount * 0.8,
+                                'quantity': 2,
+                              },
+                              {
+                                'name': 'Fresh Eggs',
+                                'price': totalAmount * 0.2,
+                                'quantity': 1,
+                              },
+                            ];
+
+                            // طباعة البيانات المرسلة
+                            print(
+                              'Sending to Invoice - Total: $totalAmount, Currency: $currency',
+                            );
+                            for (var item in cartItems) {
+                              print(
+                                'Item: ${item['name']}, Price: ${item['price']}, Quantity: ${item['quantity']}',
+                              );
+                            }
+
+                            context.go(
+                              '/invoice',
+                              extra: {
+                                'totalAmount': totalAmount,
+                                'currency': currency,
+                                'cartItems': cartItems,
+                              },
                             );
                           },
                           child: const Center(
