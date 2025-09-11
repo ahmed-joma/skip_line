@@ -14,6 +14,7 @@ import '../../features/Product_Detail/presentation/views/Product_Detail_view.dar
 import '../../features/Product_Detail/data/models/product_model.dart';
 import '../../features/my_cart/presentation/views/my_cart_view.dart';
 import '../../features/scan/presentation/views/scan_view.dart';
+import '../../features/Product_Details2/presentation/views/product_details2_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -29,6 +30,7 @@ class AppRouters {
   static const String kChatBotView = '/chatbot';
   static const String kProductDetailView = '/product-detail';
   static const String kScanView = '/scan';
+  static const String kProductDetails2View = '/product-details2';
   static const String kCartView = '/cart';
   static const String kPaymentView = '/payment';
   static const String kProfileView = '/profile';
@@ -108,6 +110,22 @@ class AppRouters {
 
       // Scan Screen
       GoRoute(path: kScanView, builder: (context, state) => const ScanView()),
+
+      // Product Details 2 Screen
+      GoRoute(
+        path: kProductDetails2View,
+        builder: (context, state) {
+          final productData = state.extra as Map<String, dynamic>?;
+          if (productData != null) {
+            return ProductDetails2View(
+              productName: productData['productName'] ?? '',
+              productCategory: productData['productCategory'] ?? '',
+              productImage: productData['productImage'] ?? '',
+            );
+          }
+          return const Scaffold(body: Center(child: Text('Product not found')));
+        },
+      ),
 
       // Cart Screen
       GoRoute(path: kCartView, builder: (context, state) => const MyCartView()),

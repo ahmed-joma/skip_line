@@ -139,12 +139,13 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                       productCategory: state.productCategory,
                       productImage: state.productImage,
                       onAddPressed: () {
-                        // TODO: سيتم تحديد الصفحة المستقبلية
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('سيتم إضافة التنقل مستقبلاً'),
-                            duration: Duration(seconds: 2),
-                          ),
+                        context.go(
+                          '/product-details2',
+                          extra: {
+                            'productName': state.productName,
+                            'productCategory': state.productCategory,
+                            'productImage': state.productImage,
+                          },
                         );
                       },
                     ),
