@@ -97,6 +97,10 @@ class PaymentViewContent extends StatelessWidget {
                         },
                       ),
 
+                    // Apple Pay section
+                    if (state.payment.paymentMethod == 'Apple Pay')
+                      _buildApplePaySection(context, totalAmount),
+
                     const SizedBox(height: 20),
 
                     // Order details message
@@ -201,5 +205,212 @@ class PaymentViewContent extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildApplePaySection(BuildContext context, double totalAmount) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 2,
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+      ),
+      child: Column(
+        children: [
+          // Apple Pay Logo
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.apple, color: Colors.white, size: 40),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Apple Pay Title
+          const Text(
+            'Apple Pay',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Apple Pay Description
+          Text(
+            'Pay securely with Touch ID or Face ID',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 30),
+
+          // Apple Pay Button
+          Container(
+            width: double.infinity,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _processApplePay(context),
+                borderRadius: BorderRadius.circular(15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.apple, color: Colors.white, size: 24),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Pay with Apple Pay',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Security Info
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.security, color: Colors.green[600], size: 16),
+              const SizedBox(width: 8),
+              Text(
+                'Secured by Apple',
+                style: TextStyle(
+                  color: Colors.green[600],
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _processApplePay(BuildContext context) {
+    // محاكاة عملية Apple Pay
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.apple, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 15),
+            const Text('Apple Pay'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            const Text(
+              'Processing payment with Apple Pay...',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Use Touch ID or Face ID to confirm',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // محاكاة تأكيد Apple Pay
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.of(context).pop(); // إغلاق dialog التحميل
+
+      // عرض رسالة النجاح
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 30),
+              const SizedBox(width: 10),
+              const Text('Payment Successful!'),
+            ],
+          ),
+          content: const Text(
+            'Your Apple Pay payment has been processed successfully. You will receive an order confirmation email shortly.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.go('/home');
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
