@@ -123,7 +123,7 @@ class PaymentViewContent extends StatelessWidget {
                       totalAmount: totalAmount,
                       currency: state.payment.currency,
                       onPressed: () {
-                        context.read<PaymentCubit>().processPayment();
+                        _validateAndProcessPayment(context, state.payment);
                       },
                     ),
                   ],
@@ -333,6 +333,59 @@ class PaymentViewContent extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _validateAndProcessPayment(BuildContext context, payment) {
+    // التحقق من صحة البيانات
+    bool isValid = true;
+    List<String> missingFields = [];
+
+    if (payment.cardNumber.isEmpty) {
+      missingFields.add('Card Number');
+      isValid = false;
+    }
+    if (payment.cardholderName.isEmpty) {
+      missingFields.add('Cardholder Name');
+      isValid = false;
+    }
+    if (payment.expiryMonth.isEmpty) {
+      missingFields.add('Expiry Month');
+      isValid = false;
+    }
+    if (payment.expiryYear.isEmpty) {
+      missingFields.add('Expiry Year');
+      isValid = false;
+    }
+    if (payment.cvv.isEmpty) {
+      missingFields.add('CVV');
+      isValid = false;
+    }
+
+    if (!isValid) {
+      // إظهار إشعار الخطأ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please fill in all required fields: ${missingFields.join(', ')}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor: Colors.red[600],
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+      return;
+    }
+
+    // إذا كانت البيانات صحيحة، تابع عملية الدفع
+    context.read<PaymentCubit>().processPayment();
   }
 
   void _processApplePay(BuildContext context) {

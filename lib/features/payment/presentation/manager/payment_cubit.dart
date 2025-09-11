@@ -82,6 +82,13 @@ class PaymentCubit extends Cubit<PaymentState> {
     }
   }
 
+  void setFieldError(String fieldName, bool hasError) {
+    if (state is PaymentLoaded) {
+      // يمكن إضافة منطق إدارة الأخطاء هنا
+      // emit(PaymentFieldError(fieldName, hasError));
+    }
+  }
+
   void resetPayment() {
     emit(PaymentInitial());
   }

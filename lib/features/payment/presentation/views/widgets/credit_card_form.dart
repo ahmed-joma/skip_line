@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../data/models/payment_model.dart';
 
-class CreditCardForm extends StatelessWidget {
+class CreditCardForm extends StatefulWidget {
   final PaymentModel payment;
   final Function(String) onCardNumberChanged;
   final Function(String) onCardholderChanged;
@@ -17,6 +17,31 @@ class CreditCardForm extends StatelessWidget {
     required this.onExpiryChanged,
     required this.onCVVChanged,
   }) : super(key: key);
+
+  @override
+  State<CreditCardForm> createState() => _CreditCardFormState();
+}
+
+class _CreditCardFormState extends State<CreditCardForm> {
+  Map<String, bool> _fieldErrors = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fieldErrors = {
+      'cardNumber': false,
+      'cardholderName': false,
+      'expiryMonth': false,
+      'expiryYear': false,
+      'cvv': false,
+    };
+  }
+
+  void _validateField(String fieldName, String value) {
+    setState(() {
+      _fieldErrors[fieldName] = value.isEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,26 +71,31 @@ class CreditCardForm extends StatelessWidget {
                 Expanded(
                   child: TextFormField(
                     initialValue: '',
-                    onChanged: onCardNumberChanged,
+                    onChanged: (value) {
+                      widget.onCardNumberChanged(value);
+                      _validateField('cardNumber', value);
+                    },
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(16),
                       CardNumberInputFormatter(),
                     ],
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'xxxx xxxx xxxx xxxx',
-                      hintStyle: TextStyle(
+                      hintStyle: const TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: _fieldErrors['cardNumber']!
+                          ? Colors.red
+                          : Colors.black87,
                     ),
                   ),
                 ),
@@ -110,7 +140,10 @@ class CreditCardForm extends StatelessWidget {
             label: 'Cardholder name',
             child: TextFormField(
               initialValue: '',
-              onChanged: onCardholderChanged,
+              onChanged: (value) {
+                widget.onCardholderChanged(value);
+                _validateField('cardholderName', value);
+              },
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter cardholder name',
@@ -120,10 +153,12 @@ class CreditCardForm extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: _fieldErrors['cardholderName']!
+                    ? Colors.red
+                    : Colors.black87,
               ),
             ),
           ),
@@ -143,8 +178,13 @@ class CreditCardForm extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           initialValue: '',
-                          onChanged: (value) =>
-                              onExpiryChanged(value, payment.expiryYear),
+                          onChanged: (value) {
+                            widget.onExpiryChanged(
+                              value,
+                              widget.payment.expiryYear,
+                            );
+                            _validateField('expiryMonth', value);
+                          },
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -159,10 +199,12 @@ class CreditCardForm extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey,
+                            color: _fieldErrors['expiryMonth']!
+                                ? Colors.red
+                                : Colors.black87,
                           ),
                         ),
                       ),
@@ -177,8 +219,13 @@ class CreditCardForm extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           initialValue: '',
-                          onChanged: (value) =>
-                              onExpiryChanged(payment.expiryMonth, value),
+                          onChanged: (value) {
+                            widget.onExpiryChanged(
+                              widget.payment.expiryMonth,
+                              value,
+                            );
+                            _validateField('expiryYear', value);
+                          },
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -193,10 +240,12 @@ class CreditCardForm extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey,
+                            color: _fieldErrors['expiryYear']!
+                                ? Colors.red
+                                : Colors.black87,
                           ),
                         ),
                       ),
@@ -216,7 +265,10 @@ class CreditCardForm extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           initialValue: '',
-                          onChanged: onCVVChanged,
+                          onChanged: (value) {
+                            widget.onCVVChanged(value);
+                            _validateField('cvv', value);
+                          },
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -231,10 +283,12 @@ class CreditCardForm extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey,
+                            color: _fieldErrors['cvv']!
+                                ? Colors.red
+                                : Colors.black87,
                           ),
                         ),
                       ),

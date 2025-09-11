@@ -19,3 +19,10 @@ class PaymentError extends PaymentState {
 
   PaymentError(this.message);
 }
+
+class PaymentFieldError extends PaymentState {
+  final String fieldName;
+  final bool hasError;
+
+  PaymentFieldError(this.fieldName, this.hasError);
+}
