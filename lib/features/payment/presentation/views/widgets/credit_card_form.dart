@@ -21,18 +21,19 @@ class CreditCardForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 2,
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +45,7 @@ class CreditCardForm extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextFormField(
-                    initialValue: payment.cardNumber,
+                    initialValue: '',
                     onChanged: onCardNumberChanged,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
@@ -54,11 +55,12 @@ class CreditCardForm extends StatelessWidget {
                     ],
                     decoration: const InputDecoration(
                       border: InputBorder.none,
-                      hintText: '1234 5678 9012 3456',
+                      hintText: 'xxxx xxxx xxxx xxxx',
                     ),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      color: Colors.grey,
                     ),
                   ),
                 ),
@@ -102,13 +104,17 @@ class CreditCardForm extends StatelessWidget {
           _buildFormField(
             label: 'Cardholder name',
             child: TextFormField(
-              initialValue: payment.cardholderName,
+              initialValue: '',
               onChanged: onCardholderChanged,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter cardholder name',
               ),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
             ),
           ),
 
@@ -126,7 +132,7 @@ class CreditCardForm extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TextFormField(
-                          initialValue: payment.expiryMonth,
+                          initialValue: '',
                           onChanged: (value) =>
                               onExpiryChanged(value, payment.expiryYear),
                           keyboardType: TextInputType.number,
@@ -141,6 +147,7 @@ class CreditCardForm extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
@@ -154,7 +161,7 @@ class CreditCardForm extends StatelessWidget {
                       ),
                       Expanded(
                         child: TextFormField(
-                          initialValue: payment.expiryYear,
+                          initialValue: '',
                           onChanged: (value) =>
                               onExpiryChanged(payment.expiryMonth, value),
                           keyboardType: TextInputType.number,
@@ -169,6 +176,7 @@ class CreditCardForm extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
@@ -187,7 +195,7 @@ class CreditCardForm extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TextFormField(
-                          initialValue: payment.cvv,
+                          initialValue: '',
                           onChanged: onCVVChanged,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
@@ -201,6 +209,7 @@ class CreditCardForm extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
@@ -235,11 +244,19 @@ class CreditCardForm extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           decoration: BoxDecoration(
             color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey[200]!),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.05),
+                spreadRadius: 1,
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
           child: child,
         ),

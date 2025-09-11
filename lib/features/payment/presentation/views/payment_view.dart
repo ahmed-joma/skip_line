@@ -17,13 +17,16 @@ class PaymentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => PaymentCubit()..loadPayment(totalAmount),
-      child: const PaymentViewContent(),
+      child: PaymentViewContent(totalAmount: totalAmount),
     );
   }
 }
 
 class PaymentViewContent extends StatelessWidget {
-  const PaymentViewContent({Key? key}) : super(key: key);
+  final double totalAmount;
+
+  const PaymentViewContent({Key? key, required this.totalAmount})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {

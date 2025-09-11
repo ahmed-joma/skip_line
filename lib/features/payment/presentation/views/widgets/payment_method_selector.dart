@@ -13,18 +13,19 @@ class PaymentMethodSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 65,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
       ),
       child: Row(
         children: [
@@ -33,15 +34,30 @@ class PaymentMethodSelector extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onMethodChanged('Credit card'),
               child: Container(
-                height: 60,
+                height: 65,
                 decoration: BoxDecoration(
-                  color: selectedMethod == 'Credit card'
-                      ? const Color(0xFF1E3A8A)
-                      : Colors.white,
+                  gradient: selectedMethod == 'Credit card'
+                      ? const LinearGradient(
+                          colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: selectedMethod == 'Credit card' ? null : Colors.white,
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    bottomLeft: Radius.circular(15),
+                    topLeft: Radius.circular(18),
+                    bottomLeft: Radius.circular(18),
                   ),
+                  boxShadow: selectedMethod == 'Credit card'
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF1E3A8A).withOpacity(0.3),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -75,15 +91,30 @@ class PaymentMethodSelector extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onMethodChanged('Apple Pay'),
               child: Container(
-                height: 60,
+                height: 65,
                 decoration: BoxDecoration(
-                  color: selectedMethod == 'Apple Pay'
-                      ? const Color(0xFF1E3A8A)
-                      : Colors.white,
+                  gradient: selectedMethod == 'Apple Pay'
+                      ? const LinearGradient(
+                          colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: selectedMethod == 'Apple Pay' ? null : Colors.white,
                   borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(15),
-                    bottomRight: Radius.circular(15),
+                    topRight: Radius.circular(18),
+                    bottomRight: Radius.circular(18),
                   ),
+                  boxShadow: selectedMethod == 'Apple Pay'
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF1E3A8A).withOpacity(0.3),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

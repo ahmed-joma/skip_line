@@ -19,18 +19,26 @@ class PaymentHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Back button
-        IconButton(
-          onPressed: () => context.pop(),
-          icon: Container(
-            width: 40,
-            height: 40,
+        GestureDetector(
+          onTap: () => context.pop(),
+          child: Container(
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: Colors.grey[50],
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: const Icon(
               Icons.arrow_back_ios_new,
-              color: Colors.blue,
+              color: Color(0xFF1E3A8A),
               size: 20,
             ),
           ),
@@ -43,32 +51,72 @@ class PaymentHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Title
-            const Text(
-              'Checkout',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-
-            // Price
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            Row(
               children: [
-                Text(
-                  '$currency ${totalAmount.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 24,
+                const Text(
+                  'Checkout',
+                  style: TextStyle(
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
-                Text(
-                  'Including GST ($gstRate%)',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E3A8A).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.credit_card,
+                    color: Color(0xFF1E3A8A),
+                    size: 20,
+                  ),
                 ),
               ],
+            ),
+
+            // Price
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1E3A8A).withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$currency ${totalAmount.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Including GST ($gstRate%)',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
