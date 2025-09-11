@@ -15,6 +15,9 @@ class PaymentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // طباعة السعر للتأكد من استلامه
+    print('PaymentView received totalAmount: $totalAmount');
+
     return BlocProvider(
       create: (context) => PaymentCubit()..loadPayment(totalAmount),
       child: PaymentViewContent(totalAmount: totalAmount),
@@ -50,7 +53,7 @@ class PaymentViewContent extends StatelessWidget {
                   children: [
                     // Header with back button and title
                     PaymentHeader(
-                      totalAmount: state.payment.totalAmount,
+                      totalAmount: totalAmount,
                       currency: state.payment.currency,
                       gstRate: 15,
                     ),
@@ -113,7 +116,7 @@ class PaymentViewContent extends StatelessWidget {
 
                     // Payment button
                     PaymentButton(
-                      totalAmount: state.payment.totalAmount,
+                      totalAmount: totalAmount,
                       currency: state.payment.currency,
                       onPressed: () {
                         context.read<PaymentCubit>().processPayment();

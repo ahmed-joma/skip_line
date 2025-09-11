@@ -183,6 +183,9 @@ class CheckoutButton extends StatelessWidget {
       totalPrice = cartState.totalPrice;
     }
 
+    // طباعة السعر للتأكد من انتقاله
+    print('Total Price from Cart: $totalPrice');
+
     // التنقل إلى صفحة الدفع مع السعر
     context.go('/payment', extra: totalPrice);
   }

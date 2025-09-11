@@ -20,7 +20,13 @@ class PaymentHeader extends StatelessWidget {
       children: [
         // Back button
         GestureDetector(
-          onTap: () => context.pop(),
+          onTap: () {
+            if (Navigator.canPop(context)) {
+              context.pop();
+            } else {
+              context.go('/cart');
+            }
+          },
           child: Container(
             width: 44,
             height: 44,

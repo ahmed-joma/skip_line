@@ -56,11 +56,16 @@ class CreditCardForm extends StatelessWidget {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'xxxx xxxx xxxx xxxx',
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey,
+                      color: Colors.black87,
                     ),
                   ),
                 ),
@@ -109,11 +114,16 @@ class CreditCardForm extends StatelessWidget {
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter cardholder name',
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey,
+                color: Colors.black87,
               ),
             ),
           ),
@@ -143,6 +153,11 @@ class CreditCardForm extends StatelessWidget {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: 'MM',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           style: const TextStyle(
                             fontSize: 16,
@@ -172,6 +187,11 @@ class CreditCardForm extends StatelessWidget {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: 'YYYY',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           style: const TextStyle(
                             fontSize: 16,
@@ -205,6 +225,11 @@ class CreditCardForm extends StatelessWidget {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: '123',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           style: const TextStyle(
                             fontSize: 16,
