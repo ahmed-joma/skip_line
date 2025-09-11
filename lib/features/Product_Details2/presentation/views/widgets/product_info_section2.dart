@@ -1,137 +1,158 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../manager/product_details2_cubit.dart';
+import '../../manager/product_details2_state.dart';
 import '../../../data/models/product_details2_model.dart';
 
 class ProductInfoSection2 extends StatelessWidget {
   final ProductDetails2Model product;
-  final ProductDetails2Cubit cubit;
+  final bool isArabic;
 
   const ProductInfoSection2({
     super.key,
     required this.product,
-    required this.cubit,
+    required this.isArabic,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // اسم المنتج والمفضلة
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => cubit.toggleFavorite(),
-                child: Icon(
-                  product.isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: product.isFavorite ? Colors.red : Colors.grey,
-                  size: 28,
-                ),
-              ),
-            ],
-          ),
+    return BlocBuilder<ProductDetails2Cubit, ProductDetails2State>(
+      builder: (context, state) {
+        final cubit = context.read<ProductDetails2Cubit>();
 
-          const SizedBox(height: 8),
-
-          // الوزن والسعر
-          Text(
-            '${product.weight}, Priceg',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-
-          const SizedBox(height: 20),
-
-          // الكمية والسعر
-          Row(
-            children: [
-              // أزرار الكمية
-              _buildQuantityControls(),
-
-              const Spacer(),
-
-              // السعر
-              Text(
-                'SR${product.price.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuantityControls() {
-    return Row(
-      children: [
-        // زر النقص
-        GestureDetector(
-          onTap: () => cubit.decrementQuantity(),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: const Icon(Icons.remove, color: Colors.grey, size: 20),
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
-        // الكمية
-        Container(
-          width: 50,
-          height: 40,
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: Center(
-            child: Text(
-              product.quantity.toString(),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
-            ),
+            ],
           ),
-        ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // اسم المنتج والوزن
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic ? product.nameAr : product.name,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${product.weight}, ${isArabic ? 'السعر' : 'Price'}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
 
-        const SizedBox(width: 16),
+              const SizedBox(height: 20),
 
-        // زر الزيادة
-        GestureDetector(
-          onTap: () => cubit.incrementQuantity(),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: const Icon(Icons.add, color: Colors.grey, size: 20),
+              // عداد الكمية والسعر
+              Row(
+                children: [
+                  // عداد الكمية
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey[300]!),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // زر النقص
+                        GestureDetector(
+                          onTap: () {
+                            cubit.decrementQuantity();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            child: const Icon(
+                              Icons.remove,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+
+                        // العدد
+                        Container(
+                          width: 60,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            border: Border.symmetric(
+                              vertical: BorderSide(color: Colors.grey[300]!),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${cubit.quantity}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // زر الزيادة
+                        GestureDetector(
+                          onTap: () {
+                            cubit.incrementQuantity();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            child: const Icon(
+                              Icons.add,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // السعر
+                  Text(
+                    'SR${(product.price * cubit.quantity).toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

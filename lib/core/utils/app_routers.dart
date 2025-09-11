@@ -15,6 +15,7 @@ import '../../features/Product_Detail/data/models/product_model.dart';
 import '../../features/my_cart/presentation/views/my_cart_view.dart';
 import '../../features/scan/presentation/views/scan_view.dart';
 import '../../features/Product_Details2/presentation/views/product_details2_view.dart';
+import '../../features/Product_Details2/data/models/product_details2_model.dart';
 
 class AppRouters {
   // Route Constants
@@ -117,11 +118,29 @@ class AppRouters {
         builder: (context, state) {
           final productData = state.extra as Map<String, dynamic>?;
           if (productData != null) {
-            return ProductDetails2View(
-              productName: productData['productName'] ?? '',
-              productCategory: productData['productCategory'] ?? '',
-              productImage: productData['productImage'] ?? '',
+            // إنشاء ProductDetails2Model من البيانات المرسلة
+            final product = ProductDetails2Model(
+              id: '1',
+              name: productData['productName'] ?? '',
+              nameAr: productData['productName'] ?? '',
+              description:
+                  'Saudi Milk Is One Of The Finest Types Of Long-Life Milk That Can Be Kept At Room Temperature.',
+              descriptionAr:
+                  'حليب السعودية من أجود أنواع الحليب طويل الأمد الذي يمكن الاحتفاظ به في درجة حرارة الغرفة.',
+              price: 5.0,
+              images: [
+                productData['productImage'] ?? 'assets/images/banana.png',
+              ],
+              isFavorite: false,
+              quantity: 1,
+              weight: '1L',
+              nutritionInfo: '100gr',
+              rating: 5.0,
+              reviewCount: 128,
+              category: productData['productCategory'] ?? '',
+              categoryAr: productData['productCategory'] ?? '',
             );
+            return ProductDetails2View(product: product);
           }
           return const Scaffold(body: Center(child: Text('Product not found')));
         },

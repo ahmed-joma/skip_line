@@ -12,6 +12,8 @@ class ProductDetails2Model {
   final String nutritionInfo;
   final double rating;
   final int reviewCount;
+  final String category;
+  final String categoryAr;
 
   ProductDetails2Model({
     required this.id,
@@ -27,6 +29,8 @@ class ProductDetails2Model {
     required this.nutritionInfo,
     required this.rating,
     required this.reviewCount,
+    required this.category,
+    required this.categoryAr,
   });
 
   ProductDetails2Model copyWith({
@@ -43,6 +47,8 @@ class ProductDetails2Model {
     String? nutritionInfo,
     double? rating,
     int? reviewCount,
+    String? category,
+    String? categoryAr,
   }) {
     return ProductDetails2Model(
       id: id ?? this.id,
@@ -58,6 +64,8 @@ class ProductDetails2Model {
       nutritionInfo: nutritionInfo ?? this.nutritionInfo,
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
+      category: category ?? this.category,
+      categoryAr: categoryAr ?? this.categoryAr,
     );
   }
 }

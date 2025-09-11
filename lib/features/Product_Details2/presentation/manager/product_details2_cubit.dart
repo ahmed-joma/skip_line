@@ -5,43 +5,30 @@ import '../../data/models/product_details2_model.dart';
 class ProductDetails2Cubit extends Cubit<ProductDetails2State> {
   ProductDetails2Cubit() : super(ProductDetails2Initial());
 
-  void loadProduct(
-    String productName,
-    String productCategory,
-    String productImage,
-  ) {
-    emit(
-      ProductDetails2Loaded(
-        product: ProductDetails2Model(
-          id: '1',
-          name: productName,
-          nameAr: productName,
-          description:
-              'Saudi Milk Is One Of The Finest Types Of Long-Life Milk That Can Be Kept At Room Temperature.',
-          descriptionAr:
-              'حليب السعودية من أجود أنواع الحليب طويل الأمد الذي يمكن الاحتفاظ به في درجة حرارة الغرفة.',
-          price: 5.0,
-          images: [productImage],
-          isFavorite: false,
-          quantity: 1,
-          weight: '1L',
-          nutritionInfo: '100gr',
-          rating: 5.0,
-          reviewCount: 128,
-        ),
-      ),
-    );
+  ProductDetails2Model? _product;
+  int _quantity = 1;
+  int _currentImageIndex = 0;
+  bool _isProductDetailExpanded = false;
+  bool _isNutritionExpanded = false;
+
+  ProductDetails2Model? get product => _product;
+  int get quantity => _quantity;
+  int get currentImageIndex => _currentImageIndex;
+  bool get isProductDetailExpanded => _isProductDetailExpanded;
+  bool get isNutritionExpanded => _isNutritionExpanded;
+
+  void loadProduct(ProductDetails2Model product) {
+    _product = product;
+    _quantity = product.quantity;
+    emit(ProductDetails2Loaded(product: product));
   }
 
   void toggleFavorite() {
-    if (state is ProductDetails2Loaded) {
-      final currentState = state as ProductDetails2Loaded;
-      final updatedProduct = currentState.product.copyWith(
-        isFavorite: !currentState.product.isFavorite,
-      );
-      emit(ProductDetails2Loaded(product: updatedProduct));
+    if (_product != null) {
+      _product = _product!.copyWith(isFavorite: !_product!.isFavorite);
+      emit(ProductDetails2Loaded(product: _product!));
 
-      if (updatedProduct.isFavorite) {
+      if (_product!.isFavorite) {
         emit(ProductDetails2FavoriteAdded());
       } else {
         emit(ProductDetails2FavoriteRemoved());
@@ -50,50 +37,43 @@ class ProductDetails2Cubit extends Cubit<ProductDetails2State> {
   }
 
   void incrementQuantity() {
-    if (state is ProductDetails2Loaded) {
-      final currentState = state as ProductDetails2Loaded;
-      final updatedProduct = currentState.product.copyWith(
-        quantity: currentState.product.quantity + 1,
-      );
-      emit(ProductDetails2Loaded(product: updatedProduct));
+    _quantity++;
+    emit(ProductDetails2QuantityChanged());
+  }
+
+  void decrementQuantity() {
+    if (_quantity > 1) {
+      _quantity--;
       emit(ProductDetails2QuantityChanged());
     }
   }
 
-  void decrementQuantity() {
-    if (state is ProductDetails2Loaded) {
-      final currentState = state as ProductDetails2Loaded;
-      if (currentState.product.quantity > 1) {
-        final updatedProduct = currentState.product.copyWith(
-          quantity: currentState.product.quantity - 1,
-        );
-        emit(ProductDetails2Loaded(product: updatedProduct));
-        emit(ProductDetails2QuantityChanged());
-      }
-    }
-  }
-
   void changeImageIndex(int index) {
-    if (state is ProductDetails2Loaded) {
+    if (_product != null && index >= 0 && index < _product!.images.length) {
+      _currentImageIndex = index;
       emit(ProductDetails2ImageChanged());
     }
   }
 
   void toggleProductDetailsExpansion() {
-    if (state is ProductDetails2Loaded) {
-      emit(ProductDetails2ExpansionChanged());
-    }
+    _isProductDetailExpanded = !_isProductDetailExpanded;
+    emit(ProductDetails2ExpansionChanged());
   }
 
   void toggleNutritionExpansion() {
-    if (state is ProductDetails2Loaded) {
-      emit(ProductDetails2NutritionExpansionChanged());
-    }
+    _isNutritionExpanded = !_isNutritionExpanded;
+    emit(ProductDetails2NutritionExpansionChanged());
   }
 
   void addToCart() {
-    if (state is ProductDetails2Loaded) {
-      emit(ProductDetails2AddedToCart());
-    }
+    emit(ProductDetails2AddedToCart());
+  }
+
+  void navigateToNutrition() {
+    emit(ProductDetails2NavigateToNutrition());
+  }
+
+  void navigateToReviews() {
+    emit(ProductDetails2NavigateToReviews());
   }
 }
