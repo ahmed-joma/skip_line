@@ -6,7 +6,9 @@ import '../../../../../shared/widgets/password_requirements_widget.dart';
 import '../../../../../shared/utils/password_validator.dart';
 
 class SignUpView extends StatefulWidget {
-  const SignUpView({super.key});
+  final Map<String, dynamic>? extraData;
+
+  const SignUpView({super.key, this.extraData});
 
   @override
   State<SignUpView> createState() => _SignUpViewState();
@@ -83,8 +85,17 @@ class _SignUpViewState extends State<SignUpView> {
       return;
     }
 
-    // Navigate to verification code screen
-    context.go('/signup-verification');
+    // Check if user came from checkout (has payment data)
+    if (widget.extraData != null &&
+        widget.extraData!['redirectToPayment'] == true) {
+      // For now, navigate directly to payment (in real app, would go to verification first)
+      double totalPrice = widget.extraData!['totalPrice'] ?? 0.0;
+      print('Redirecting to payment with total: $totalPrice');
+      context.go('/payment', extra: totalPrice);
+    } else {
+      // Navigate to verification code screen
+      context.go('/signup-verification');
+    }
   }
 
   void _showTopNotification(String message, {bool isError = false}) {
@@ -659,7 +670,11 @@ class _SignUpViewState extends State<SignUpView> {
                               WidgetSpan(
                                 child: GestureDetector(
                                   onTap: () {
-                                    context.go('/signin');
+                                    // Pass the same extra data to sign in
+                                    context.go(
+                                      '/signin',
+                                      extra: widget.extraData,
+                                    );
                                   },
                                   child: Text(
                                     languageManager.isArabic

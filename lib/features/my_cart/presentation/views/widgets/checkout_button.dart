@@ -186,7 +186,10 @@ class CheckoutButton extends StatelessWidget {
     // طباعة السعر للتأكد من انتقاله
     print('Total Price from Cart: $totalPrice');
 
-    // التنقل إلى صفحة الدفع مع السعر
-    context.go('/payment', extra: totalPrice);
+    // التنقل إلى صفحة تسجيل الدخول مع السعر (سيتم استخدامه بعد تسجيل الدخول)
+    context.go(
+      '/signin',
+      extra: {'totalPrice': totalPrice, 'redirectToPayment': true},
+    );
   }
 }

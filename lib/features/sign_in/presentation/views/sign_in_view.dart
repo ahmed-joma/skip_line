@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../../shared/constants/language_manager.dart';
 
 class SignInView extends StatefulWidget {
-  const SignInView({super.key});
+  final Map<String, dynamic>? extraData;
+
+  const SignInView({super.key, this.extraData});
 
   @override
   State<SignInView> createState() => _SignInViewState();
@@ -48,8 +50,17 @@ class _SignInViewState extends State<SignInView> {
     // TODO: Handle actual login logic
     print('Login with email: ${_emailController.text}');
 
-    // Navigate to home screen after successful login
-    context.go('/home');
+    // Check if user came from checkout (has payment data)
+    if (widget.extraData != null &&
+        widget.extraData!['redirectToPayment'] == true) {
+      // Navigate to payment screen with the total price
+      double totalPrice = widget.extraData!['totalPrice'] ?? 0.0;
+      print('Redirecting to payment with total: $totalPrice');
+      context.go('/payment', extra: totalPrice);
+    } else {
+      // Navigate to home screen after successful login
+      context.go('/home');
+    }
   }
 
   void _showTopNotification(String message, {bool isError = false}) {
@@ -392,7 +403,11 @@ class _SignInViewState extends State<SignInView> {
                                 WidgetSpan(
                                   child: GestureDetector(
                                     onTap: () {
-                                      context.go('/signup');
+                                      // Pass the same extra data to sign up
+                                      context.go(
+                                        '/signup',
+                                        extra: widget.extraData,
+                                      );
                                     },
                                     child: Text(
                                       languageManager.isArabic

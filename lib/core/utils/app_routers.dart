@@ -59,13 +59,23 @@ class AppRouters {
       // Login Screen
       GoRoute(
         path: kLoginView,
-        builder: (context, state) => const SignInScreen(),
+        builder: (context, state) {
+          // Get extra data if available (from checkout)
+          Map<String, dynamic>? extraData =
+              state.extra as Map<String, dynamic>?;
+          return SignInScreen(extraData: extraData);
+        },
       ),
 
       // Sign Up Screen
       GoRoute(
         path: kRegisterView,
-        builder: (context, state) => const SignUpScreen(),
+        builder: (context, state) {
+          // Get extra data if available (from checkout)
+          Map<String, dynamic>? extraData =
+              state.extra as Map<String, dynamic>?;
+          return SignUpScreen(extraData: extraData);
+        },
       ),
 
       // Reset Password Screen

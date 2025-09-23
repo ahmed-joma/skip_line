@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'presentation/views/sign_up_view.dart';
 
 class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({super.key});
+  final Map<String, dynamic>? extraData;
+
+  const SignUpScreen({super.key, this.extraData});
 
   @override
   Widget build(BuildContext context) {
-    return const SignUpView();
+    return SignUpView(extraData: extraData);
   }
 }
