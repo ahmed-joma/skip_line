@@ -709,7 +709,34 @@ class _SignUpViewState extends State<SignUpView> {
                 ],
               ),
 
-              const SizedBox(height: 50), // Extra space for keyboard
+              const SizedBox(height: 30),
+
+              // Skip Button - Simple and Modern
+              Consumer<LanguageManager>(
+                builder: (context, languageManager, child) {
+                  return Center(
+                    child: TextButton(
+                      onPressed: () => context.go('/home'),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Text(
+                        languageManager.isArabic ? 'تخطي' : 'Skip',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 20), // Extra space for keyboard
             ],
           ),
         ),

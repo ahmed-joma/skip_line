@@ -92,13 +92,13 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   void _verifyCode(String code) {
     _showTopNotification(
       Provider.of<LanguageManager>(context, listen: false).isArabic
-          ? 'تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول'
-          : 'Your account has been created successfully! You can now sign in',
+          ? 'تم إنشاء حسابك بنجاح! مرحباً بك في SkipLine'
+          : 'Your account has been created successfully! Welcome to SkipLine',
       isError: false,
     );
 
-    // Navigate to sign in screen after successful verification
-    context.go('/signin');
+    // Navigate to home screen after successful verification
+    context.go('/home');
   }
 
   void _showTopNotification(String message, {bool isError = false}) {
