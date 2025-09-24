@@ -19,6 +19,7 @@ import '../../features/Product_Details2/data/models/product_details2_model.dart'
 import '../../features/payment/presentation/views/payment_view.dart';
 import '../../features/payment/presentation/views/payment_success_view.dart';
 import '../../features/payment/presentation/views/invoice_view.dart';
+import '../../features/help/help_screen.dart';
 
 class AppRouters {
   // Route Constants
@@ -40,6 +41,7 @@ class AppRouters {
   static const String kPaymentSuccessView = '/payment-success';
   static const String kInvoiceView = '/invoice';
   static const String kProfileView = '/profile';
+  static const String kHelpView = '/help';
 
   static final router = GoRouter(
     initialLocation: kSplashView,
@@ -272,6 +274,9 @@ class AppRouters {
         builder: (context, state) =>
             const Scaffold(body: Center(child: Text('Profile Screen'))),
       ),
+
+      // Help Screen
+      GoRoute(path: kHelpView, builder: (context, state) => const HelpScreen()),
     ],
   );
 }

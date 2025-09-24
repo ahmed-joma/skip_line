@@ -798,7 +798,7 @@ class _HomeViewState extends State<HomeView> {
                   title: isArabic ? 'المساعدة' : 'Help',
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Navigate to help
+                    context.go('/help');
                   },
                 ),
                 _buildMenuOption(
