@@ -90,33 +90,55 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
 
-              // Language Toggle
-              GestureDetector(
-                onTap: () {
-                  languageManager.toggleLanguage();
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: languageManager.isArabic
-                        ? const Color(0xFF123459)
-                        : Colors.grey[200],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    languageManager.isArabic ? 'Ar' : 'En',
-                    style: TextStyle(
-                      color: languageManager.isArabic
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+              // Language Toggle and Menu
+              Row(
+                children: [
+                  // Language Toggle
+                  GestureDetector(
+                    onTap: () {
+                      languageManager.toggleLanguage();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: languageManager.isArabic
+                            ? const Color(0xFF123459)
+                            : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        languageManager.isArabic ? 'Ar' : 'En',
+                        style: TextStyle(
+                          color: languageManager.isArabic
+                              ? Colors.white
+                              : Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+
+                  const SizedBox(width: 12),
+
+                  // Menu Button
+                  GestureDetector(
+                    onTap: () {
+                      _showAccountMenu(context, languageManager.isArabic);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.menu, color: Colors.black, size: 24),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -627,11 +649,6 @@ class _HomeViewState extends State<HomeView> {
                     Icons.smart_toy,
                     languageManager.isArabic ? 'روبوت' : 'Chatbot',
                   ),
-                  _buildNavItem(
-                    4,
-                    Icons.person,
-                    languageManager.isArabic ? 'حساب' : 'Account',
-                  ),
                 ],
               ),
             ),
@@ -657,8 +674,6 @@ class _HomeViewState extends State<HomeView> {
           context.go('/cart');
         } else if (index == 3) {
           context.go('/chatbot');
-        } else if (index == 4) {
-          context.go('/account');
         }
       },
       child: Column(
@@ -680,6 +695,152 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAccountMenu(BuildContext context, bool isArabic) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Menu title
+                Text(
+                  isArabic ? 'القائمة' : 'Menu',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Menu options
+                _buildMenuOption(
+                  context,
+                  icon: Icons.shopping_bag_outlined,
+                  title: isArabic ? 'الطلبات' : 'Orders',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to orders
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.person_outline,
+                  title: isArabic ? 'تفاصيلي' : 'My Details',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to my details
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.qr_code_scanner_outlined,
+                  title: isArabic ? 'مسح' : 'Scan',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go('/scan');
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.credit_card_outlined,
+                  title: isArabic ? 'طرق الدفع' : 'Payment Methods',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to payment methods
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.smart_toy_outlined,
+                  title: isArabic ? 'المساعد الذكي' : 'Chatbot',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go('/chatbot');
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.notifications_outlined,
+                  title: isArabic ? 'الإشعارات' : 'Notifications',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to notifications
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.help_outline,
+                  title: isArabic ? 'المساعدة' : 'Help',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to help
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.info_outline,
+                  title: isArabic ? 'حول' : 'About',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to about
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF123459), size: 24),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: Colors.grey,
+        size: 16,
+      ),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
     );
   }
 }

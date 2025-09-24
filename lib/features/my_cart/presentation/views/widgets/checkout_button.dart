@@ -133,13 +133,6 @@ class CheckoutButton extends StatelessWidget {
           isActive: false,
           onTap: () => context.go('/chatbot'),
         ),
-        _buildNavItem(
-          context,
-          icon: Icons.person,
-          label: isArabic ? 'الحساب' : 'Account',
-          isActive: false,
-          onTap: () => context.go('/account'),
-        ),
       ],
     );
   }

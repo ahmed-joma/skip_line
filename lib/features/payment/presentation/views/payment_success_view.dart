@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/auth_service.dart';
 
-class PaymentSuccessView extends StatelessWidget {
+class PaymentSuccessView extends StatefulWidget {
   final double totalAmount;
   final String currency;
 
@@ -10,6 +11,28 @@ class PaymentSuccessView extends StatelessWidget {
     required this.totalAmount,
     required this.currency,
   }) : super(key: key);
+
+  @override
+  State<PaymentSuccessView> createState() => _PaymentSuccessViewState();
+}
+
+class _PaymentSuccessViewState extends State<PaymentSuccessView> {
+  @override
+  void initState() {
+    super.initState();
+    // Auto logout after payment completion
+    _autoLogoutAfterPayment();
+  }
+
+  Future<void> _autoLogoutAfterPayment() async {
+    // Wait a bit to show the success message
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Clear user token (simulate logout)
+    await AuthService().clearToken();
+
+    print('Payment completed - User automatically logged out');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +47,9 @@ class PaymentSuccessView extends StatelessWidget {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      // Clear token before going back
+                      await AuthService().clearToken();
                       if (Navigator.canPop(context)) {
                         context.pop();
                       } else {
@@ -150,24 +175,24 @@ class PaymentSuccessView extends StatelessWidget {
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
-                          onTap: () {
+                          onTap: () async {
                             // Navigate to invoice page
                             final cartItems = [
                               {
                                 'name': 'Saudi Milk',
-                                'price': totalAmount * 0.8,
+                                'price': widget.totalAmount * 0.8,
                                 'quantity': 2,
                               },
                               {
                                 'name': 'Fresh Eggs',
-                                'price': totalAmount * 0.2,
+                                'price': widget.totalAmount * 0.2,
                                 'quantity': 1,
                               },
                             ];
 
                             // طباعة البيانات المرسلة
                             print(
-                              'Sending to Invoice - Total: $totalAmount, Currency: $currency',
+                              'Sending to Invoice - Total: ${widget.totalAmount}, Currency: ${widget.currency}',
                             );
                             for (var item in cartItems) {
                               print(
@@ -175,11 +200,14 @@ class PaymentSuccessView extends StatelessWidget {
                               );
                             }
 
+                            // Clear token before going to invoice
+                            await AuthService().clearToken();
+
                             context.go(
                               '/invoice',
                               extra: {
-                                'totalAmount': totalAmount,
-                                'currency': currency,
+                                'totalAmount': widget.totalAmount,
+                                'currency': widget.currency,
                                 'cartItems': cartItems,
                               },
                             );
@@ -202,7 +230,9 @@ class PaymentSuccessView extends StatelessWidget {
 
                     // Return to home page link
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        // Clear token before going to home
+                        await AuthService().clearToken();
                         context.go('/home');
                       },
                       child: Text(
