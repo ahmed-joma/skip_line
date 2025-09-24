@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../shared/constants/language_manager.dart';
+import '../../../../../core/services/auth_service.dart';
 
 class SignInView extends StatefulWidget {
   final Map<String, dynamic>? extraData;
@@ -26,7 +27,7 @@ class _SignInViewState extends State<SignInView> {
     super.dispose();
   }
 
-  void _validateAndLogin() {
+  void _validateAndLogin() async {
     final languageManager = Provider.of<LanguageManager>(
       context,
       listen: false,
@@ -47,8 +48,14 @@ class _SignInViewState extends State<SignInView> {
       return;
     }
 
-    // TODO: Handle actual login logic
+    // Simulate login and save token
     print('Login with email: ${_emailController.text}');
+
+    // Save user token (simulate successful login)
+    await AuthService().saveUserToken(
+      'user_token_${DateTime.now().millisecondsSinceEpoch}',
+    );
+    print('User token saved successfully');
 
     // Check if user came from checkout (has payment data)
     if (widget.extraData != null &&

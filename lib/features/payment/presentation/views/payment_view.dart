@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/constants/language_manager.dart';
 import '../manager/payment_cubit.dart';
 import '../manager/payment_state.dart';
 import 'widgets/payment_header.dart';
@@ -169,6 +171,10 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
   }
 
   void _showErrorDialog(BuildContext context, String message) {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -177,14 +183,14 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
           children: [
             Icon(Icons.error, color: Colors.red, size: 30),
             const SizedBox(width: 10),
-            const Text('Payment Failed'),
+            Text(languageManager.isArabic ? 'فشل الدفع' : 'Payment Failed'),
           ],
         ),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            child: Text(languageManager.isArabic ? 'موافق' : 'OK'),
           ),
         ],
       ),

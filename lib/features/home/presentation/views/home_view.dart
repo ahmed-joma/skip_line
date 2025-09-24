@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/constants/language_manager.dart';
+import '../../../../core/services/auth_service.dart';
 import '../../../search/presentation/views/search_view.dart';
 import '../../../Product_Detail/data/models/product_model.dart' as detail;
 import '../../../Product_Detail/presentation/utils/navigation_helper.dart';
@@ -120,6 +121,64 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ),
                     ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // Sign In Button or User Avatar
+                  FutureBuilder<bool>(
+                    future: AuthService().isLoggedIn(),
+                    builder: (context, snapshot) {
+                      final isLoggedIn = snapshot.data ?? false;
+
+                      if (isLoggedIn) {
+                        // Show user avatar
+                        return GestureDetector(
+                          onTap: () {
+                            _showUserMenu(context, languageManager.isArabic);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF123459),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Show Sign In button
+                        return GestureDetector(
+                          onTap: () {
+                            context.go('/signin');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF123459),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              languageManager.isArabic
+                                  ? 'تسجيل دخول'
+                                  : 'SIGN IN',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
 
                   const SizedBox(width: 12),
@@ -809,6 +868,182 @@ class _HomeViewState extends State<HomeView> {
                     Navigator.pop(context);
                     // TODO: Navigate to about
                   },
+                ),
+
+                // Favorites (only show if logged in)
+                FutureBuilder<bool>(
+                  future: AuthService().isLoggedIn(),
+                  builder: (context, snapshot) {
+                    final isLoggedIn = snapshot.data ?? false;
+
+                    if (isLoggedIn) {
+                      return _buildMenuOption(
+                        context,
+                        icon: Icons.favorite_outline,
+                        title: isArabic ? 'المفضلة' : 'Favorites',
+                        onTap: () {
+                          Navigator.pop(context);
+                          // TODO: Navigate to favorites
+                        },
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                // Sign In/Logout button
+                FutureBuilder<bool>(
+                  future: AuthService().isLoggedIn(),
+                  builder: (context, snapshot) {
+                    final isLoggedIn = snapshot.data ?? false;
+
+                    return Container(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          if (isLoggedIn) {
+                            // Logout
+                            await AuthService().logout();
+                            setState(() {}); // Refresh UI
+                          } else {
+                            // Sign In
+                            context.go('/signin');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isLoggedIn
+                              ? Colors.red[600]
+                              : const Color(0xFF123459),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          isLoggedIn
+                              ? (isArabic ? 'تسجيل الخروج' : 'Logout')
+                              : (isArabic ? 'تسجيل الدخول' : 'Sign In'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showUserMenu(BuildContext context, bool isArabic) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.4,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // User info
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF123459).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Color(0xFF123459),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic ? 'مرحباً!' : 'Welcome!',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF123459),
+                            ),
+                          ),
+                          Text(
+                            isArabic
+                                ? 'تم تسجيل دخولك بنجاح'
+                                : 'You are logged in successfully',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Logout button
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await AuthService().logout();
+                      Navigator.pop(context);
+                      // Refresh the page to update UI
+                      setState(() {});
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[600],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      isArabic ? 'تسجيل الخروج' : 'Logout',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

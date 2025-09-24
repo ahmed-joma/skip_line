@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../shared/constants/language_manager.dart';
+import '../../../../../core/services/auth_service.dart';
 import '../../../../../shared/widgets/password_requirements_widget.dart';
 import '../../../../../shared/utils/password_validator.dart';
 
@@ -38,7 +39,7 @@ class _SignUpViewState extends State<SignUpView> {
     super.dispose();
   }
 
-  void _validateAndSignUp() {
+  void _validateAndSignUp() async {
     final languageManager = Provider.of<LanguageManager>(
       context,
       listen: false,
@@ -84,6 +85,15 @@ class _SignUpViewState extends State<SignUpView> {
       );
       return;
     }
+
+    // Simulate signup and save token
+    print('Signup with email: ${_emailController.text}');
+
+    // Save user token (simulate successful signup)
+    await AuthService().saveUserToken(
+      'user_token_${DateTime.now().millisecondsSinceEpoch}',
+    );
+    print('User token saved successfully');
 
     // Check if user came from checkout (has payment data)
     if (widget.extraData != null &&

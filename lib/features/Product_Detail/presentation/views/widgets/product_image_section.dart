@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
+import '../../../../../../core/services/auth_service.dart';
 import '../../../data/models/product_model.dart';
 
 class ProductImageSection extends StatelessWidget {
@@ -78,7 +80,31 @@ class ProductImageSection extends StatelessWidget {
                 top: 16,
                 right: 16,
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
+                    // Check if user is logged in
+                    final isLoggedIn = await AuthService().isLoggedIn();
+                    if (!isLoggedIn) {
+                      // Show message and redirect to sign in
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isArabic
+                                ? 'يرجى تسجيل الدخول أولاً لإضافة المنتج للمفضلة'
+                                : 'Please sign in first to add product to favorites',
+                          ),
+                          backgroundColor: Colors.orange,
+                          action: SnackBarAction(
+                            label: isArabic ? 'تسجيل دخول' : 'Sign In',
+                            textColor: Colors.white,
+                            onPressed: () {
+                              context.go('/signin');
+                            },
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    // If logged in, proceed with adding to favorites
                     cubit.toggleFavorite();
                   },
                   child: Container(

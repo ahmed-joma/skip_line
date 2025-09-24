@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../../shared/constants/language_manager.dart';
 
 class ChatInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -83,9 +85,16 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 onPressed: () {
                   // TODO: Implement voice input
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('ميزة الصوت قريباً!'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text(
+                        Provider.of<LanguageManager>(
+                              context,
+                              listen: false,
+                            ).isArabic
+                            ? 'ميزة الصوت قريباً!'
+                            : 'Voice feature coming soon!',
+                      ),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },

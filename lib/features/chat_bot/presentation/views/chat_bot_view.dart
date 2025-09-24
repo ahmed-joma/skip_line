@@ -338,7 +338,7 @@ class _ChatBotViewState extends State<ChatBotView>
           children: [
             Icon(Icons.smart_toy, color: Color(0xFF123459)),
             SizedBox(width: 8),
-            Text('حول SkiBot'),
+            Text('About SkiBot'),
           ],
         ),
         content: const Text(
@@ -348,7 +348,7 @@ class _ChatBotViewState extends State<ChatBotView>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('حسناً'),
+            child: const Text('OK'),
           ),
         ],
       ),
