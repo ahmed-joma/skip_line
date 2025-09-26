@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/services/auth_service.dart';
 
 class PaymentSuccessView extends StatefulWidget {
   final double totalAmount;
@@ -20,18 +19,8 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
   @override
   void initState() {
     super.initState();
-    // Auto logout after payment completion
-    _autoLogoutAfterPayment();
-  }
-
-  Future<void> _autoLogoutAfterPayment() async {
-    // Wait a bit to show the success message
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Clear user token (simulate logout)
-    await AuthService().clearToken();
-
-    print('Payment completed - User automatically logged out');
+    // Payment completed successfully
+    print('Payment completed successfully - User remains logged in');
   }
 
   @override
@@ -47,9 +36,7 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () async {
-                      // Clear token before going back
-                      await AuthService().clearToken();
+                    onTap: () {
                       if (Navigator.canPop(context)) {
                         context.pop();
                       } else {
@@ -200,9 +187,6 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
                               );
                             }
 
-                            // Clear token before going to invoice
-                            await AuthService().clearToken();
-
                             context.go(
                               '/invoice',
                               extra: {
@@ -230,9 +214,7 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
 
                     // Return to home page link
                     GestureDetector(
-                      onTap: () async {
-                        // Clear token before going to home
-                        await AuthService().clearToken();
+                      onTap: () {
                         context.go('/home');
                       },
                       child: Text(

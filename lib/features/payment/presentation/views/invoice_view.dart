@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../../../../shared/constants/language_manager.dart';
-import '../../../../core/services/auth_service.dart';
 
 class InvoiceView extends StatelessWidget {
   final double totalAmount;
@@ -164,9 +161,7 @@ class InvoiceView extends StatelessWidget {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () async {
-                  // Clear token before going to home
-                  await AuthService().clearToken();
+                onPressed: () {
                   context.go('/home');
                 },
                 style: ElevatedButton.styleFrom(

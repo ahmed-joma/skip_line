@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../manager/cart/cart_cubit.dart';
 import '../../manager/cart/cart_state.dart';
+import '../../../../../core/services/auth_service.dart';
 
 class CheckoutButton extends StatelessWidget {
   final bool isArabic;
@@ -168,7 +169,7 @@ class CheckoutButton extends StatelessWidget {
     );
   }
 
-  void _handleCheckout(BuildContext context) {
+  void _handleCheckout(BuildContext context) async {
     // الحصول على السعر الإجمالي من الحالة الحالية
     final cartState = context.read<CartCubit>().state;
     double totalPrice = 0.0;
@@ -179,10 +180,21 @@ class CheckoutButton extends StatelessWidget {
     // طباعة السعر للتأكد من انتقاله
     print('Total Price from Cart: $totalPrice');
 
-    // التنقل إلى صفحة تسجيل الدخول مع السعر (سيتم استخدامه بعد تسجيل الدخول)
-    context.go(
-      '/signin',
-      extra: {'totalPrice': totalPrice, 'redirectToPayment': true},
-    );
+    // التحقق من حالة تسجيل الدخول
+    final isLoggedIn = await AuthService().isLoggedIn();
+    print('User login status: $isLoggedIn');
+
+    if (isLoggedIn) {
+      // المستخدم مسجل دخول - الانتقال مباشرة لصفحة الدفع
+      print('User is logged in - Redirecting to payment...');
+      context.go('/payment', extra: totalPrice);
+    } else {
+      // المستخدم غير مسجل دخول - الانتقال لصفحة تسجيل الدخول
+      print('User is not logged in - Redirecting to sign in...');
+      context.go(
+        '/signin',
+        extra: {'totalPrice': totalPrice, 'redirectToPayment': true},
+      );
+    }
   }
 }
