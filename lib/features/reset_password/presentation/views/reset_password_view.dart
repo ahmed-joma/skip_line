@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/constants/language_manager.dart';
-import '../../../../core/services/api_service.dart';
-import '../../../../core/services/email_manager.dart';
+import '../../../../core/services/auth_service.dart';
 import 'package:go_router/go_router.dart';
 
 class ResetPasswordView extends StatefulWidget {
@@ -52,14 +51,23 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
     );
 
     try {
-      final apiService = ApiService();
-      final response = await apiService.sendPasswordResetCode(
+      print('🎯 ===== RESET PASSWORD VIEW - STARTING SEND CODE =====');
+      print('📧 User email: ${_emailController.text.trim()}');
+      print('🔄 Calling AuthService.passwordSendCode()...');
+
+      final result = await AuthService().passwordSendCode(
         _emailController.text.trim(),
       );
 
-      if (response.isSuccess) {
-        // Save email for verification screen
-        EmailManager().setResetEmail(_emailController.text.trim());
+      print('📥 Received response from AuthService');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+
+      if (result.isSuccess) {
+        print('🎉 ===== SEND CODE SUCCESSFUL! =====');
+        print(
+          '✅ Password reset code sent successfully! Showing success message...',
+        );
 
         _showTopNotification(
           languageManager.isArabic
@@ -67,30 +75,40 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
               : 'Verification code has been sent to your email',
           isError: false,
         );
+
+        print('🔄 Redirecting to verification code screen...');
+        print('🏁 ===== RESET PASSWORD VIEW - SEND CODE COMPLETED =====');
         context.go('/verification-code');
       } else {
-        String errorMessage = response.msg;
+        print('❌ ===== SEND CODE FAILED! =====');
+        print('❌ Failed to send password reset code! Showing error message...');
+
+        String errorMessage = result.msg;
 
         // Handle specific error cases
-        if (response.isNotFound) {
+        if (result.code == 404) {
           errorMessage = languageManager.isArabic
               ? 'لا يوجد مستخدم بهذا البريد الإلكتروني'
               : 'No user found with this email address';
-        } else if (response.isValidationError) {
+        } else if (result.code == 422) {
           errorMessage = languageManager.isArabic
               ? 'البريد الإلكتروني غير صحيح'
               : 'Invalid email address';
         }
 
         _showTopNotification(errorMessage, isError: true);
+        print('🏁 ===== RESET PASSWORD VIEW - SEND CODE FAILED =====');
       }
     } catch (e) {
+      print('❌ ===== SEND CODE ERROR! =====');
+      print('❌ Error during send code: $e');
       _showTopNotification(
         languageManager.isArabic
             ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى'
             : 'Unexpected error occurred. Please try again',
         isError: true,
       );
+      print('🏁 ===== RESET PASSWORD VIEW - SEND CODE ERROR =====');
     }
   }
 

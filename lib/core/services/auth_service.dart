@@ -423,6 +423,245 @@ class AuthService {
     }
   }
 
+  // Send password reset code
+  Future<ApiResponseModel<void>> passwordSendCode(String email) async {
+    print('🚀 ===== PASSWORD SEND CODE API CALL STARTED =====');
+    print('📝 Preparing password send code request...');
+    print('   📧 Email: $email');
+
+    try {
+      print('🌐 Sending POST request to /password/send/code...');
+      print('📋 Request Body: {email: $email}');
+
+      final response = await NetworkService.post(
+        '/password/send/code',
+        body: {'email': email},
+      );
+
+      print('📥 Received response from server');
+      print('   Status Code: ${response.statusCode}');
+      print('   Response Type: ${response.data.runtimeType}');
+
+      final responseData = response.data as Map<String, dynamic>;
+      print('🔍 Parsed response data:');
+      print('   Raw Data: $responseData');
+
+      // Check if response is successful based on status code and data
+      bool isSuccess =
+          response.statusCode == 200 &&
+          responseData['status'] == true &&
+          responseData['code'] == 200;
+
+      print('🔍 Response analysis:');
+      print('   Status Code: ${response.statusCode}');
+      print('   API Status: ${responseData['status']}');
+      print('   API Code: ${responseData['code']}');
+      print('   Is Success: $isSuccess');
+
+      if (isSuccess) {
+        print('✅ Password reset code sent successfully!');
+        print('📧 Reset code sent to user email: $email');
+        return ApiResponseModel(
+          status: true,
+          code: 200,
+          msg:
+              responseData['msg'] ??
+              'A reset password code has been sent to your email.',
+        );
+      } else {
+        print('❌ Failed to send password reset code');
+        return ApiResponseModel(
+          status: false,
+          code: responseData['code'] ?? response.statusCode ?? 500,
+          msg: responseData['msg'] ?? 'Failed to send password reset code',
+        );
+      }
+    } on DioException catch (e) {
+      print('❌ DioException occurred during password send code');
+      print('🔍 Error Type: ${e.type}');
+      print('🔍 Status Code: ${e.response?.statusCode}');
+      print('🔍 Response Data: ${e.response?.data}');
+
+      // Check for specific error types
+      if (e.response?.statusCode == 404) {
+        print('📧 Email not found error detected');
+        return ApiResponseModel(
+          status: false,
+          code: 404,
+          msg: 'There is no user with this email. try with correct account',
+        );
+      }
+
+      if (e.response?.statusCode == 422) {
+        print('📧 Validation error detected');
+        try {
+          final responseData = e.response?.data as Map<String, dynamic>?;
+          if (responseData != null && responseData.containsKey('errors')) {
+            final errors = responseData['errors'];
+            if (errors is Map && errors.containsKey('email')) {
+              print('📧 Email validation error found');
+              return ApiResponseModel(
+                status: false,
+                code: 422,
+                msg: 'The email field must be a valid email address.',
+              );
+            }
+          }
+        } catch (parseError) {
+          print('⚠️ Could not parse validation errors: $parseError');
+        }
+      }
+
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
+
+      return ApiResponseModel(
+        status: false,
+        code: e.response?.statusCode ?? 500,
+        msg: errorMessage,
+      );
+    } catch (e) {
+      print('❌ Unexpected error during password send code: $e');
+      return ApiResponseModel(
+        status: false,
+        code: 500,
+        msg: 'Unexpected error: $e',
+      );
+    }
+  }
+
+  // Reset password with code
+  Future<ApiResponseModel<void>> passwordReset({
+    required String email,
+    required String code,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    print('🚀 ===== PASSWORD RESET API CALL STARTED =====');
+    print('📝 Preparing password reset request...');
+    print('   📧 Email: $email');
+    print('   🔢 Code: $code');
+    print('   🔒 Password: [HIDDEN]');
+    print('   🔒 Password Confirmation: [HIDDEN]');
+
+    try {
+      print('🌐 Sending POST request to /password/reset...');
+      print(
+        '📋 Request Body: {email: $email, code: $code, password: [HIDDEN], password_confirmation: [HIDDEN]}',
+      );
+
+      final response = await NetworkService.post(
+        '/password/reset',
+        body: {
+          'email': email,
+          'code': code,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        },
+      );
+
+      print('📥 Received response from server');
+      print('   Status Code: ${response.statusCode}');
+      print('   Response Type: ${response.data.runtimeType}');
+
+      final responseData = response.data as Map<String, dynamic>;
+      print('🔍 Parsed response data:');
+      print('   Raw Data: $responseData');
+
+      // Check if response is successful based on status code and data
+      bool isSuccess =
+          response.statusCode == 200 &&
+          responseData['status'] == true &&
+          responseData['code'] == 200;
+
+      print('🔍 Response analysis:');
+      print('   Status Code: ${response.statusCode}');
+      print('   API Status: ${responseData['status']}');
+      print('   API Code: ${responseData['code']}');
+      print('   Is Success: $isSuccess');
+
+      if (isSuccess) {
+        print('✅ Password reset successfully!');
+        print('🔒 User password has been updated successfully');
+        return ApiResponseModel(
+          status: true,
+          code: 200,
+          msg:
+              responseData['msg'] ??
+              'Your password has been reset successfully.',
+        );
+      } else {
+        print('❌ Failed to reset password');
+        return ApiResponseModel(
+          status: false,
+          code: responseData['code'] ?? response.statusCode ?? 500,
+          msg: responseData['msg'] ?? 'Failed to reset password',
+        );
+      }
+    } on DioException catch (e) {
+      print('❌ DioException occurred during password reset');
+      print('🔍 Error Type: ${e.type}');
+      print('🔍 Status Code: ${e.response?.statusCode}');
+      print('🔍 Response Data: ${e.response?.data}');
+
+      // Check for specific error types
+      if (e.response?.statusCode == 422) {
+        print('📧 Validation error detected');
+        try {
+          final responseData = e.response?.data as Map<String, dynamic>?;
+          if (responseData != null && responseData.containsKey('errors')) {
+            final errors = responseData['errors'];
+            print('🔍 Validation errors: $errors');
+
+            // Check for specific field errors
+            if (errors is Map) {
+              if (errors.containsKey('email')) {
+                print('📧 Email validation error found');
+                return ApiResponseModel(
+                  status: false,
+                  code: 422,
+                  msg: 'The email field must be a valid email address.',
+                );
+              } else if (errors.containsKey('code')) {
+                print('🔢 Code validation error found');
+                return ApiResponseModel(
+                  status: false,
+                  code: 422,
+                  msg: 'Invalid or expired verification code.',
+                );
+              } else if (errors.containsKey('password')) {
+                print('🔒 Password validation error found');
+                return ApiResponseModel(
+                  status: false,
+                  code: 422,
+                  msg: 'Password does not meet requirements.',
+                );
+              }
+            }
+          }
+        } catch (parseError) {
+          print('⚠️ Could not parse validation errors: $parseError');
+        }
+      }
+
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
+
+      return ApiResponseModel(
+        status: false,
+        code: e.response?.statusCode ?? 500,
+        msg: errorMessage,
+      );
+    } catch (e) {
+      print('❌ Unexpected error during password reset: $e');
+      return ApiResponseModel(
+        status: false,
+        code: 500,
+        msg: 'Unexpected error: $e',
+      );
+    }
+  }
+
   // Logout - call API and clear local data
   Future<ApiResponseModel<void>> logout() async {
     try {

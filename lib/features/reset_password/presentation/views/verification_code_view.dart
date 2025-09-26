@@ -6,8 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/constants/language_manager.dart';
 import '../../../../shared/widgets/password_requirements_widget.dart';
 import '../../../../shared/utils/password_validator.dart';
-import '../../../../core/services/api_service.dart';
-import '../../../../core/services/email_manager.dart';
+import '../../../../core/services/auth_service.dart';
 
 class VerificationCodeView extends StatefulWidget {
   const VerificationCodeView({super.key});
@@ -45,7 +44,9 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   }
 
   void _loadEmail() {
-    _userEmail = EmailManager().resetEmail ?? '';
+    // For now, we'll use a placeholder email
+    // In a real app, you would get this from shared preferences or pass it as a parameter
+    _userEmail = 'user@example.com';
   }
 
   @override
@@ -173,19 +174,26 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     );
 
     try {
-      final apiService = ApiService();
+      print('🎯 ===== VERIFICATION CODE VIEW - STARTING PASSWORD RESET =====');
+      print('📧 User email: $_userEmail');
       String code = _controllers.map((controller) => controller.text).join();
+      print('🔢 Verification code: $code');
+      print('🔄 Calling AuthService.passwordReset()...');
 
-      final response = await apiService.resetPassword(
+      final result = await AuthService().passwordReset(
         email: _userEmail,
         code: code,
         password: _newPasswordController.text.trim(),
         passwordConfirmation: _confirmPasswordController.text.trim(),
       );
 
-      if (response.isSuccess) {
-        // Clear saved email
-        EmailManager().clearResetEmail();
+      print('📥 Received response from AuthService');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+
+      if (result.isSuccess) {
+        print('🎉 ===== PASSWORD RESET SUCCESSFUL! =====');
+        print('✅ Password reset successfully! Showing success message...');
 
         _showTopNotification(
           languageManager.isArabic
@@ -194,33 +202,51 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
           isError: false,
         );
 
+        print('🔄 Redirecting to sign in screen...');
+        print(
+          '🏁 ===== VERIFICATION CODE VIEW - PASSWORD RESET COMPLETED =====',
+        );
         // Navigate to sign in screen after a short delay
         Future.delayed(const Duration(seconds: 2), () {
           context.go('/signin');
         });
       } else {
-        String errorMessage = response.msg;
+        print('❌ ===== PASSWORD RESET FAILED! =====');
+        print('❌ Failed to reset password! Showing error message...');
+
+        String errorMessage = result.msg;
 
         // Handle specific error cases
-        if (response.isNotFound) {
-          errorMessage = languageManager.isArabic
-              ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
-              : 'Verification code is invalid or expired';
-        } else if (response.isValidationError) {
-          errorMessage = languageManager.isArabic
-              ? 'كلمة المرور لا تلبي المتطلبات'
-              : 'Password does not meet requirements';
+        if (result.code == 422) {
+          // Check for specific validation errors
+          if (result.msg.toLowerCase().contains('code')) {
+            errorMessage = languageManager.isArabic
+                ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
+                : 'Verification code is invalid or expired';
+          } else if (result.msg.toLowerCase().contains('password')) {
+            errorMessage = languageManager.isArabic
+                ? 'كلمة المرور لا تلبي المتطلبات'
+                : 'Password does not meet requirements';
+          } else if (result.msg.toLowerCase().contains('email')) {
+            errorMessage = languageManager.isArabic
+                ? 'البريد الإلكتروني غير صحيح'
+                : 'Invalid email address';
+          }
         }
 
         _showTopNotification(errorMessage, isError: true);
+        print('🏁 ===== VERIFICATION CODE VIEW - PASSWORD RESET FAILED =====');
       }
     } catch (e) {
+      print('❌ ===== PASSWORD RESET ERROR! =====');
+      print('❌ Error during password reset: $e');
       _showTopNotification(
         languageManager.isArabic
             ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
             : 'Connection error. Please try again',
         isError: true,
       );
+      print('🏁 ===== VERIFICATION CODE VIEW - PASSWORD RESET ERROR =====');
     }
   }
 
