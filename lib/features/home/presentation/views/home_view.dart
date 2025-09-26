@@ -908,7 +908,7 @@ class _HomeViewState extends State<HomeView> {
                           Navigator.pop(context);
                           if (isLoggedIn) {
                             // Logout
-                            await AuthService().logout();
+                            await AuthService().clearToken();
                             setState(() {}); // Refresh UI
                           } else {
                             // Sign In
@@ -1024,7 +1024,8 @@ class _HomeViewState extends State<HomeView> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await AuthService().logout();
+                      // Logout
+                      await AuthService().clearToken();
                       Navigator.pop(context);
                       // Refresh the page to update UI
                       setState(() {});

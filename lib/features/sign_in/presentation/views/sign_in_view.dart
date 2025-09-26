@@ -48,25 +48,68 @@ class _SignInViewState extends State<SignInView> {
       return;
     }
 
-    // Simulate login and save token
-    print('Login with email: ${_emailController.text}');
-
-    // Save user token (simulate successful login)
-    await AuthService().saveUserToken(
-      'user_token_${DateTime.now().millisecondsSinceEpoch}',
+    // Show loading
+    print('🔄 Showing loading notification...');
+    _showTopNotification(
+      languageManager.isArabic ? 'جاري تسجيل الدخول...' : 'Signing in...',
+      isError: false,
     );
-    print('User token saved successfully');
 
-    // Check if user came from checkout (has payment data)
-    if (widget.extraData != null &&
-        widget.extraData!['redirectToPayment'] == true) {
-      // Navigate to payment screen with the total price
-      double totalPrice = widget.extraData!['totalPrice'] ?? 0.0;
-      print('Redirecting to payment with total: $totalPrice');
-      context.go('/payment', extra: totalPrice);
-    } else {
-      // Navigate to home screen after successful login
-      context.go('/home');
+    try {
+      print('📞 Calling AuthService.login()...');
+      // Call login API
+      final response = await AuthService().login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      print('📥 Received response from AuthService');
+      print('   Success: ${response.isSuccess}');
+      print('   Message: ${response.msg}');
+
+      if (response.isSuccess) {
+        // Login successful
+        print('✅ Login successful! Showing success message...');
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم تسجيل الدخول بنجاح!'
+              : 'Login successful!',
+          isError: false,
+        );
+
+        // Check if user came from checkout (has payment data)
+        if (widget.extraData != null &&
+            widget.extraData!['redirectToPayment'] == true) {
+          // Navigate to payment screen with the total price
+          double totalPrice = widget.extraData!['totalPrice'] ?? 0.0;
+          print('💳 Redirecting to payment with total: $totalPrice');
+          context.go('/payment', extra: totalPrice);
+        } else {
+          // Navigate to home screen after successful login
+          print('🏠 Redirecting to home screen...');
+          context.go('/home');
+        }
+      } else {
+        // Login failed
+        print('❌ Login failed! Showing error message...');
+        _showTopNotification(
+          response.msg.isNotEmpty
+              ? response.msg
+              : (languageManager.isArabic
+                    ? 'فشل في تسجيل الدخول'
+                    : 'Login failed'),
+          isError: true,
+        );
+      }
+    } catch (e) {
+      // Network or other error
+      print('❌ Exception occurred during login: $e');
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'خطأ في الشبكة. يرجى المحاولة مرة أخرى'
+            : 'Network error. Please try again',
+        isError: true,
+      );
     }
   }
 

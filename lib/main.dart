@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/utils/app_routers.dart';
 import 'core/services/api_service.dart';
+import 'core/services/network_service.dart';
 import 'shared/themes/app_theme.dart';
 import 'shared/constants/language_manager.dart';
 import 'features/my_cart/presentation/manager/cart/cart_cubit.dart';
@@ -13,6 +14,10 @@ void main() {
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemUiOverlayStyle);
+
+  // Initialize Network Service with Dio
+  print('🚀 Initializing Network Service...');
+  NetworkService.initialize();
 
   // Initialize API service
   ApiService().init();
