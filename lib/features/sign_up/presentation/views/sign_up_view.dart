@@ -219,14 +219,34 @@ class _SignUpViewState extends State<SignUpView> {
       } else {
         print('❌ ===== REGISTRATION FAILED! =====');
         print('❌ Register failed! Showing error message...');
-        _showTopNotification(
-          result.msg.isNotEmpty
-              ? result.msg
-              : (languageManager.isArabic
-                    ? 'فشل في إنشاء الحساب'
-                    : 'Failed to create account'),
-          isError: true,
-        );
+
+        // Check if it's an existing email error
+        String errorMessage = result.msg.isNotEmpty ? result.msg : '';
+        bool isExistingEmail =
+            errorMessage.toLowerCase().contains('email') &&
+            (errorMessage.toLowerCase().contains('already') ||
+                errorMessage.toLowerCase().contains('exists') ||
+                errorMessage.toLowerCase().contains('taken') ||
+                errorMessage.toLowerCase().contains('duplicate'));
+
+        if (isExistingEmail) {
+          print('📧 Detected existing email error');
+          _showTopNotification(
+            languageManager.isArabic
+                ? 'هذا الإيميل مستخدم مسبقاً! يرجى استخدام إيميل آخر أو تسجيل الدخول'
+                : 'This email is already in use! Please use a different email or sign in',
+            isError: true,
+          );
+        } else {
+          _showTopNotification(
+            errorMessage.isNotEmpty
+                ? errorMessage
+                : (languageManager.isArabic
+                      ? 'فشل في إنشاء الحساب'
+                      : 'Failed to create account'),
+            isError: true,
+          );
+        }
         print('🏁 ===== SIGNUP VIEW - REGISTRATION FAILED =====');
       }
     } catch (e) {

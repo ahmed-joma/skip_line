@@ -90,13 +90,78 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     }
   }
 
-  void _resendCode() {
-    setState(() {
-      _remainingTime = 300;
-      _isTimerActive = true;
-    });
-    _startTimer();
-    // هنا تستدعي API لإعادة إرسال الكود
+  void _resendCode() async {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    // Show loading notification
+    _showTopNotification(
+      languageManager.isArabic
+          ? 'جاري إعادة إرسال الرمز...'
+          : 'Resending verification code...',
+      isError: false,
+    );
+
+    print('🎯 ===== VERIFICATION CODE VIEW - STARTING RESEND =====');
+    print('📧 User email: $_userEmail');
+    print('🔄 Calling AuthService.resendVerificationCode()...');
+
+    try {
+      // Call resend API
+      final result = await AuthService().resendVerificationCode();
+
+      print('📥 Received response from AuthService');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+
+      if (result.isSuccess) {
+        print('🎉 ===== RESEND SUCCESSFUL! =====');
+        print(
+          '✅ Verification code resent successfully! Showing success message...',
+        );
+
+        // Show success message
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم إعادة إرسال رمز التحقق بنجاح!'
+              : 'Verification code resent successfully!',
+          isError: false,
+        );
+
+        // Reset timer
+        setState(() {
+          _remainingTime = 300;
+          _isTimerActive = true;
+        });
+        _startTimer();
+        print('🔄 Timer reset to 5 minutes');
+        print('🏁 ===== VERIFICATION CODE VIEW - RESEND COMPLETED =====');
+      } else {
+        print('❌ ===== RESEND FAILED! =====');
+        print('❌ Failed to resend verification code! Showing error message...');
+        _showTopNotification(
+          result.msg.isNotEmpty
+              ? result.msg
+              : (languageManager.isArabic
+                    ? 'فشل في إعادة إرسال رمز التحقق'
+                    : 'Failed to resend verification code'),
+          isError: true,
+        );
+        print('🏁 ===== VERIFICATION CODE VIEW - RESEND FAILED =====');
+      }
+    } catch (e) {
+      print('❌ ===== RESEND ERROR! =====');
+      print('❌ Error during resend: $e');
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'حدث خطأ أثناء إعادة إرسال الرمز'
+            : 'Error occurred during resend',
+        isError: true,
+      );
+      print('🏁 ===== VERIFICATION CODE VIEW - RESEND ERROR =====');
+    }
   }
 
   String _formatTime(int seconds) {

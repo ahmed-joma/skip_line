@@ -196,6 +196,29 @@ class AuthService {
       final errorMessage = NetworkService.handleDioError(e);
       print('🔧 Error handled: $errorMessage');
 
+      // Check for specific error types
+      if (e.response?.statusCode == 422) {
+        print('📧 Validation error detected (likely existing email)');
+        // Try to extract more specific error message from response
+        try {
+          final responseData = e.response?.data as Map<String, dynamic>?;
+          if (responseData != null && responseData.containsKey('errors')) {
+            final errors = responseData['errors'];
+            if (errors is Map && errors.containsKey('email')) {
+              print('📧 Email validation error found');
+              return ApiResponseModel(
+                status: false,
+                code: 422,
+                msg:
+                    'This email is already in use. Please use a different email or sign in.',
+              );
+            }
+          }
+        } catch (parseError) {
+          print('⚠️ Could not parse validation errors: $parseError');
+        }
+      }
+
       return ApiResponseModel(
         status: false,
         code: e.response?.statusCode ?? 500,
@@ -283,9 +306,13 @@ class AuthService {
 
   // Resend verification code
   Future<ApiResponseModel<void>> resendVerificationCode() async {
+    print('🚀 ===== RESEND VERIFICATION API CALL STARTED =====');
+    print('📝 Preparing resend verification request...');
+
     try {
       final token = await getUserToken();
       if (token == null) {
+        print('❌ No authentication token found');
         return ApiResponseModel(
           status: false,
           code: 401,
@@ -293,19 +320,54 @@ class AuthService {
         );
       }
 
+      print('🎫 Token found: ${token.substring(0, 10)}...');
+      print('🌐 Sending POST request to /verify/resend...');
+
       final response = await NetworkService.post(
         '/verify/resend',
         token: token,
       );
 
+      print('📥 Received response from server');
+      print('   Status Code: ${response.statusCode}');
+      print('   Response Type: ${response.data.runtimeType}');
+
       final responseData = response.data as Map<String, dynamic>;
-      return ApiResponseModel.fromJson(responseData, null);
+      print('🔍 Parsed response data:');
+      print('   Raw Data: $responseData');
+
+      final apiResponse = ApiResponseModel.fromJson(responseData, null);
+
+      print('🔍 Parsed API response:');
+      print('   Status: ${apiResponse.status}');
+      print('   Code: ${apiResponse.code}');
+      print('   Message: ${apiResponse.msg}');
+
+      if (apiResponse.isSuccess) {
+        print('✅ Verification code resent successfully!');
+        print('📧 New verification code sent to user email');
+      } else {
+        print('❌ Failed to resend verification code: ${apiResponse.msg}');
+      }
+
+      print('🏁 ===== RESEND VERIFICATION API CALL COMPLETED =====');
+      return apiResponse;
+    } on DioException catch (e) {
+      print('❌ DioException occurred during resend verification');
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
+
+      return ApiResponseModel(
+        status: false,
+        code: e.response?.statusCode ?? 500,
+        msg: errorMessage,
+      );
     } catch (e) {
-      print('Resend verification error: $e');
+      print('❌ Unexpected error during resend verification: $e');
       return ApiResponseModel(
         status: false,
         code: 500,
-        msg: 'Network error: $e',
+        msg: 'Unexpected error: $e',
       );
     }
   }
