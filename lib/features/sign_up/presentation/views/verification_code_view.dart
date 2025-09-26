@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/constants/language_manager.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/services/auth_service.dart';
 
 class VerificationCodeView extends StatefulWidget {
   const VerificationCodeView({super.key});
@@ -22,13 +23,28 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   int _remainingTime = 300; // 5 minutes in seconds
   bool _isTimerActive = true;
   Timer? _timer;
+  String? _userEmail;
 
   @override
   void initState() {
     super.initState();
+    _loadUserEmail();
     _startTimer();
     // Hide system UI to make screen full
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
+
+  Future<void> _loadUserEmail() async {
+    try {
+      final userData = await AuthService().getUserData();
+      if (userData != null) {
+        setState(() {
+          _userEmail = userData.email;
+        });
+      }
+    } catch (e) {
+      print('Error loading user email: $e');
+    }
   }
 
   @override
@@ -89,16 +105,73 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  void _verifyCode(String code) {
+  void _verifyCode(String code) async {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    // Show loading notification
     _showTopNotification(
-      Provider.of<LanguageManager>(context, listen: false).isArabic
-          ? 'تم إنشاء حسابك بنجاح! مرحباً بك في SkipLine'
-          : 'Your account has been created successfully! Welcome to SkipLine',
+      languageManager.isArabic
+          ? 'جاري التحقق من الرمز...'
+          : 'Verifying code...',
       isError: false,
     );
 
-    // Navigate to home screen after successful verification
-    context.go('/home');
+    print('🎯 ===== VERIFICATION CODE VIEW - STARTING VERIFICATION =====');
+    print('📝 Verification code entered: $code');
+    print('📧 User email: $_userEmail');
+    print('🔄 Calling AuthService.verifyEmail()...');
+
+    try {
+      // Call verify API
+      final result = await AuthService().verifyEmail(code);
+
+      print('📥 Received response from AuthService');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+
+      if (result.isSuccess) {
+        print('🎉 ===== VERIFICATION SUCCESSFUL! =====');
+        print('✅ Email verification successful! Showing success message...');
+
+        // Show success message
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم إنشاء حسابك بنجاح! مرحباً بك في SkipLine'
+              : 'Your account has been created successfully! Welcome to SkipLine',
+          isError: false,
+        );
+
+        // Navigate to home screen after successful verification
+        print('🔄 Redirecting to home screen...');
+        print('🏁 ===== VERIFICATION CODE VIEW - VERIFICATION COMPLETED =====');
+        context.go('/home');
+      } else {
+        print('❌ ===== VERIFICATION FAILED! =====');
+        print('❌ Email verification failed! Showing error message...');
+        _showTopNotification(
+          result.msg.isNotEmpty
+              ? result.msg
+              : (languageManager.isArabic
+                    ? 'رمز التحقق غير صحيح'
+                    : 'Invalid verification code'),
+          isError: true,
+        );
+        print('🏁 ===== VERIFICATION CODE VIEW - VERIFICATION FAILED =====');
+      }
+    } catch (e) {
+      print('❌ ===== VERIFICATION ERROR! =====');
+      print('❌ Error during verification: $e');
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'حدث خطأ أثناء التحقق'
+            : 'Error occurred during verification',
+        isError: true,
+      );
+      print('🏁 ===== VERIFICATION CODE VIEW - VERIFICATION ERROR =====');
+    }
   }
 
   void _showTopNotification(String message, {bool isError = false}) {
@@ -255,7 +328,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                             : "We've sent you the verification code on ",
                       ),
                       TextSpan(
-                        text: 'ahmedjomma18@gmail.com',
+                        text: _userEmail ?? 'user@example.com',
                         style: const TextStyle(
                           fontSize: 16,
                           color: const Color(0xFF123459),

@@ -18,6 +18,7 @@ class SignUpView extends StatefulWidget {
 class _SignUpViewState extends State<SignUpView> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -26,14 +27,89 @@ class _SignUpViewState extends State<SignUpView> {
   bool _isEmailValid = false;
   bool _usernameError = false;
   bool _emailError = false;
+  bool _phoneError = false;
+  bool _cityError = false;
   bool _passwordError = false;
   bool _confirmPasswordError = false;
   bool _isPasswordValid = false;
+
+  // Address dropdown
+  String? _selectedCity;
+  final List<String> _saudiCities = [
+    'الرياض',
+    'جدة',
+    'مكة المكرمة',
+    'المدينة المنورة',
+    'الدمام',
+    'الخبر',
+    'الظهران',
+    'الطائف',
+    'بريدة',
+    'تبوك',
+    'حائل',
+    'الأحساء',
+    'نجران',
+    'جازان',
+    'الباحة',
+    'عرعر',
+    'سكاكا',
+    'القطيف',
+    'ينبع',
+    'أبها',
+  ];
+
+  String _getEnglishCityName(String arabicCity) {
+    switch (arabicCity) {
+      case 'الرياض':
+        return 'Riyadh';
+      case 'جدة':
+        return 'Jeddah';
+      case 'مكة المكرمة':
+        return 'Makkah';
+      case 'المدينة المنورة':
+        return 'Madinah';
+      case 'الدمام':
+        return 'Dammam';
+      case 'الخبر':
+        return 'Khobar';
+      case 'الظهران':
+        return 'Dhahran';
+      case 'الطائف':
+        return 'Taif';
+      case 'بريدة':
+        return 'Buraydah';
+      case 'تبوك':
+        return 'Tabuk';
+      case 'حائل':
+        return 'Hail';
+      case 'الأحساء':
+        return 'Al Ahsa';
+      case 'نجران':
+        return 'Najran';
+      case 'جازان':
+        return 'Jazan';
+      case 'الباحة':
+        return 'Al Baha';
+      case 'عرعر':
+        return 'Arar';
+      case 'سكاكا':
+        return 'Sakaka';
+      case 'القطيف':
+        return 'Qatif';
+      case 'ينبع':
+        return 'Yanbu';
+      case 'أبها':
+        return 'Abha';
+      default:
+        return arabicCity;
+    }
+  }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -48,12 +124,16 @@ class _SignUpViewState extends State<SignUpView> {
     setState(() {
       _usernameError = _usernameController.text.trim().isEmpty;
       _emailError = _emailController.text.trim().isEmpty;
+      _phoneError = _phoneController.text.trim().isEmpty;
+      _cityError = _selectedCity == null;
       _passwordError = _passwordController.text.trim().isEmpty;
       _confirmPasswordError = _confirmPasswordController.text.trim().isEmpty;
     });
 
     if (_usernameError ||
         _emailError ||
+        _phoneError ||
+        _cityError ||
         _passwordError ||
         _confirmPasswordError) {
       _showTopNotification(
@@ -86,14 +166,76 @@ class _SignUpViewState extends State<SignUpView> {
       return;
     }
 
-    // Simulate signup and save token
-    print('Signup with email: ${_emailController.text}');
-
-    // Save user token (simulate successful signup)
-    await AuthService().saveUserToken(
-      'user_token_${DateTime.now().millisecondsSinceEpoch}',
+    // Show loading notification
+    _showTopNotification(
+      languageManager.isArabic ? 'جاري إنشاء الحساب...' : 'Creating account...',
+      isError: false,
     );
-    print('User token saved successfully');
+
+    print('🎯 ===== SIGNUP VIEW - STARTING REGISTRATION =====');
+    print('📋 Form validation passed successfully!');
+    print('📝 Collected form data:');
+    print('   👤 Username: ${_usernameController.text.trim()}');
+    print('   📧 Email: ${_emailController.text.trim()}');
+    print('   📱 Phone: +966${_phoneController.text.trim()}');
+    print('   🏠 Address: ${_selectedCity}');
+    print('   🔒 Password: [HIDDEN]');
+    print('🔄 Calling AuthService.register()...');
+
+    try {
+      // Call register API
+      final result = await AuthService().register(
+        username: _usernameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        phone: '+966${_phoneController.text.trim()}',
+        address: _selectedCity!,
+      );
+
+      print('📥 Received response from AuthService');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+
+      if (result.isSuccess) {
+        print('🎉 ===== REGISTRATION SUCCESSFUL! =====');
+        print('✅ Register successful! Showing success message...');
+
+        // Show success message
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم إنشاء الحساب بنجاح!'
+              : 'Account created successfully!',
+          isError: false,
+        );
+
+        // Navigate to verification screen
+        print('🔄 Redirecting to verification screen...');
+        print('🏁 ===== SIGNUP VIEW - REGISTRATION COMPLETED =====');
+        context.go('/signup-verification');
+      } else {
+        print('❌ ===== REGISTRATION FAILED! =====');
+        print('❌ Register failed! Showing error message...');
+        _showTopNotification(
+          result.msg.isNotEmpty
+              ? result.msg
+              : (languageManager.isArabic
+                    ? 'فشل في إنشاء الحساب'
+                    : 'Failed to create account'),
+          isError: true,
+        );
+        print('🏁 ===== SIGNUP VIEW - REGISTRATION FAILED =====');
+      }
+    } catch (e) {
+      print('❌ ===== REGISTRATION ERROR! =====');
+      print('❌ Error during register: $e');
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'حدث خطأ أثناء إنشاء الحساب'
+            : 'Error occurred during registration',
+        isError: true,
+      );
+      print('🏁 ===== SIGNUP VIEW - REGISTRATION ERROR =====');
+    }
 
     // Check if user came from checkout (has payment data)
     if (widget.extraData != null &&
@@ -377,6 +519,161 @@ class _SignUpViewState extends State<SignUpView> {
                                     )
                                   : null,
                             ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Phone Field
+                  Consumer<LanguageManager>(
+                    builder: (context, languageManager, child) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            languageManager.isArabic
+                                ? 'رقم الهاتف'
+                                : 'Phone Number',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          TextFormField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 16,
+                            ),
+                            onChanged: (value) {
+                              if (_phoneError && value.trim().isNotEmpty) {
+                                setState(() {
+                                  _phoneError = false;
+                                });
+                              }
+                            },
+                            decoration: InputDecoration(
+                              prefixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(width: 12),
+                                  const Text(
+                                    '🇸🇦',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    '+966',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
+                              ),
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _phoneError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
+                                ),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _phoneError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _phoneError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Address Field
+                  Consumer<LanguageManager>(
+                    builder: (context, languageManager, child) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            languageManager.isArabic ? 'المدينة' : 'City',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          DropdownButtonFormField<String>(
+                            value: _selectedCity,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedCity = newValue;
+                                if (_cityError && newValue != null) {
+                                  _cityError = false;
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              hintText: languageManager.isArabic
+                                  ? 'اختر مدينتك'
+                                  : 'Select your city',
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _cityError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
+                                ),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _cityError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: _cityError
+                                      ? Colors.red
+                                      : Color(0xFF123459),
+                                ),
+                              ),
+                            ),
+                            items: _saudiCities.map((String city) {
+                              return DropdownMenuItem<String>(
+                                value: city,
+                                child: Text(
+                                  languageManager.isArabic
+                                      ? city
+                                      : _getEnglishCityName(city),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ],
                       );

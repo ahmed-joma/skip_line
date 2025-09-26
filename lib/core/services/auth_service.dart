@@ -123,55 +123,104 @@ class AuthService {
 
   // Register new user
   Future<ApiResponseModel<LoginResponseModel>> register({
-    required String name,
+    required String username,
     required String email,
     required String password,
-    required String passwordConfirmation,
     required String phone,
     required String address,
   }) async {
+    print('🚀 ===== REGISTER API CALL STARTED =====');
+    print('📝 Preparing registration data...');
+    print('   👤 Username: $username');
+    print('   📧 Email: $email');
+    print('   📱 Phone: $phone');
+    print('   🏠 Address: $address');
+    print('   🔒 Password: [HIDDEN]');
+
     try {
+      print('🌐 Sending POST request to /register...');
       final response = await NetworkService.post(
         '/register',
         body: {
-          'name': name,
+          'name': username,
           'email': email,
           'password': password,
-          'password_confirmation': passwordConfirmation,
+          'password_confirmation': password,
           'phone': phone,
           'address': address,
         },
       );
 
+      print('📥 Received response from server');
+      print('   Status Code: ${response.statusCode}');
+      print('   Response Type: ${response.data.runtimeType}');
+
       final responseData = response.data as Map<String, dynamic>;
+      print('🔍 Parsed response data:');
+      print('   Raw Data: $responseData');
+
       final apiResponse = ApiResponseModel.fromJson(
         responseData,
         (data) => LoginResponseModel.fromJson(data),
       );
 
+      print('🔍 Parsed API response:');
+      print('   Status: ${apiResponse.status}');
+      print('   Code: ${apiResponse.code}');
+      print('   Message: ${apiResponse.msg}');
+      print('   Has Data: ${apiResponse.data != null}');
+
       if (apiResponse.isSuccess && apiResponse.data != null) {
+        print('✅ Registration successful!');
+        print(
+          '🎫 Token received: ${apiResponse.data!.token.substring(0, 10)}...',
+        );
+        print('👤 User data: ${apiResponse.data!.user.fullName}');
+        print('📧 Email: ${apiResponse.data!.user.email}');
+        print('📱 Phone: ${apiResponse.data!.user.phone}');
+        print('🏠 Address: ${apiResponse.data!.user.address}');
+
         // Save token and user data
+        print('💾 Saving token and user data locally...');
         await saveUserToken(apiResponse.data!.token);
         await saveUserData(apiResponse.data!.user);
-        print('Registration successful - Token saved');
+        print('✅ Token and user data saved successfully');
+      } else {
+        print('❌ Registration failed: ${apiResponse.msg}');
       }
 
+      print('🏁 ===== REGISTER API CALL COMPLETED =====');
       return apiResponse;
+    } on DioException catch (e) {
+      print('❌ DioException occurred during registration');
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
+
+      return ApiResponseModel(
+        status: false,
+        code: e.response?.statusCode ?? 500,
+        msg: errorMessage,
+      );
     } catch (e) {
-      print('Registration error: $e');
+      print('❌ Unexpected error during registration: $e');
       return ApiResponseModel(
         status: false,
         code: 500,
-        msg: 'Network error: $e',
+        msg: 'Unexpected error: $e',
       );
     }
   }
 
   // Verify email with code
   Future<ApiResponseModel<void>> verifyEmail(String code) async {
+    print('🚀 ===== VERIFY EMAIL API CALL STARTED =====');
+    print('📝 Preparing verification data...');
+    print('   🔢 Code: $code');
+
     try {
       final token = await getUserToken();
       if (token == null) {
+        print('❌ No authentication token found');
         return ApiResponseModel(
           status: false,
           code: 401,
@@ -179,20 +228,55 @@ class AuthService {
         );
       }
 
+      print('🎫 Token found: ${token.substring(0, 10)}...');
+      print('🌐 Sending POST request to /verify...');
+
       final response = await NetworkService.post(
         '/verify',
         body: {'code': code},
         token: token,
       );
 
+      print('📥 Received response from server');
+      print('   Status Code: ${response.statusCode}');
+      print('   Response Type: ${response.data.runtimeType}');
+
       final responseData = response.data as Map<String, dynamic>;
-      return ApiResponseModel.fromJson(responseData, null);
+      print('🔍 Parsed response data:');
+      print('   Raw Data: $responseData');
+
+      final apiResponse = ApiResponseModel.fromJson(responseData, null);
+
+      print('🔍 Parsed API response:');
+      print('   Status: ${apiResponse.status}');
+      print('   Code: ${apiResponse.code}');
+      print('   Message: ${apiResponse.msg}');
+
+      if (apiResponse.isSuccess) {
+        print('✅ Email verification successful!');
+        print('🎉 User email has been verified successfully');
+      } else {
+        print('❌ Email verification failed: ${apiResponse.msg}');
+      }
+
+      print('🏁 ===== VERIFY EMAIL API CALL COMPLETED =====');
+      return apiResponse;
+    } on DioException catch (e) {
+      print('❌ DioException occurred during email verification');
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
+
+      return ApiResponseModel(
+        status: false,
+        code: e.response?.statusCode ?? 500,
+        msg: errorMessage,
+      );
     } catch (e) {
-      print('Email verification error: $e');
+      print('❌ Unexpected error during email verification: $e');
       return ApiResponseModel(
         status: false,
         code: 500,
-        msg: 'Network error: $e',
+        msg: 'Unexpected error: $e',
       );
     }
   }
