@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../shared/constants/language_manager.dart';
@@ -28,6 +29,7 @@ class _SignUpViewState extends State<SignUpView> {
   bool _usernameError = false;
   bool _emailError = false;
   bool _phoneError = false;
+  bool _phoneLengthError = false;
   bool _cityError = false;
   bool _passwordError = false;
   bool _confirmPasswordError = false;
@@ -125,6 +127,7 @@ class _SignUpViewState extends State<SignUpView> {
       _usernameError = _usernameController.text.trim().isEmpty;
       _emailError = _emailController.text.trim().isEmpty;
       _phoneError = _phoneController.text.trim().isEmpty;
+      _phoneLengthError = _phoneController.text.trim().length != 9;
       _cityError = _selectedCity == null;
       _passwordError = _passwordController.text.trim().isEmpty;
       _confirmPasswordError = _confirmPasswordController.text.trim().isEmpty;
@@ -133,6 +136,7 @@ class _SignUpViewState extends State<SignUpView> {
     if (_usernameError ||
         _emailError ||
         _phoneError ||
+        _phoneLengthError ||
         _cityError ||
         _passwordError ||
         _confirmPasswordError) {
@@ -546,17 +550,24 @@ class _SignUpViewState extends State<SignUpView> {
                           const SizedBox(height: 4),
                           TextFormField(
                             controller: _phoneController,
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
+                            maxLength: 9,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             style: const TextStyle(
                               color: Colors.black87,
                               fontSize: 16,
                             ),
                             onChanged: (value) {
-                              if (_phoneError && value.trim().isNotEmpty) {
-                                setState(() {
+                              setState(() {
+                                if (_phoneError && value.trim().isNotEmpty) {
                                   _phoneError = false;
-                                });
-                              }
+                                }
+                                if (_phoneLengthError && value.length == 9) {
+                                  _phoneLengthError = false;
+                                }
+                              });
                             },
                             decoration: InputDecoration(
                               prefixIcon: Row(
@@ -581,21 +592,21 @@ class _SignUpViewState extends State<SignUpView> {
                               ),
                               border: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: _phoneError
+                                  color: (_phoneError || _phoneLengthError)
                                       ? Colors.red
                                       : Color(0xFF123459),
                                 ),
                               ),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: _phoneError
+                                  color: (_phoneError || _phoneLengthError)
                                       ? Colors.red
                                       : Color(0xFF123459),
                                 ),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: _phoneError
+                                  color: (_phoneError || _phoneLengthError)
                                       ? Colors.red
                                       : Color(0xFF123459),
                                 ),
