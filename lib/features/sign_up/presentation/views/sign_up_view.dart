@@ -222,12 +222,29 @@ class _SignUpViewState extends State<SignUpView> {
 
         // Check if it's an existing email error
         String errorMessage = result.msg.isNotEmpty ? result.msg : '';
-        bool isExistingEmail =
-            errorMessage.toLowerCase().contains('email') &&
-            (errorMessage.toLowerCase().contains('already') ||
-                errorMessage.toLowerCase().contains('exists') ||
-                errorMessage.toLowerCase().contains('taken') ||
-                errorMessage.toLowerCase().contains('duplicate'));
+        print('🔍 Error message to check: $errorMessage');
+        print('🔍 Error code: ${result.code}');
+
+        bool isExistingEmail = false;
+
+        // Check by error code first
+        if (result.code == 422) {
+          print('📧 Status code 422 detected - likely validation error');
+          isExistingEmail = true;
+        }
+
+        // Check by error message content
+        if (!isExistingEmail && errorMessage.isNotEmpty) {
+          String lowerMessage = errorMessage.toLowerCase();
+          isExistingEmail =
+              lowerMessage.contains('email') &&
+              (lowerMessage.contains('already') ||
+                  lowerMessage.contains('exists') ||
+                  lowerMessage.contains('taken') ||
+                  lowerMessage.contains('duplicate') ||
+                  lowerMessage.contains('in use') ||
+                  lowerMessage.contains('registered'));
+        }
 
         if (isExistingEmail) {
           print('📧 Detected existing email error');
@@ -238,6 +255,7 @@ class _SignUpViewState extends State<SignUpView> {
             isError: true,
           );
         } else {
+          print('❌ Other error type detected');
           _showTopNotification(
             errorMessage.isNotEmpty
                 ? errorMessage
@@ -248,6 +266,7 @@ class _SignUpViewState extends State<SignUpView> {
           );
         }
         print('🏁 ===== SIGNUP VIEW - REGISTRATION FAILED =====');
+        return; // Stop execution here, don't navigate
       }
     } catch (e) {
       print('❌ ===== REGISTRATION ERROR! =====');
@@ -259,8 +278,10 @@ class _SignUpViewState extends State<SignUpView> {
         isError: true,
       );
       print('🏁 ===== SIGNUP VIEW - REGISTRATION ERROR =====');
+      return; // Stop execution here, don't navigate
     }
 
+    // This code only runs if registration was successful
     // Check if user came from checkout (has payment data)
     if (widget.extraData != null &&
         widget.extraData!['redirectToPayment'] == true) {

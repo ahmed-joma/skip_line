@@ -193,8 +193,9 @@ class AuthService {
       return apiResponse;
     } on DioException catch (e) {
       print('❌ DioException occurred during registration');
-      final errorMessage = NetworkService.handleDioError(e);
-      print('🔧 Error handled: $errorMessage');
+      print('🔍 Error Type: ${e.type}');
+      print('🔍 Status Code: ${e.response?.statusCode}');
+      print('🔍 Response Data: ${e.response?.data}');
 
       // Check for specific error types
       if (e.response?.statusCode == 422) {
@@ -202,22 +203,72 @@ class AuthService {
         // Try to extract more specific error message from response
         try {
           final responseData = e.response?.data as Map<String, dynamic>?;
-          if (responseData != null && responseData.containsKey('errors')) {
-            final errors = responseData['errors'];
-            if (errors is Map && errors.containsKey('email')) {
-              print('📧 Email validation error found');
-              return ApiResponseModel(
-                status: false,
-                code: 422,
-                msg:
-                    'This email is already in use. Please use a different email or sign in.',
-              );
+          print('🔍 Full response data: $responseData');
+
+          if (responseData != null) {
+            // Check for errors field
+            if (responseData.containsKey('errors')) {
+              final errors = responseData['errors'];
+              print('🔍 Errors field: $errors');
+
+              if (errors is Map && errors.containsKey('email')) {
+                print('📧 Email validation error found in errors.email');
+                return ApiResponseModel(
+                  status: false,
+                  code: 422,
+                  msg:
+                      'This email is already in use. Please use a different email or sign in.',
+                );
+              }
+            }
+
+            // Check for message field
+            if (responseData.containsKey('message')) {
+              final message = responseData['message'].toString().toLowerCase();
+              print('🔍 Message field: $message');
+
+              if (message.contains('email') &&
+                  (message.contains('already') ||
+                      message.contains('exists') ||
+                      message.contains('taken') ||
+                      message.contains('duplicate'))) {
+                print('📧 Email validation error found in message');
+                return ApiResponseModel(
+                  status: false,
+                  code: 422,
+                  msg:
+                      'This email is already in use. Please use a different email or sign in.',
+                );
+              }
+            }
+
+            // Check for msg field
+            if (responseData.containsKey('msg')) {
+              final msg = responseData['msg'].toString().toLowerCase();
+              print('🔍 Msg field: $msg');
+
+              if (msg.contains('email') &&
+                  (msg.contains('already') ||
+                      msg.contains('exists') ||
+                      msg.contains('taken') ||
+                      msg.contains('duplicate'))) {
+                print('📧 Email validation error found in msg');
+                return ApiResponseModel(
+                  status: false,
+                  code: 422,
+                  msg:
+                      'This email is already in use. Please use a different email or sign in.',
+                );
+              }
             }
           }
         } catch (parseError) {
           print('⚠️ Could not parse validation errors: $parseError');
         }
       }
+
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
 
       return ApiResponseModel(
         status: false,
