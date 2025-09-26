@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/constants/language_manager.dart';
 import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/product_service.dart';
+import '../../../../core/models/product_model.dart';
 import '../../../search/presentation/views/search_view.dart';
 import '../../../Product_Detail/data/models/product_model.dart' as detail;
 import '../../../Product_Detail/presentation/utils/navigation_helper.dart';
@@ -19,10 +21,85 @@ class _HomeViewState extends State<HomeView> {
   int _currentPage = 0;
   final PageController _pageController = PageController();
 
+  // Product data
+  List<ProductModel> _bestSellers = [];
+  List<ProductModel> _exclusiveOffers = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  /// تحميل المنتجات من الـ API
+  Future<void> _loadProducts() async {
+    print('🔄 ===== LOADING PRODUCTS =====');
+    print('📱 Current loading state: $_isLoading');
+    print('📱 Current error message: $_errorMessage');
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    print('📱 Updated loading state to: $_isLoading');
+
+    try {
+      print('📞 Calling ProductService.getProducts()...');
+      final result = await ProductService.getProducts();
+
+      print('📥 Received result from ProductService:');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+      print('   Data: ${result.data}');
+
+      if (result.isSuccess && result.data != null) {
+        print('✅ Products loaded successfully!');
+        print('📦 Best Sellers count: ${result.data!.bestSellers.length}');
+        print(
+          '📦 Exclusive Offers count: ${result.data!.exclusiveOffers.length}',
+        );
+
+        setState(() {
+          _bestSellers = result.data!.bestSellers;
+          _exclusiveOffers = result.data!.exclusiveOffers;
+          _isLoading = false;
+        });
+
+        print('📱 Updated state - Loading: $_isLoading');
+        print('📱 Best Sellers in state: ${_bestSellers.length}');
+        print('📱 Exclusive Offers in state: ${_exclusiveOffers.length}');
+        print(
+          '📦 Loaded ${_bestSellers.length} best sellers and ${_exclusiveOffers.length} exclusive offers',
+        );
+      } else {
+        print('❌ Failed to load products: ${result.msg}');
+        setState(() {
+          _errorMessage = result.msg;
+          _isLoading = false;
+        });
+        print('📱 Updated state - Loading: $_isLoading, Error: $_errorMessage');
+      }
+    } catch (e) {
+      print('❌ Error loading products: $e');
+      print('🔍 Error type: ${e.runtimeType}');
+      setState(() {
+        _errorMessage = 'Error loading products: $e';
+        _isLoading = false;
+      });
+      print('📱 Updated state - Loading: $_isLoading, Error: $_errorMessage');
+    }
+
+    print('🏁 ===== PRODUCTS LOADING COMPLETED =====');
+    print('📱 Final state - Loading: $_isLoading, Error: $_errorMessage');
   }
 
   @override
@@ -418,27 +495,91 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildProductCard(
-                      'assets/images/banana.png',
-                      languageManager.isArabic ? 'موز عضوي' : 'Organic Bananas',
-                      '1kg, Priceg',
-                      'SR8',
+
+              // Loading state
+              if (_isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF123459),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildProductCard(
-                      'assets/images/apple.png',
-                      languageManager.isArabic ? 'تفاح أحمر' : 'Red Apple',
-                      '1kg, Priceg',
-                      'SR10',
+                )
+              // Error state
+              else if (_errorMessage != null)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 8),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: _loadProducts,
+                          child: Text(
+                            languageManager.isArabic
+                                ? 'إعادة المحاولة'
+                                : 'Retry',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                )
+              // Empty state
+              else if (_bestSellers.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          color: Colors.grey,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          languageManager.isArabic
+                              ? 'لا توجد منتجات متاحة'
+                              : 'No products available',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              // Products display
+              else
+                Row(
+                  children: [
+                    if (_bestSellers.isNotEmpty)
+                      Expanded(
+                        child: _buildProductCardFromModel(
+                          _bestSellers[0],
+                          languageManager.isArabic,
+                        ),
+                      ),
+                    if (_bestSellers.length > 1) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildProductCardFromModel(
+                          _bestSellers[1],
+                          languageManager.isArabic,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
             ],
           ),
         );
@@ -478,27 +619,91 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildProductCard(
-                      'assets/images/mike.png',
-                      languageManager.isArabic ? 'حليب طازج' : 'Fresh Milk',
-                      '1L, Fresh',
-                      'SR5',
+
+              // Loading state
+              if (_isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF123459),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildProductCard(
-                      'assets/images/laban.png',
-                      languageManager.isArabic ? 'لبن طبيعي' : 'Natural Yogurt',
-                      '500g, Natural',
-                      'SR9',
+                )
+              // Error state
+              else if (_errorMessage != null)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 8),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: _loadProducts,
+                          child: Text(
+                            languageManager.isArabic
+                                ? 'إعادة المحاولة'
+                                : 'Retry',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                )
+              // Empty state
+              else if (_exclusiveOffers.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.local_offer_outlined,
+                          color: Colors.grey,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          languageManager.isArabic
+                              ? 'لا توجد عروض متاحة'
+                              : 'No offers available',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              // Products display
+              else
+                Row(
+                  children: [
+                    if (_exclusiveOffers.isNotEmpty)
+                      Expanded(
+                        child: _buildProductCardFromModel(
+                          _exclusiveOffers[0],
+                          languageManager.isArabic,
+                        ),
+                      ),
+                    if (_exclusiveOffers.length > 1) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildProductCardFromModel(
+                          _exclusiveOffers[1],
+                          languageManager.isArabic,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
             ],
           ),
         );
@@ -515,31 +720,91 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildProductCard(
-                      'assets/images/Egge.png',
-                      languageManager.isArabic
-                          ? 'بيض دجاج أحمر'
-                          : 'Egg Chicken Red',
-                      '4pcs, Price',
-                      'SR1.99',
+
+              // Loading state
+              if (_isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF123459),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildProductCard(
-                      'assets/images/Egge2.png',
-                      languageManager.isArabic
-                          ? 'بيض دجاج أبيض'
-                          : 'Egg Chicken White',
-                      '180g, Price',
-                      'SR1.50',
+                )
+              // Error state
+              else if (_errorMessage != null)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 8),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: _loadProducts,
+                          child: Text(
+                            languageManager.isArabic
+                                ? 'إعادة المحاولة'
+                                : 'Retry',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                )
+              // Empty state
+              else if (_exclusiveOffers.length < 3)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.local_offer_outlined,
+                          color: Colors.grey,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          languageManager.isArabic
+                              ? 'لا توجد عروض إضافية'
+                              : 'No additional offers',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              // Products display (show items 2 and 3 from exclusive offers)
+              else
+                Row(
+                  children: [
+                    if (_exclusiveOffers.length > 2)
+                      Expanded(
+                        child: _buildProductCardFromModel(
+                          _exclusiveOffers[2],
+                          languageManager.isArabic,
+                        ),
+                      ),
+                    if (_exclusiveOffers.length > 3) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildProductCardFromModel(
+                          _exclusiveOffers[3],
+                          languageManager.isArabic,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
             ],
           ),
         );
@@ -547,35 +812,34 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildProductCard(
-    String imagePath,
-    String title,
-    String subtitle,
-    String price,
-  ) {
+  /// بناء بطاقة منتج من نموذج البيانات
+  Widget _buildProductCardFromModel(ProductModel product, bool isArabic) {
     return GestureDetector(
       onTap: () {
         // إنشاء منتج تجريبي للتنقل
-        final product = detail.ProductModel(
-          id: '1',
-          name: title,
-          nameAr: title,
-          description: subtitle,
-          descriptionAr: subtitle,
-          price: double.parse(price.replaceAll('SR', '').trim()),
-          weight: '1kg',
-          images: [imagePath], // سيتم تحويله إلى URL في صفحة التفاصيل
-          category: 'Fruits',
-          categoryAr: 'الفواكه',
+        final detailProduct = detail.ProductModel(
+          id: product.id.toString(),
+          name: product.nameEn,
+          nameAr: product.nameAr,
+          description: '${product.getUnit(isArabic)}',
+          descriptionAr: '${product.getUnit(isArabic)}',
+          price: double.parse(product.salePrice),
+          weight: product.getUnit(isArabic),
+          images: [product.imageUrl],
+          category: 'Product',
+          categoryAr: 'منتج',
           rating: 4.5,
           reviewCount: 128,
-          isFavorite: false,
+          isFavorite: product.isFavorite,
           nutrition: {},
           features: [],
           featuresAr: [],
         );
 
-        NavigationHelper.navigateToProductDetailFromHome(context, product);
+        NavigationHelper.navigateToProductDetailFromHome(
+          context,
+          detailProduct,
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -600,14 +864,40 @@ class _HomeViewState extends State<HomeView> {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(12),
                 ),
-                color: Colors.grey[50],
+                color: Colors.grey[100],
               ),
-              child: Center(
-                child: Image.asset(
-                  imagePath,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.contain,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: Image.network(
+                  product.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFF123459),
+                          ),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -618,42 +908,54 @@ class _HomeViewState extends State<HomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Product Name
                   Text(
-                    title,
+                    product.getName(isArabic),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
+
+                  // Product Unit
                   Text(
-                    subtitle,
+                    '1${product.getUnit(isArabic)}',
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 8),
+
+                  // Price and Add Button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        price,
+                        product.getFormattedPrice(),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF123459),
                         ),
                       ),
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF123459),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: 20,
+                      GestureDetector(
+                        onTap: () {
+                          // إضافة المنتج للسلة
+                          print('➕ Adding product ${product.id} to cart');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF123459),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                         ),
                       ),
                     ],
