@@ -908,8 +908,62 @@ class _HomeViewState extends State<HomeView> {
                           Navigator.pop(context);
                           if (isLoggedIn) {
                             // Logout
-                            await AuthService().clearToken();
+                            print('🎯 ===== HOME VIEW - STARTING LOGOUT =====');
+                            print('🔄 Calling AuthService.logout()...');
+
+                            final result = await AuthService().logout();
+
+                            print('📥 Received response from AuthService');
+                            print('   Success: ${result.isSuccess}');
+                            print('   Message: ${result.msg}');
+
+                            final languageManager =
+                                Provider.of<LanguageManager>(
+                                  context,
+                                  listen: false,
+                                );
+
+                            if (result.isSuccess) {
+                              print('🎉 ===== LOGOUT SUCCESSFUL! =====');
+                              print('✅ User logged out successfully!');
+
+                              // Show success notification
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    languageManager.isArabic
+                                        ? 'تم تسجيل الخروج بنجاح'
+                                        : 'Logged out successfully',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: Colors.green,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            } else {
+                              print('❌ ===== LOGOUT FAILED! =====');
+                              print('❌ Logout failed: ${result.msg}');
+
+                              // Show error notification
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    languageManager.isArabic
+                                        ? 'فشل في تسجيل الخروج'
+                                        : 'Failed to logout',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            }
+
+                            print('🔄 Refreshing UI...');
                             setState(() {}); // Refresh UI
+                            print(
+                              '🏁 ===== HOME VIEW - LOGOUT COMPLETED =====',
+                            );
                           } else {
                             // Sign In
                             context.go('/signin');
@@ -1025,10 +1079,64 @@ class _HomeViewState extends State<HomeView> {
                   child: ElevatedButton(
                     onPressed: () async {
                       // Logout
-                      await AuthService().clearToken();
+                      print(
+                        '🎯 ===== HOME VIEW - STARTING LOGOUT (USER MENU) =====',
+                      );
+                      print('🔄 Calling AuthService.logout()...');
+
+                      final result = await AuthService().logout();
+
+                      print('📥 Received response from AuthService');
+                      print('   Success: ${result.isSuccess}');
+                      print('   Message: ${result.msg}');
+
+                      final languageManager = Provider.of<LanguageManager>(
+                        context,
+                        listen: false,
+                      );
+
+                      if (result.isSuccess) {
+                        print('🎉 ===== LOGOUT SUCCESSFUL! =====');
+                        print('✅ User logged out successfully!');
+
+                        // Show success notification
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              languageManager.isArabic
+                                  ? 'تم تسجيل الخروج بنجاح'
+                                  : 'Logged out successfully',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.green,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      } else {
+                        print('❌ ===== LOGOUT FAILED! =====');
+                        print('❌ Logout failed: ${result.msg}');
+
+                        // Show error notification
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              languageManager.isArabic
+                                  ? 'فشل في تسجيل الخروج'
+                                  : 'Failed to logout',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+
                       Navigator.pop(context);
-                      // Refresh the page to update UI
-                      setState(() {});
+                      print('🔄 Refreshing UI...');
+                      setState(() {}); // Refresh the page to update UI
+                      print(
+                        '🏁 ===== HOME VIEW - LOGOUT COMPLETED (USER MENU) =====',
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red[600],

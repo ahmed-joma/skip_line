@@ -664,34 +664,120 @@ class AuthService {
 
   // Logout - call API and clear local data
   Future<ApiResponseModel<void>> logout() async {
+    print('🚀 ===== LOGOUT API CALL STARTED =====');
+    print('📝 Preparing logout request...');
+
     try {
       final token = await getUserToken();
       if (token != null) {
+        print('🎫 Token found: ${token.substring(0, 10)}...');
+        print('🌐 Sending POST request to /logout...');
+        print('📋 Request Headers: {Authorization: Bearer [HIDDEN]}');
+
         // Call logout API
         final response = await NetworkService.post('/logout', token: token);
+
+        print('📥 Received response from server');
+        print('   Status Code: ${response.statusCode}');
+        print('   Response Type: ${response.data.runtimeType}');
+
         final responseData = response.data as Map<String, dynamic>;
-        final apiResponse = ApiResponseModel.fromJson(responseData, null);
+        print('🔍 Parsed response data:');
+        print('   Raw Data: $responseData');
+
+        // Check if response is successful based on status code and data
+        bool isSuccess =
+            response.statusCode == 200 &&
+            responseData['status'] == true &&
+            responseData['code'] == 200;
+
+        print('🔍 Response analysis:');
+        print('   Status Code: ${response.statusCode}');
+        print('   API Status: ${responseData['status']}');
+        print('   API Code: ${responseData['code']}');
+        print('   Is Success: $isSuccess');
+
+        if (isSuccess) {
+          print('✅ Logout successful!');
+          print('🔒 User token has been invalidated successfully');
+        } else {
+          print('❌ Logout failed: ${responseData['msg']}');
+        }
 
         // Clear local data regardless of API response
+        print('🧹 Clearing local data...');
         await _clearLocalData();
-        return apiResponse;
+        print('✅ Local data cleared successfully');
+
+        print('🏁 ===== LOGOUT API CALL COMPLETED =====');
+        return ApiResponseModel(
+          status: isSuccess,
+          code: responseData['code'] ?? response.statusCode ?? 500,
+          msg:
+              responseData['msg'] ??
+              (isSuccess ? 'User logged out successfully' : 'Logout failed'),
+        );
       } else {
-        // No token, just clear local data
+        print('❌ No authentication token found');
+        print('🧹 Clearing local data...');
         await _clearLocalData();
+        print('✅ Local data cleared successfully');
+
+        print('🏁 ===== LOGOUT API CALL COMPLETED (NO TOKEN) =====');
         return ApiResponseModel(
           status: true,
           code: 200,
-          msg: 'Logged out successfully',
+          msg: 'Logged out successfully (no token found)',
         );
       }
-    } catch (e) {
-      print('Logout error: $e');
+    } on DioException catch (e) {
+      print('❌ DioException occurred during logout');
+      print('🔍 Error Type: ${e.type}');
+      print('🔍 Status Code: ${e.response?.statusCode}');
+      print('🔍 Response Data: ${e.response?.data}');
+
+      // Check for specific error types
+      if (e.response?.statusCode == 401) {
+        print('🔒 Unauthorized error detected');
+        print('🧹 Clearing local data...');
+        await _clearLocalData();
+        print('✅ Local data cleared successfully');
+
+        print('🏁 ===== LOGOUT API CALL COMPLETED (UNAUTHORIZED) =====');
+        return ApiResponseModel(
+          status: true,
+          code: 200,
+          msg: 'Logged out successfully (token was invalid)',
+        );
+      }
+
+      final errorMessage = NetworkService.handleDioError(e);
+      print('🔧 Error handled: $errorMessage');
+
       // Clear local data even if API call fails
+      print('🧹 Clearing local data...');
       await _clearLocalData();
+      print('✅ Local data cleared successfully');
+
+      print('🏁 ===== LOGOUT API CALL COMPLETED (ERROR) =====');
+      return ApiResponseModel(
+        status: false,
+        code: e.response?.statusCode ?? 500,
+        msg: errorMessage,
+      );
+    } catch (e) {
+      print('❌ Unexpected error during logout: $e');
+
+      // Clear local data even if API call fails
+      print('🧹 Clearing local data...');
+      await _clearLocalData();
+      print('✅ Local data cleared successfully');
+
+      print('🏁 ===== LOGOUT API CALL COMPLETED (UNEXPECTED ERROR) =====');
       return ApiResponseModel(
         status: false,
         code: 500,
-        msg: 'Network error: $e',
+        msg: 'Unexpected error: $e',
       );
     }
   }
