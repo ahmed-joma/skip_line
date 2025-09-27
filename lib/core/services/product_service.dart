@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../models/products_response_model.dart';
 import '../models/product_model.dart';
+import '../models/product_detail_response_model.dart';
 import '../models/api_response_model.dart';
 import 'network_service.dart';
 
@@ -115,7 +116,7 @@ class ProductService {
     }
   }
 
-  /// جلب منتج واحد بالمعرف
+  /// جلب منتج واحد بالمعرف (مع تفاصيل كاملة)
   static Future<ApiResponseModel<ProductModel>> getProductById(
     int productId,
   ) async {
@@ -151,7 +152,10 @@ class ProductService {
       if (isSuccess) {
         print('✅ Product fetched successfully!');
 
-        final product = ProductModel.fromJson(responseData['data']);
+        final productDetailData = ProductDetailData.fromJson(
+          responseData['data'],
+        );
+        final product = productDetailData.product;
         print('📦 Product Data:');
         print('   ID: ${product.id}');
         print('   Name EN: ${product.nameEn}');
@@ -159,6 +163,11 @@ class ProductService {
         print('   Price: ${product.salePrice} ر.س');
         print('   Unit: ${product.unitEn} (${product.unitAr})');
         print('   Is Favorite: ${product.isFavorite}');
+        print('   Description EN: ${product.descriptionEn}');
+        print('   Description AR: ${product.descriptionAr}');
+        print('   Nutrition EN: ${product.nutritionEn}');
+        print('   Nutrition AR: ${product.nutritionAr}');
+        print('   Rate: ${product.rate}');
       } else {
         print('❌ Failed to fetch product: ${responseData['msg']}');
       }
@@ -172,7 +181,9 @@ class ProductService {
             (isSuccess
                 ? 'Product fetched successfully'
                 : 'Failed to fetch product'),
-        data: isSuccess ? ProductModel.fromJson(responseData['data']) : null,
+        data: isSuccess
+            ? ProductDetailData.fromJson(responseData['data']).product
+            : null,
       );
     } on DioException catch (e) {
       print('❌ DioException occurred during get product by ID');

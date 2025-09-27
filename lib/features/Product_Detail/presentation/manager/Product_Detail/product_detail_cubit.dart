@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
+import '../../../../../core/services/product_service.dart';
 import 'product_detail_state.dart';
 
 class ProductDetailCubit extends Cubit<ProductDetailState> {
@@ -20,6 +21,49 @@ class ProductDetailCubit extends Cubit<ProductDetailState> {
   void loadProduct(ProductModel product) {
     _product = product;
     emit(ProductDetailLoaded(product));
+  }
+
+  /// تحميل تفاصيل المنتج من الـ API
+  Future<void> loadProductFromApi(int productId) async {
+    print('🔄 ===== LOADING PRODUCT DETAILS FROM API =====');
+    print('📝 Product ID: $productId');
+
+    emit(ProductDetailLoading());
+
+    try {
+      print('📞 Calling ProductService.getProductById($productId)...');
+      final result = await ProductService.getProductById(productId);
+
+      print('📥 Received result from ProductService:');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+      print('   Data: ${result.data}');
+
+      if (result.isSuccess && result.data != null) {
+        print('✅ Product details loaded successfully!');
+        print('📦 Product: ${result.data!.nameEn} (${result.data!.nameAr})');
+
+        _product = result.data!;
+        emit(ProductDetailLoaded(result.data!));
+
+        print('📱 Product details state updated');
+        print('💰 Product price: ${result.data!.salePrice}');
+        print('🔢 Quantity: $_quantity');
+        print(
+          '💵 Total price: ${double.parse(result.data!.salePrice) * _quantity}',
+        );
+      } else {
+        print('❌ Failed to load product details: ${result.msg}');
+        emit(ProductDetailError(result.msg));
+        print('📱 Product details error state updated');
+      }
+    } catch (e) {
+      print('❌ Unexpected error loading product details: $e');
+      emit(ProductDetailError('Unexpected error: $e'));
+      print('📱 Product details error state updated');
+    }
+
+    print('🏁 ===== PRODUCT DETAILS LOADING COMPLETED =====');
   }
 
   void toggleFavorite() {

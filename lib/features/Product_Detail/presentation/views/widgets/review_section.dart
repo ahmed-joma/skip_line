@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 
 class ReviewSection extends StatelessWidget {
   final ProductModel product;
@@ -57,7 +57,7 @@ class ReviewSection extends StatelessWidget {
                       Row(
                         children: List.generate(5, (index) {
                           return Icon(
-                            index < product.rating
+                            index < (product.rate ?? 0)
                                 ? Icons.star
                                 : Icons.star_border,
                             color: Colors.red,

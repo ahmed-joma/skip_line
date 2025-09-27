@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 
 class ProductDetailSection extends StatelessWidget {
   final ProductModel product;
@@ -75,8 +75,8 @@ class ProductDetailSection extends StatelessWidget {
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                         child: Text(
                           isArabic
-                              ? product.descriptionAr
-                              : product.description,
+                              ? (product.descriptionAr ?? '')
+                              : (product.descriptionEn ?? ''),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[700],

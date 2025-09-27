@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 import '../../../../my_cart/presentation/manager/cart/cart_cubit.dart';
 import '../../../../my_cart/data/models/cart_item.dart';
 import '../../../../../shared/widgets/top_notification.dart';
@@ -74,17 +74,17 @@ class AddToCartButton extends StatelessWidget {
 
     // إنشاء CartItem من ProductModel مع الكمية الصحيحة
     final cartItem = CartItem(
-      id: product.id,
-      productId: product.id,
-      name: product.name,
+      id: product.id.toString(),
+      productId: product.id.toString(),
+      name: product.nameEn,
       nameAr: product.nameAr,
-      description: product.description,
-      descriptionAr: product.descriptionAr,
-      price: product.price,
-      weight: product.weight,
-      imagePath: product.images.isNotEmpty ? product.images.first : '',
-      category: product.category,
-      categoryAr: product.categoryAr,
+      description: product.descriptionEn ?? '',
+      descriptionAr: product.descriptionAr ?? '',
+      price: double.parse(product.salePrice),
+      weight: product.unitEn,
+      imagePath: product.imageUrl,
+      category: product.unitEn,
+      categoryAr: product.unitAr,
       quantity: quantity, // استخدام الكمية المختارة
     );
 

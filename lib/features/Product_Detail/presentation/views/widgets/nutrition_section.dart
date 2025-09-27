@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 
 class NutritionSection extends StatelessWidget {
   final ProductModel product;
@@ -64,7 +64,7 @@ class NutritionSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '100g',
+                          product.getUnit(isArabic),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],

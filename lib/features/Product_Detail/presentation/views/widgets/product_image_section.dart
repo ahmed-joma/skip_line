@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
 import '../../../../../../core/services/auth_service.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 
 class ProductImageSection extends StatelessWidget {
   final ProductModel product;
@@ -44,8 +44,8 @@ class ProductImageSection extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: _buildProductImage(
-                    product.images.isNotEmpty
-                        ? product.images[cubit.currentImageIndex]
+                    product.imageUrl.isNotEmpty
+                        ? product.imageUrl
                         : 'assets/images/banana.png',
                   ),
                 ),
@@ -59,7 +59,7 @@ class ProductImageSection extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    product.images.length,
+                    1, // صورة واحدة فقط
                     (index) => Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       width: index == cubit.currentImageIndex ? 24 : 8,

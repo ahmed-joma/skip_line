@@ -6,8 +6,6 @@ import '../../../../core/services/auth_service.dart';
 import '../../../../core/services/product_service.dart';
 import '../../../../core/models/product_model.dart';
 import '../../../search/presentation/views/search_view.dart';
-import '../../../Product_Detail/data/models/product_model.dart' as detail;
-import '../../../Product_Detail/presentation/utils/navigation_helper.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -816,30 +814,11 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildProductCardFromModel(ProductModel product, bool isArabic) {
     return GestureDetector(
       onTap: () {
-        // إنشاء منتج تجريبي للتنقل
-        final detailProduct = detail.ProductModel(
-          id: product.id.toString(),
-          name: product.nameEn,
-          nameAr: product.nameAr,
-          description: '${product.getUnit(isArabic)}',
-          descriptionAr: '${product.getUnit(isArabic)}',
-          price: double.parse(product.salePrice),
-          weight: product.getUnit(isArabic),
-          images: [product.imageUrl],
-          category: 'Product',
-          categoryAr: 'منتج',
-          rating: 4.5,
-          reviewCount: 128,
-          isFavorite: product.isFavorite,
-          nutrition: {},
-          features: [],
-          featuresAr: [],
-        );
+        print('🔄 Navigating to product detail for ID: ${product.id}');
+        print('📦 Product: ${product.nameEn} (${product.nameAr})');
 
-        NavigationHelper.navigateToProductDetailFromHome(
-          context,
-          detailProduct,
-        );
+        // التنقل باستخدام productId بدلاً من تمرير المنتج كاملاً
+        context.push('/product-detail', extra: {'productId': product.id});
       },
       child: Container(
         decoration: BoxDecoration(

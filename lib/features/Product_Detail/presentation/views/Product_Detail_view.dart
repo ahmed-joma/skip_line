@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/constants/language_manager.dart';
+import '../../../../../core/models/product_model.dart';
 import '../manager/Product_Detail/product_detail_cubit.dart';
 import '../manager/Product_Detail/product_detail_state.dart';
-import '../../data/models/product_model.dart';
 import 'widgets/product_image_section.dart';
 import 'widgets/product_info_section.dart';
 import 'widgets/product_detail_section.dart';
@@ -13,16 +13,28 @@ import 'widgets/nutrition_section.dart';
 import 'widgets/review_section.dart';
 import 'widgets/add_to_cart_button.dart';
 
-
 class ProductDetailView extends StatelessWidget {
-  final ProductModel product;
+  final ProductModel? product;
+  final int? productId;
 
-  const ProductDetailView({super.key, required this.product});
+  const ProductDetailView({super.key, this.product, this.productId})
+    : assert(
+        product != null || productId != null,
+        'Either product or productId must be provided',
+      );
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProductDetailCubit()..loadProduct(product),
+      create: (context) {
+        final cubit = ProductDetailCubit();
+        if (product != null) {
+          cubit.loadProduct(product!);
+        } else if (productId != null) {
+          cubit.loadProductFromApi(productId!);
+        }
+        return cubit;
+      },
       child: Consumer<LanguageManager>(
         builder: (context, languageManager, child) {
           return Scaffold(
@@ -72,60 +84,133 @@ class ProductDetailView extends StatelessWidget {
                         : 'Reviews page coming soon',
                     Colors.blue,
                   );
+                } else if (state is ProductQuantityChanged) {
+                  // لا نفعل شيء، فقط نحدث الواجهة
+                  print('🔄 Quantity changed to: ${state.quantity}');
                 }
               },
               builder: (context, state) {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // قسم الصور
-                      ProductImageSection(
-                        product: product,
-                        isArabic: languageManager.isArabic,
-                      ),
+                if (state is ProductDetailLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                      const SizedBox(height: 16),
+                if (state is ProductDetailError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red[300],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          state.message,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (productId != null) {
+                              context
+                                  .read<ProductDetailCubit>()
+                                  .loadProductFromApi(productId!);
+                            }
+                          },
+                          child: Text(
+                            languageManager.isArabic
+                                ? 'إعادة المحاولة'
+                                : 'Retry',
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-                      // قسم معلومات المنتج
-                      ProductInfoSection(
-                        product: product,
-                        isArabic: languageManager.isArabic,
-                      ),
+                if (state is ProductDetailLoaded ||
+                    state is ProductQuantityChanged) {
+                  // الحصول على المنتج الحالي من الـ cubit
+                  final cubit = context.read<ProductDetailCubit>();
+                  final currentProduct = cubit.product;
 
-                      const SizedBox(height: 16),
+                  if (currentProduct == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                      // قسم تفاصيل المنتج
-                      ProductDetailSection(
-                        product: product,
-                        isArabic: languageManager.isArabic,
-                      ),
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // قسم الصور
+                        ProductImageSection(
+                          product: currentProduct,
+                          isArabic: languageManager.isArabic,
+                        ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // قسم التغذية
-                      NutritionSection(
-                        product: product,
-                        isArabic: languageManager.isArabic,
-                      ),
+                        // قسم معلومات المنتج
+                        ProductInfoSection(
+                          product: currentProduct,
+                          isArabic: languageManager.isArabic,
+                        ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // قسم المراجعات
-                      ReviewSection(
-                        product: product,
-                        isArabic: languageManager.isArabic,
-                      ),
+                        // قسم تفاصيل المنتج
+                        ProductDetailSection(
+                          product: currentProduct,
+                          isArabic: languageManager.isArabic,
+                        ),
 
-                      const SizedBox(height: 100), // مساحة للزر السفلي
-                    ],
-                  ),
-                );
+                        const SizedBox(height: 16),
+
+                        // قسم التغذية
+                        NutritionSection(
+                          product: currentProduct,
+                          isArabic: languageManager.isArabic,
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // قسم المراجعات
+                        ReviewSection(
+                          product: currentProduct,
+                          isArabic: languageManager.isArabic,
+                        ),
+
+                        const SizedBox(height: 100), // مساحة للزر السفلي
+                      ],
+                    ),
+                  );
+                }
+
+                return const Center(child: CircularProgressIndicator());
               },
             ),
-            bottomNavigationBar: AddToCartButton(
-              product: product,
-              isArabic: languageManager.isArabic,
-            ),
+            bottomNavigationBar:
+                BlocBuilder<ProductDetailCubit, ProductDetailState>(
+                  builder: (context, state) {
+                    if (state is ProductDetailLoaded ||
+                        state is ProductQuantityChanged) {
+                      final cubit = context.read<ProductDetailCubit>();
+                      final currentProduct = cubit.product;
+
+                      if (currentProduct != null) {
+                        return AddToCartButton(
+                          product: currentProduct,
+                          isArabic: languageManager.isArabic,
+                        );
+                      }
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
           );
         },
       ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../manager/Product_Detail/product_detail_cubit.dart';
 import '../../manager/Product_Detail/product_detail_state.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 
 class ProductInfoSection extends StatelessWidget {
   final ProductModel product;
@@ -46,7 +46,7 @@ class ProductInfoSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isArabic ? product.nameAr : product.name,
+                          isArabic ? product.nameAr : product.nameEn,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -55,7 +55,7 @@ class ProductInfoSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${product.weight}, ${isArabic ? 'السعر' : 'Price'}',
+                          '${product.getUnit(isArabic)}, ${isArabic ? 'السعر' : 'Price'}',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -136,26 +136,39 @@ class ProductInfoSection extends StatelessWidget {
                     ),
                   ),
 
-                  const Spacer(),
+                  const SizedBox(width: 16),
 
                   // السعر
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green[200]!),
-                    ),
-                    child: Text(
-                      'SR${(product.price * cubit.quantity).toStringAsFixed(0)}',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green[800],
+                  Expanded(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green[200]!),
+                      ),
+                      child: Builder(
+                        builder: (context) {
+                          final totalPrice =
+                              double.parse(product.salePrice) * cubit.quantity;
+                          print(
+                            '💰 Displaying price: ${product.salePrice} × ${cubit.quantity} = $totalPrice',
+                          );
+                          return Text(
+                            '${isArabic ? 'السعر' : 'Price'}: ${isArabic ? 'ر.س' : 'SR'}${totalPrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 20, // تقليل حجم الخط
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[800],
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          );
+                        },
                       ),
                     ),
                   ),

@@ -11,7 +11,6 @@ import '../../features/home/presentation/views/home_view.dart';
 import '../../features/account/account_screen.dart';
 import '../../features/chat_bot/presentation/views/chat_bot_view.dart';
 import '../../features/Product_Detail/presentation/views/Product_Detail_view.dart';
-import '../../features/Product_Detail/data/models/product_model.dart';
 import '../../features/my_cart/presentation/views/my_cart_view.dart';
 import '../../features/scan/presentation/views/scan_view.dart';
 import '../../features/Product_Details2/presentation/views/product_details2_view.dart';
@@ -117,10 +116,11 @@ class AppRouters {
       GoRoute(
         path: kProductDetailView,
         builder: (context, state) {
-          final productData = state.extra as Map<String, dynamic>?;
-          if (productData != null) {
-            final product = ProductModel.fromJson(productData);
-            return ProductDetailView(product: product);
+          final extraData = state.extra as Map<String, dynamic>?;
+          if (extraData != null && extraData.containsKey('productId')) {
+            final productId = extraData['productId'] as int;
+            print('🔄 Opening ProductDetailView with productId: $productId');
+            return ProductDetailView(productId: productId);
           }
           return const Scaffold(body: Center(child: Text('Product not found')));
         },

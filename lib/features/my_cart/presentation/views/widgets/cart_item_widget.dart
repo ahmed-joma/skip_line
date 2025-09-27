@@ -170,7 +170,7 @@ class CartItemWidget extends StatelessWidget {
         const SizedBox(height: 8),
         // السعر
         Text(
-          'SR${currentItem.totalPrice.toStringAsFixed(0)}',
+          '${isArabic ? 'ر.س' : 'SR'}${currentItem.totalPrice.toStringAsFixed(2)}',
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

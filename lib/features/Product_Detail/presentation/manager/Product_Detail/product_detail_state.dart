@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../data/models/product_model.dart';
+import '../../../../../core/models/product_model.dart';
 
 abstract class ProductDetailState extends Equatable {
   const ProductDetailState();
@@ -9,6 +9,17 @@ abstract class ProductDetailState extends Equatable {
 }
 
 class ProductDetailInitial extends ProductDetailState {}
+
+class ProductDetailLoading extends ProductDetailState {}
+
+class ProductDetailError extends ProductDetailState {
+  final String message;
+
+  const ProductDetailError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
 
 class ProductDetailLoaded extends ProductDetailState {
   final ProductModel product;

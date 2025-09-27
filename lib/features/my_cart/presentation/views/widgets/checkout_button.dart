@@ -80,7 +80,7 @@ class CheckoutButton extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'SR${totalPrice.toStringAsFixed(2)}',
+                          '${isArabic ? 'ر.س' : 'SR'}${totalPrice.toStringAsFixed(2)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
