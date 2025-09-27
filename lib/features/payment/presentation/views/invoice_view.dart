@@ -1,26 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class InvoiceView extends StatelessWidget {
+class InvoiceView extends StatefulWidget {
   final double totalAmount;
   final String currency;
-  final List<Map<String, dynamic>> cartItems;
+  final int? orderId;
 
   const InvoiceView({
     super.key,
     required this.totalAmount,
     required this.currency,
-    required this.cartItems,
+    this.orderId,
   });
 
   @override
+  State<InvoiceView> createState() => _InvoiceViewState();
+}
+
+class _InvoiceViewState extends State<InvoiceView> {
+  List<Map<String, dynamic>> orderItems = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrderData();
+  }
+
+  Future<void> _loadOrderData() async {
+    if (widget.orderId != null) {
+      // TODO: جلب بيانات الطلب من الـ API
+      // مؤقتاً سنستخدم بيانات وهمية
+      setState(() {
+        orderItems = [
+          {'name': 'خيار', 'price': 1.60, 'quantity': 1},
+        ];
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // طباعة السعر للتأكد من وصوله
-    print('InvoiceView received totalAmount: $totalAmount');
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     // Calculate subtotal, tax, and total
     double subtotal = 0.0;
-    for (var item in cartItems) {
+    for (var item in orderItems) {
       subtotal += (item['price'] as double) * (item['quantity'] as int);
     }
 
@@ -96,7 +128,7 @@ class InvoiceView extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Order items
-                  ...cartItems.map(
+                  ...orderItems.map(
                     (item) => _buildOrderItem(
                       item['name'] as String,
                       (item['price'] as double) * (item['quantity'] as int),
@@ -132,7 +164,7 @@ class InvoiceView extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${currency}${finalTotal.toStringAsFixed(2)}',
+                        '${widget.currency}${finalTotal.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -231,7 +263,7 @@ class InvoiceView extends StatelessWidget {
             ),
           ),
           Text(
-            '${currency}${price.toStringAsFixed(2)}',
+            '${widget.currency}${price.toStringAsFixed(2)}',
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -249,7 +281,7 @@ class InvoiceView extends StatelessWidget {
       children: [
         Text(label, style: TextStyle(fontSize: 16, color: Colors.grey[700])),
         Text(
-          '${currency}${amount.toStringAsFixed(2)}',
+          '${widget.currency}${amount.toStringAsFixed(2)}',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,

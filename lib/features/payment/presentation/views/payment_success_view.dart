@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 class PaymentSuccessView extends StatefulWidget {
   final double totalAmount;
   final String currency;
+  final int? orderId;
 
   const PaymentSuccessView({
     Key? key,
     required this.totalAmount,
     required this.currency,
+    this.orderId,
   }) : super(key: key);
 
   @override
@@ -163,36 +165,13 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () async {
-                            // Navigate to invoice page
-                            final cartItems = [
-                              {
-                                'name': 'Saudi Milk',
-                                'price': widget.totalAmount * 0.8,
-                                'quantity': 2,
-                              },
-                              {
-                                'name': 'Fresh Eggs',
-                                'price': widget.totalAmount * 0.2,
-                                'quantity': 1,
-                              },
-                            ];
-
-                            // طباعة البيانات المرسلة
-                            print(
-                              'Sending to Invoice - Total: ${widget.totalAmount}, Currency: ${widget.currency}',
-                            );
-                            for (var item in cartItems) {
-                              print(
-                                'Item: ${item['name']}, Price: ${item['price']}, Quantity: ${item['quantity']}',
-                              );
-                            }
-
+                            // Navigate to invoice page with order data
                             context.go(
                               '/invoice',
                               extra: {
                                 'totalAmount': widget.totalAmount,
                                 'currency': widget.currency,
-                                'cartItems': cartItems,
+                                'orderId': widget.orderId,
                               },
                             );
                           },

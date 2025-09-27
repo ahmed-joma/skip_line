@@ -9,11 +9,14 @@ import 'widgets/payment_header.dart';
 import 'widgets/payment_method_selector.dart';
 import 'widgets/credit_card_form.dart';
 import 'widgets/payment_button.dart';
+import '../../../my_cart/presentation/manager/cart/cart_cubit.dart';
 
 class PaymentView extends StatelessWidget {
   final double totalAmount;
+  final List<dynamic>? cartItems;
 
-  const PaymentView({Key? key, required this.totalAmount}) : super(key: key);
+  const PaymentView({Key? key, required this.totalAmount, this.cartItems})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +25,20 @@ class PaymentView extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => PaymentCubit()..loadPayment(totalAmount),
-      child: PaymentViewContent(totalAmount: totalAmount),
+      child: PaymentViewContent(totalAmount: totalAmount, cartItems: cartItems),
     );
   }
 }
 
 class PaymentViewContent extends StatefulWidget {
   final double totalAmount;
+  final List<dynamic>? cartItems;
 
-  const PaymentViewContent({Key? key, required this.totalAmount})
-    : super(key: key);
+  const PaymentViewContent({
+    Key? key,
+    required this.totalAmount,
+    this.cartItems,
+  }) : super(key: key);
 
   @override
   State<PaymentViewContent> createState() => _PaymentViewContentState();
@@ -49,10 +56,17 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
         child: BlocConsumer<PaymentCubit, PaymentState>(
           listener: (context, state) {
             if (state is PaymentSuccess) {
+              // مسح السلة بعد نجاح الدفع
+              context.read<CartCubit>().clearCart();
+
               // Navigate to payment success page
               context.go(
                 '/payment-success',
-                extra: {'totalAmount': widget.totalAmount, 'currency': 'SAR'},
+                extra: {
+                  'totalAmount': widget.totalAmount,
+                  'currency': 'SAR',
+                  'orderId': state.orderId,
+                },
               );
             } else if (state is PaymentError) {
               _showErrorDialog(context, state.message);
@@ -138,7 +152,11 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
                       totalAmount: widget.totalAmount,
                       currency: state.payment.currency,
                       onPressed: () {
-                        _validateAndProcessPayment(context, state.payment);
+                        _validateAndProcessPayment(
+                          context,
+                          state.payment,
+                          widget.cartItems ?? [],
+                        );
                       },
                     ),
                   ],
@@ -325,7 +343,11 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
     );
   }
 
-  void _validateAndProcessPayment(BuildContext context, payment) {
+  void _validateAndProcessPayment(
+    BuildContext context,
+    payment,
+    List<dynamic> cartItems,
+  ) {
     // الحصول على القيم الحالية من CreditCardForm
     Map<String, String> currentValues = {};
     if (_creditCardFormKey.currentState != null) {
@@ -396,7 +418,7 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
 
     // إذا كانت البيانات صحيحة، تابع عملية الدفع
     print('All fields valid, processing payment...');
-    context.read<PaymentCubit>().processPayment();
+    context.read<PaymentCubit>().processPayment(cartItems, context);
   }
 
   void _processApplePay(BuildContext context) {

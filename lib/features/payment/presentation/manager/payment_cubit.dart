@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../manager/payment_state.dart';
 import '../../data/models/payment_model.dart';
+import '../../../../core/services/order_service.dart';
+import '../../../../shared/widgets/top_notification.dart';
+import '../../../../shared/constants/language_manager.dart';
 
 class PaymentCubit extends Cubit<PaymentState> {
   PaymentCubit() : super(PaymentInitial());
@@ -71,16 +75,53 @@ class PaymentCubit extends Cubit<PaymentState> {
     }
   }
 
-  Future<void> processPayment() async {
+  Future<void> processPayment(
+    List<dynamic> cartItems,
+    BuildContext context,
+  ) async {
     if (state is PaymentLoaded) {
       emit(PaymentProcessing());
 
-      // محاكاة عملية الدفع
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        // إنشاء الطلب أولاً
+        print('🚀 Creating order before payment...');
+        final orderResult = await OrderService.createOrder(cartItems);
 
-      // التحقق من أن الـ cubit لا يزال نشطاً
-      if (!isClosed) {
-        emit(PaymentSuccess());
+        if (orderResult.isSuccess && orderResult.data != null) {
+          print(
+            '✅ Order created successfully! Order ID: ${orderResult.orderId}',
+          );
+
+          // إظهار إشعار النجاح
+          final languageManager = LanguageManager();
+          final isArabic = languageManager.isArabic;
+
+          TopNotification.show(
+            context,
+            isArabic
+                ? 'تم إنشاء الطلب بنجاح! رقم الطلب: ${orderResult.orderId}'
+                : 'Order created successfully! Order ID: ${orderResult.orderId}',
+            isError: false,
+          );
+
+          // محاكاة عملية الدفع
+          await Future.delayed(const Duration(seconds: 2));
+
+          // التحقق من أن الـ cubit لا يزال نشطاً
+          if (!isClosed) {
+            emit(PaymentSuccess(orderId: orderResult.orderId));
+          }
+        } else {
+          print('❌ Failed to create order: ${orderResult.msg}');
+          if (!isClosed) {
+            emit(PaymentError('Failed to create order: ${orderResult.msg}'));
+          }
+        }
+      } catch (e) {
+        print('❌ Error during payment process: $e');
+        if (!isClosed) {
+          emit(PaymentError('Payment failed: $e'));
+        }
       }
     }
   }

@@ -246,8 +246,18 @@ class AppRouters {
       GoRoute(
         path: kPaymentView,
         builder: (context, state) {
-          final totalAmount = state.extra as double? ?? 0.0;
-          return PaymentView(totalAmount: totalAmount);
+          double totalAmount = 0.0;
+
+          List<dynamic> cartItems = [];
+          if (state.extra is Map<String, dynamic>) {
+            final extraData = state.extra as Map<String, dynamic>;
+            totalAmount = extraData['totalPrice'] as double? ?? 0.0;
+            cartItems = extraData['cartItems'] as List<dynamic>? ?? [];
+          } else if (state.extra is double) {
+            totalAmount = state.extra as double;
+          }
+
+          return PaymentView(totalAmount: totalAmount, cartItems: cartItems);
         },
       ),
 
@@ -258,9 +268,11 @@ class AppRouters {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final totalAmount = extra['totalAmount'] as double? ?? 0.0;
           final currency = extra['currency'] as String? ?? 'SAR';
+          final orderId = extra['orderId'] as int?;
           return PaymentSuccessView(
             totalAmount: totalAmount,
             currency: currency,
+            orderId: orderId,
           );
         },
       ),
@@ -272,12 +284,11 @@ class AppRouters {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final totalAmount = extra['totalAmount'] as double? ?? 0.0;
           final currency = extra['currency'] as String? ?? 'SAR';
-          final cartItems =
-              extra['cartItems'] as List<Map<String, dynamic>>? ?? [];
+          final orderId = extra['orderId'] as int?;
           return InvoiceView(
             totalAmount: totalAmount,
             currency: currency,
-            cartItems: cartItems,
+            orderId: orderId,
           );
         },
       ),

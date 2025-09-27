@@ -1089,27 +1089,7 @@ class _HomeViewState extends State<HomeView> {
 
                 // Menu options
                 // Orders (only show if logged in)
-                FutureBuilder<bool>(
-                  future: AuthService().isLoggedIn(),
-                  builder: (context, snapshot) {
-                    final isLoggedIn = snapshot.data ?? false;
-
-                    if (isLoggedIn) {
-                      return _buildMenuOption(
-                        context,
-                        icon: Icons.shopping_bag_outlined,
-                        title: isArabic ? 'الطلبات' : 'Orders',
-                        onTap: () {
-                          Navigator.pop(context);
-                          // TODO: Navigate to orders
-                          print('📦 Navigating to Orders page...');
-                        },
-                      );
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  },
-                ),
+                const SizedBox.shrink(),
                 _buildMenuOption(
                   context,
                   icon: Icons.person_outline,

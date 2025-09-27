@@ -12,7 +12,11 @@ class PaymentLoaded extends PaymentState {
 
 class PaymentProcessing extends PaymentState {}
 
-class PaymentSuccess extends PaymentState {}
+class PaymentSuccess extends PaymentState {
+  final int? orderId;
+
+  PaymentSuccess({this.orderId});
+}
 
 class PaymentError extends PaymentState {
   final String message;

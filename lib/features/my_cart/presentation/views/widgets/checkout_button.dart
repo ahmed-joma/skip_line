@@ -173,21 +173,30 @@ class CheckoutButton extends StatelessWidget {
     // الحصول على السعر الإجمالي من الحالة الحالية
     final cartState = context.read<CartCubit>().state;
     double totalPrice = 0.0;
+    List<dynamic> cartItems = [];
+
     if (cartState is CartLoaded) {
       totalPrice = cartState.totalPrice;
+      cartItems = cartState.items;
     }
 
     // طباعة السعر للتأكد من انتقاله
     print('Total Price from Cart: $totalPrice');
+    print('Cart Items Count: ${cartItems.length}');
 
     // التحقق من حالة تسجيل الدخول
     final isLoggedIn = await AuthService().isLoggedIn();
     print('User login status: $isLoggedIn');
 
     if (isLoggedIn) {
-      // المستخدم مسجل دخول - الانتقال مباشرة لصفحة الدفع
-      print('User is logged in - Redirecting to payment...');
-      context.go('/payment', extra: totalPrice);
+      // المستخدم مسجل دخول - الانتقال لصفحة الدفع
+      print('User is logged in - Going to payment...');
+
+      // الانتقال لصفحة الدفع مع بيانات السلة
+      context.go(
+        '/payment',
+        extra: {'totalPrice': totalPrice, 'cartItems': cartItems},
+      );
     } else {
       // المستخدم غير مسجل دخول - الانتقال لصفحة تسجيل الدخول
       print('User is not logged in - Redirecting to sign in...');
