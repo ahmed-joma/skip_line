@@ -5,7 +5,7 @@ import '../models/api_response_model.dart';
 import 'network_service.dart';
 
 class ProductService {
-  static const String _endpoint = '/products';
+  static const String _endpoint = '/product';
 
   /// جلب المنتجات (Best Sellers و Exclusive Offers)
   static Future<ApiResponseModel<ProductsData>> getProducts() async {
