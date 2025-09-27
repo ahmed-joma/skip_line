@@ -482,12 +482,17 @@ class _HomeViewState extends State<HomeView> {
                       color: Colors.black,
                     ),
                   ),
-                  Text(
-                    languageManager.isArabic ? 'عرض الكل' : 'See all',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF123459),
-                      fontWeight: FontWeight.w500,
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/best-sellers');
+                    },
+                    child: Text(
+                      languageManager.isArabic ? 'عرض الكل' : 'See all',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF123459),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -606,12 +611,17 @@ class _HomeViewState extends State<HomeView> {
                       color: Colors.black,
                     ),
                   ),
-                  Text(
-                    languageManager.isArabic ? 'عرض الكل' : 'See all',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF123459),
-                      fontWeight: FontWeight.w500,
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/exclusive-offers');
+                    },
+                    child: Text(
+                      languageManager.isArabic ? 'عرض الكل' : 'See all',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF123459),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],

@@ -19,6 +19,8 @@ import '../../features/payment/presentation/views/payment_view.dart';
 import '../../features/payment/presentation/views/payment_success_view.dart';
 import '../../features/payment/presentation/views/invoice_view.dart';
 import '../../features/help/help_screen.dart';
+import '../../features/home/presentation/views/widgets/best_sellers_view.dart';
+import '../../features/home/presentation/views/widgets/exclusive_offers_view.dart';
 
 class AppRouters {
   // Route Constants
@@ -41,6 +43,8 @@ class AppRouters {
   static const String kInvoiceView = '/invoice';
   static const String kProfileView = '/profile';
   static const String kHelpView = '/help';
+  static const String kBestSellersView = '/best-sellers';
+  static const String kExclusiveOffersView = '/exclusive-offers';
 
   static final router = GoRouter(
     initialLocation: kSplashView,
@@ -116,12 +120,22 @@ class AppRouters {
       GoRoute(
         path: kProductDetailView,
         builder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          if (extraData != null && extraData.containsKey('productId')) {
-            final productId = extraData['productId'] as int;
+          // Handle both Map and direct int values
+          int? productId;
+
+          if (state.extra is Map<String, dynamic>) {
+            final extraData = state.extra as Map<String, dynamic>;
+            productId = extraData['productId'] as int?;
+          } else if (state.extra is int) {
+            productId = state.extra as int;
+          }
+
+          if (productId != null) {
             print('🔄 Opening ProductDetailView with productId: $productId');
             return ProductDetailView(productId: productId);
           }
+
+          print('❌ No productId found in extra data');
           return const Scaffold(body: Center(child: Text('Product not found')));
         },
       ),
@@ -277,6 +291,18 @@ class AppRouters {
 
       // Help Screen
       GoRoute(path: kHelpView, builder: (context, state) => const HelpScreen()),
+
+      // Best Sellers Screen
+      GoRoute(
+        path: kBestSellersView,
+        builder: (context, state) => const BestSellersView(),
+      ),
+
+      // Exclusive Offers Screen
+      GoRoute(
+        path: kExclusiveOffersView,
+        builder: (context, state) => const ExclusiveOffersView(),
+      ),
     ],
   );
 }
