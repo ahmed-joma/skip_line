@@ -1155,26 +1155,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
 
                 // Favorites (only show if logged in)
-                FutureBuilder<bool>(
-                  future: AuthService().isLoggedIn(),
-                  builder: (context, snapshot) {
-                    final isLoggedIn = snapshot.data ?? false;
-
-                    if (isLoggedIn) {
-                      return _buildMenuOption(
-                        context,
-                        icon: Icons.favorite_outline,
-                        title: isArabic ? 'المفضلة' : 'Favorites',
-                        onTap: () {
-                          Navigator.pop(context);
-                          // TODO: Navigate to favorites
-                        },
-                      );
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  },
-                ),
+                const SizedBox.shrink(),
 
                 const SizedBox(height: 16),
 

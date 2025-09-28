@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../../core/models/product_model.dart';
 import '../../../../../core/services/product_service.dart';
+import '../../../../../core/services/favorite_service.dart';
 import '../../../../../core/services/auth_service.dart';
 import '../../../../../shared/constants/language_manager.dart';
 import '../../../../../shared/widgets/top_notification.dart';
@@ -64,14 +65,10 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            isArabic ? Icons.arrow_forward_ios : Icons.arrow_back_ios,
-            color: Colors.black,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              context.pop();
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
             } else {
               context.go('/home');
             }
@@ -87,17 +84,13 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
         ),
         centerTitle: true,
       ),
-      body: _buildBody(isArabic),
+      body: _buildBody(context, isArabic),
     );
   }
 
-  Widget _buildBody(bool isArabic) {
+  Widget _buildBody(BuildContext context, bool isArabic) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF123459)),
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (errorMessage != null) {
@@ -105,26 +98,15 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
             Text(
               errorMessage!,
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: const TextStyle(color: Colors.red),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadExclusiveOffers,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF123459),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                isArabic ? 'إعادة المحاولة' : 'Retry',
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
             ),
           ],
         ),
@@ -133,66 +115,37 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
 
     if (exclusiveOffers.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.local_offer_outlined, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              isArabic
-                  ? 'لا توجد عروض حصرية متاحة'
-                  : 'No exclusive offers available',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ],
+        child: Text(
+          isArabic ? 'لا توجد منتجات' : 'No products available',
+          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
       );
     }
 
-    return Column(
-      children: [
-        // عدد المنتجات
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          color: Colors.white,
-          child: Text(
-            '${exclusiveOffers.length} ${isArabic ? 'عرض حصري' : 'exclusive offers'}',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        // قائمة المنتجات
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
-            itemCount: exclusiveOffers.length,
-            itemBuilder: (context, index) {
-              final product = exclusiveOffers[index];
-              return _buildProductCard(product, isArabic);
-            },
-          ),
-        ),
-      ],
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: exclusiveOffers.length,
+      itemBuilder: (context, index) {
+        final product = exclusiveOffers[index];
+        return _buildProductCard(context, product, isArabic);
+      },
     );
   }
 
-  Widget _buildProductCard(ProductModel product, bool isArabic) {
+  Widget _buildProductCard(
+    BuildContext context,
+    ProductModel product,
+    bool isArabic,
+  ) {
     return GestureDetector(
       onTap: () {
-        print('🔄 Navigating to product detail for ID: ${product.id}');
-        print('📦 Product: ${product.nameEn} (${product.nameAr})');
-        context.go('/product-detail', extra: product.id);
+        context.go('/product-details/${product.id}');
       },
       child: Container(
         decoration: BoxDecoration(
@@ -200,9 +153,9 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
+              color: Colors.grey.withOpacity(0.1),
               spreadRadius: 1,
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
@@ -210,44 +163,59 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // صورة المنتج
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  color: Colors.grey[100],
+            // Product Image
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
                 ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  child: Image.network(
-                    product.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.image,
-                        color: Colors.grey[400],
+                color: Colors.grey[100],
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: Image.network(
+                  product.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
                         size: 40,
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFF123459),
+                          ),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
-            // تفاصيل المنتج
+
+            // Product Info
             Expanded(
-              flex: 2,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // اسم المنتج
+                    // Product Name
                     Text(
                       isArabic ? product.nameAr : product.nameEn,
                       style: const TextStyle(
@@ -259,31 +227,33 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    // الوحدة والسعر
+
+                    // Product Unit
                     Text(
-                      '${product.getUnit(isArabic)}, ${isArabic ? 'السعر' : 'Price'}',
+                      '1 ${isArabic ? product.unitAr : product.unitEn}',
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
-                    const Spacer(),
-                    // السعر
+                    const SizedBox(height: 8),
+
+                    // Price and Add Button
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Price
                         Text(
-                          '${isArabic ? 'ر.س' : 'SR'}${product.salePrice}',
+                          '${product.salePrice} ر.س',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF123459),
                           ),
                         ),
-                        // زر المفضلة
+
+                        // Favorite Button
                         GestureDetector(
                           onTap: () async {
-                            // Check if user is logged in
                             final isLoggedIn = await AuthService().isLoggedIn();
                             if (!isLoggedIn) {
-                              // Show message and redirect to sign in
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -303,23 +273,101 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
                               );
                               return;
                             }
-                            // If logged in, proceed with adding to favorites
-                            TopNotification.show(
-                              context,
-                              isArabic
-                                  ? 'تم إضافة المنتج للمفضلة'
-                                  : 'Product added to favorites',
-                              isError: false,
-                            );
+
+                            try {
+                              print(
+                                '🚀 Toggling favorite for product: ${product.id}',
+                              );
+
+                              final result =
+                                  await FavoriteService.updateFavorite(
+                                    product.id,
+                                  );
+
+                              if (result['status'] == true) {
+                                // تحديث الحالة المحلية
+                                setState(() {
+                                  final index = exclusiveOffers.indexWhere(
+                                    (p) => p.id == product.id,
+                                  );
+                                  if (index != -1) {
+                                    exclusiveOffers[index] =
+                                        exclusiveOffers[index].copyWith(
+                                          isFavorite: !exclusiveOffers[index]
+                                              .isFavorite,
+                                        );
+                                  }
+                                });
+
+                                // إظهار الإشعار المناسب
+                                if (result['msg'].contains('added')) {
+                                  TopNotification.show(
+                                    context,
+                                    isArabic
+                                        ? 'تم إضافة المنتج للمفضلة'
+                                        : 'Product added to favorites',
+                                    isError: false,
+                                  );
+                                } else {
+                                  TopNotification.show(
+                                    context,
+                                    isArabic
+                                        ? 'تم إزالة المنتج من المفضلة'
+                                        : 'Product removed from favorites',
+                                    isError: false,
+                                  );
+                                }
+
+                                print(
+                                  '✅ Favorite updated successfully: ${result['msg']}',
+                                );
+                              } else {
+                                print(
+                                  '❌ Failed to update favorite: ${result['msg']}',
+                                );
+
+                                TopNotification.show(
+                                  context,
+                                  isArabic
+                                      ? 'فشل في تحديث المفضلة'
+                                      : 'Failed to update favorite',
+                                  isError: true,
+                                );
+                              }
+                            } catch (e) {
+                              print('❌ Error updating favorite: $e');
+
+                              TopNotification.show(
+                                context,
+                                isArabic
+                                    ? 'حدث خطأ في تحديث المفضلة'
+                                    : 'Error updating favorite',
+                                isError: true,
+                              );
+                            }
                           },
-                          child: Icon(
-                            product.isFavorite
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: product.isFavorite
-                                ? Colors.red
-                                : Colors.grey[400],
-                            size: 20,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              product.isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: product.isFavorite
+                                  ? Colors.red
+                                  : Colors.grey[400],
+                              size: 16,
+                            ),
                           ),
                         ),
                       ],

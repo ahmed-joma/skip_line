@@ -1,6 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../../core/models/product_model.dart';
 import '../../../../../core/services/product_service.dart';
+import '../../../../../core/services/favorite_service.dart';
+import '../../../../../core/services/auth_service.dart';
+import '../../../../../shared/widgets/top_notification.dart';
+import '../../../../../shared/constants/language_manager.dart';
 import 'product_detail_state.dart';
 
 class ProductDetailCubit extends Cubit<ProductDetailState> {
@@ -66,17 +72,89 @@ class ProductDetailCubit extends Cubit<ProductDetailState> {
     print('🏁 ===== PRODUCT DETAILS LOADING COMPLETED =====');
   }
 
-  void toggleFavorite() {
-    if (_product != null) {
-      _product = _product!.copyWith(isFavorite: !_product!.isFavorite);
-      emit(ProductDetailLoaded(_product!));
+  Future<void> toggleFavorite(BuildContext context) async {
+    if (_product == null) return;
 
-      // إرسال إشعار
-      if (_product!.isFavorite) {
-        emit(ProductFavoriteAdded());
+    // فحص تسجيل الدخول
+    final isLoggedIn = await AuthService().isLoggedIn();
+    if (!isLoggedIn) {
+      final languageManager = LanguageManager();
+      final isArabic = languageManager.isArabic;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'يرجى تسجيل الدخول أولاً لإضافة المنتج للمفضلة'
+                : 'Please sign in first to add product to favorites',
+          ),
+          backgroundColor: Colors.orange,
+          action: SnackBarAction(
+            label: isArabic ? 'تسجيل دخول' : 'Sign In',
+            textColor: Colors.white,
+            onPressed: () {
+              context.go('/signin');
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      print('🚀 Toggling favorite for product: ${_product!.id}');
+
+      final result = await FavoriteService.updateFavorite(_product!.id);
+
+      if (result['status'] == true) {
+        // تحديث الحالة المحلية
+        _product = _product!.copyWith(isFavorite: !_product!.isFavorite);
+        emit(ProductDetailLoaded(_product!));
+
+        final languageManager = LanguageManager();
+        final isArabic = languageManager.isArabic;
+
+        // إظهار الإشعار المناسب
+        if (result['msg'].contains('added')) {
+          TopNotification.show(
+            context,
+            isArabic ? 'تم إضافة المنتج للمفضلة' : 'Product added to favorites',
+            isError: false,
+          );
+        } else {
+          TopNotification.show(
+            context,
+            isArabic
+                ? 'تم إزالة المنتج من المفضلة'
+                : 'Product removed from favorites',
+            isError: false,
+          );
+        }
+
+        print('✅ Favorite updated successfully: ${result['msg']}');
       } else {
-        emit(ProductFavoriteRemoved());
+        print('❌ Failed to update favorite: ${result['msg']}');
+
+        final languageManager = LanguageManager();
+        final isArabic = languageManager.isArabic;
+
+        TopNotification.show(
+          context,
+          isArabic ? 'فشل في تحديث المفضلة' : 'Failed to update favorite',
+          isError: true,
+        );
       }
+    } catch (e) {
+      print('❌ Error updating favorite: $e');
+
+      final languageManager = LanguageManager();
+      final isArabic = languageManager.isArabic;
+
+      TopNotification.show(
+        context,
+        isArabic ? 'حدث خطأ في تحديث المفضلة' : 'Error updating favorite',
+        isError: true,
+      );
     }
   }
 
