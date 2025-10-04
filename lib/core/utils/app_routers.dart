@@ -92,7 +92,10 @@ class AppRouters {
       // Verification Code Screen (Reset Password)
       GoRoute(
         path: kVerificationCodeView,
-        builder: (context, state) => const VerificationCodeScreen(),
+        builder: (context, state) {
+          final userEmail = state.extra as String?;
+          return VerificationCodeScreen(userEmail: userEmail);
+        },
       ),
 
       // Sign Up Verification Code Screen

@@ -401,6 +401,16 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                           decorationColor: const Color(0xFF123459),
                         ),
                       ),
+                      TextSpan(
+                        text: languageManager.isArabic
+                            ? '\n\nإذا لم تستلم الرمز، تحقق من مجلد الرسائل المزعجة أو اضغط على "إعادة الإرسال"'
+                            : '\n\nIf you didn\'t receive the code, check your spam folder or tap "Resend"',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
                     ],
                   ),
                 ),

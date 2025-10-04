@@ -214,6 +214,17 @@ class _SignUpViewState extends State<SignUpView> {
 
         // Navigate to verification screen
         print('🔄 Redirecting to verification screen...');
+
+        // إرسال رمز التحقق تلقائياً بعد التسجيل الناجح
+        try {
+          print('📧 Sending verification code automatically...');
+          await AuthService().resendVerificationCode();
+          print('✅ Verification code sent successfully');
+        } catch (e) {
+          print('⚠️ Failed to send verification code automatically: $e');
+          // لا نوقف العملية، المستخدم يمكنه الضغط على "Resend" لاحقاً
+        }
+
         print('🏁 ===== SIGNUP VIEW - REGISTRATION COMPLETED =====');
         context.go('/signup-verification');
       } else {

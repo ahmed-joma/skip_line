@@ -9,7 +9,9 @@ import '../../../../shared/utils/password_validator.dart';
 import '../../../../core/services/auth_service.dart';
 
 class VerificationCodeView extends StatefulWidget {
-  const VerificationCodeView({super.key});
+  final String? userEmail;
+
+  const VerificationCodeView({super.key, this.userEmail});
 
   @override
   State<VerificationCodeView> createState() => _VerificationCodeViewState();
@@ -44,9 +46,14 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
   }
 
   void _loadEmail() {
-    // For now, we'll use a placeholder email
-    // In a real app, you would get this from shared preferences or pass it as a parameter
-    _userEmail = 'user@example.com';
+    // استخدام البريد الإلكتروني المرسل من الصفحة السابقة
+    if (widget.userEmail != null && widget.userEmail!.isNotEmpty) {
+      _userEmail = widget.userEmail!;
+    } else {
+      // إذا لم يتم تمرير البريد الإلكتروني، استخدم placeholder
+      _userEmail = 'user@example.com';
+    }
+    print('📧 Loaded email for password reset: $_userEmail');
   }
 
   @override
@@ -79,13 +86,85 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     });
   }
 
-  void _resendCode() {
-    setState(() {
-      _remainingTime = 300;
-      _isTimerActive = true;
-    });
-    _startTimer();
-    // هنا تستدعي API لإعادة إرسال الكود
+  void _resendCode() async {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    // Show loading notification
+    _showTopNotification(
+      languageManager.isArabic
+          ? 'جاري إعادة إرسال الرمز...'
+          : 'Resending verification code...',
+      isError: false,
+    );
+
+    print('🎯 ===== VERIFICATION CODE VIEW - STARTING RESEND =====');
+    print('📧 User email: $_userEmail');
+    print('🔄 Calling AuthService.passwordSendCode()...');
+
+    try {
+      // Call resend API
+      final result = await AuthService().passwordSendCode(_userEmail);
+
+      print('📥 Received response from AuthService');
+      print('   Success: ${result.isSuccess}');
+      print('   Message: ${result.msg}');
+
+      if (result.isSuccess) {
+        print('🎉 ===== RESEND SUCCESSFUL! =====');
+        print(
+          '✅ Verification code resent successfully! Showing success message...',
+        );
+
+        // Show success message
+        _showTopNotification(
+          languageManager.isArabic
+              ? 'تم إعادة إرسال رمز التحقق بنجاح!'
+              : 'Verification code resent successfully!',
+          isError: false,
+        );
+
+        // Reset timer
+        setState(() {
+          _remainingTime = 300;
+          _isTimerActive = true;
+        });
+        _startTimer();
+
+        print('🏁 ===== VERIFICATION CODE VIEW - RESEND COMPLETED =====');
+      } else {
+        print('❌ ===== RESEND FAILED! =====');
+        print('❌ Failed to resend verification code! Showing error message...');
+
+        String errorMessage = result.msg;
+
+        // Handle specific error cases
+        if (result.code == 404) {
+          errorMessage = languageManager.isArabic
+              ? 'لا يوجد مستخدم بهذا البريد الإلكتروني'
+              : 'No user found with this email address';
+        } else if (result.code == 422) {
+          errorMessage = languageManager.isArabic
+              ? 'البريد الإلكتروني غير صحيح'
+              : 'Invalid email address';
+        }
+
+        _showTopNotification(errorMessage, isError: true);
+        print('🏁 ===== VERIFICATION CODE VIEW - RESEND FAILED =====');
+      }
+    } catch (e) {
+      print('❌ ===== RESEND ERROR! =====');
+      print('❌ Error during resend: $e');
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
+            : 'Connection error. Please try again',
+        isError: true,
+      );
+      print('🏁 ===== VERIFICATION CODE VIEW - RESEND ERROR =====');
+    }
   }
 
   String _formatTime(int seconds) {
@@ -388,12 +467,37 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
                   const SizedBox(height: 16),
 
                   // Description
-                  Text(
-                    languageManager.isArabic
-                        ? 'أدخل الرمز المكون من 4 أرقام المرسل إلى بريدك الإلكتروني'
-                        : 'Enter the 4-digit code sent to your email',
+                  RichText(
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                      children: [
+                        TextSpan(
+                          text: languageManager.isArabic
+                              ? 'أرسلنا لك رمز التحقق على '
+                              : "We've sent you the verification code on ",
+                        ),
+                        TextSpan(
+                          text: _userEmail,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: const Color(0xFF123459),
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF123459),
+                          ),
+                        ),
+                        TextSpan(
+                          text: languageManager.isArabic
+                              ? '\n\nإذا لم تستلم الرمز، تحقق من مجلد الرسائل المزعجة أو اضغط على "إعادة الإرسال"'
+                              : '\n\nIf you didn\'t receive the code, check your spam folder or tap "Resend"',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 40),
 

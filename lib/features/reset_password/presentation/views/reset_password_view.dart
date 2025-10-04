@@ -78,7 +78,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
 
         print('🔄 Redirecting to verification code screen...');
         print('🏁 ===== RESET PASSWORD VIEW - SEND CODE COMPLETED =====');
-        context.go('/verification-code');
+        context.go('/verification-code', extra: _emailController.text.trim());
       } else {
         print('❌ ===== SEND CODE FAILED! =====');
         print('❌ Failed to send password reset code! Showing error message...');
