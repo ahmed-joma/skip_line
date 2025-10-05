@@ -15,6 +15,10 @@ class PaymentHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // حساب السعر مع الضريبة
+    final taxAmount = totalAmount * (gstRate / 100);
+    final totalWithTax = totalAmount + taxAmount;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,7 +110,7 @@ class PaymentHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '$currency ${totalAmount.toStringAsFixed(2)}',
+                    '$currency ${totalWithTax.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
