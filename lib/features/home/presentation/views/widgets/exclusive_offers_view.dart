@@ -301,7 +301,7 @@ class _ExclusiveOffersViewState extends State<ExclusiveOffersView> {
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.7, // زيادة الارتفاع قليلاً لإصلاح الـ overflow
+        childAspectRatio: 0.69, // زيادة الارتفاع قليلاً لإصلاح الـ overflow
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
