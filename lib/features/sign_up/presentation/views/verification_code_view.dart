@@ -216,14 +216,64 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
       } else {
         print('❌ ===== VERIFICATION FAILED! =====');
         print('❌ Email verification failed! Showing error message...');
-        _showTopNotification(
-          result.msg.isNotEmpty
-              ? result.msg
-              : (languageManager.isArabic
-                    ? 'رمز التحقق غير صحيح'
-                    : 'Invalid verification code'),
-          isError: true,
-        );
+        print('🔍 Error code: ${result.code}');
+        print('🔍 Error message: ${result.msg}');
+
+        String errorMessage = result.msg;
+
+        // Handle specific error cases based on status code and message
+        if (result.code == 422) {
+          // Validation error - check message content
+          String lowerMessage = result.msg.toLowerCase();
+          if (lowerMessage.contains('code') ||
+              lowerMessage.contains('verification')) {
+            if (lowerMessage.contains('invalid') ||
+                lowerMessage.contains('incorrect')) {
+              errorMessage = languageManager.isArabic
+                  ? 'رمز التحقق غير صحيح'
+                  : 'Invalid verification code';
+            } else if (lowerMessage.contains('expired') ||
+                lowerMessage.contains('expire')) {
+              errorMessage = languageManager.isArabic
+                  ? 'رمز التحقق منتهي الصلاحية'
+                  : 'Verification code has expired';
+            } else {
+              errorMessage = languageManager.isArabic
+                  ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
+                  : 'Invalid or expired verification code';
+            }
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'رمز التحقق غير صحيح'
+                : 'Invalid verification code';
+          }
+        } else if (result.code == 400) {
+          // Bad request
+          errorMessage = languageManager.isArabic
+              ? 'رمز التحقق غير صحيح'
+              : 'Invalid verification code';
+        } else if (result.code == 404) {
+          // Not found
+          errorMessage = languageManager.isArabic
+              ? 'لم يتم العثور على رمز التحقق'
+              : 'Verification code not found';
+        } else if (result.code == 429) {
+          // Too many attempts
+          errorMessage = languageManager.isArabic
+              ? 'تم تجاوز عدد المحاولات المسموح. يرجى المحاولة لاحقاً'
+              : 'Too many verification attempts. Please try again later';
+        } else {
+          // Generic error - use server message if available
+          if (result.msg.isNotEmpty) {
+            errorMessage = result.msg;
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'رمز التحقق غير صحيح'
+                : 'Invalid verification code';
+          }
+        }
+
+        _showTopNotification(errorMessage, isError: true);
         print('🏁 ===== VERIFICATION CODE VIEW - VERIFICATION FAILED =====');
       }
     } catch (e) {

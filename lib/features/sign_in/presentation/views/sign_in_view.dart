@@ -38,11 +38,22 @@ class _SignInViewState extends State<SignInView> {
       _passwordError = _passwordController.text.trim().isEmpty;
     });
 
-    if (_emailError || _passwordError) {
+    // Check for specific validation errors
+    if (_emailError) {
       _showTopNotification(
         languageManager.isArabic
-            ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور'
-            : 'Please enter your email and password',
+            ? 'يرجى إدخال البريد الإلكتروني'
+            : 'Please enter your email address',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_passwordError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى إدخال كلمة المرور'
+            : 'Please enter your password',
         isError: true,
       );
       return;
@@ -92,14 +103,63 @@ class _SignInViewState extends State<SignInView> {
       } else {
         // Login failed
         print('❌ Login failed! Showing error message...');
-        _showTopNotification(
-          response.msg.isNotEmpty
-              ? response.msg
-              : (languageManager.isArabic
-                    ? 'فشل في تسجيل الدخول'
-                    : 'Login failed'),
-          isError: true,
-        );
+        print('🔍 Error code: ${response.code}');
+        print('🔍 Error message: ${response.msg}');
+
+        String errorMessage = response.msg;
+
+        // Handle specific error cases based on status code and message
+        if (response.code == 404) {
+          // Email not found
+          errorMessage = languageManager.isArabic
+              ? 'لا يوجد حساب بهذا البريد الإلكتروني'
+              : 'No account found with this email address';
+        } else if (response.code == 401) {
+          // Wrong password
+          errorMessage = languageManager.isArabic
+              ? 'كلمة المرور غير صحيحة'
+              : 'Incorrect password';
+        } else if (response.code == 422) {
+          // Validation error - check message content
+          String lowerMessage = response.msg.toLowerCase();
+          if (lowerMessage.contains('email') &&
+              (lowerMessage.contains('not found') ||
+                  lowerMessage.contains('invalid'))) {
+            errorMessage = languageManager.isArabic
+                ? 'البريد الإلكتروني غير صحيح'
+                : 'Invalid email address';
+          } else if (lowerMessage.contains('password') ||
+              lowerMessage.contains('incorrect')) {
+            errorMessage = languageManager.isArabic
+                ? 'كلمة المرور غير صحيحة'
+                : 'Incorrect password';
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'البيانات المدخلة غير صحيحة'
+                : 'Invalid credentials';
+          }
+        } else if (response.code == 403) {
+          // Account not verified
+          errorMessage = languageManager.isArabic
+              ? 'يرجى تأكيد حسابك أولاً'
+              : 'Please verify your account first';
+        } else if (response.code == 429) {
+          // Too many attempts
+          errorMessage = languageManager.isArabic
+              ? 'تم تجاوز عدد المحاولات المسموح. يرجى المحاولة لاحقاً'
+              : 'Too many login attempts. Please try again later';
+        } else {
+          // Generic error - use server message if available
+          if (response.msg.isNotEmpty) {
+            errorMessage = response.msg;
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'فشل في تسجيل الدخول'
+                : 'Login failed';
+          }
+        }
+
+        _showTopNotification(errorMessage, isError: true);
       }
     } catch (e) {
       // Network or other error

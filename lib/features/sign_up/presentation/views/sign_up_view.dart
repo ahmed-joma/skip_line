@@ -133,17 +133,72 @@ class _SignUpViewState extends State<SignUpView> {
       _confirmPasswordError = _confirmPasswordController.text.trim().isEmpty;
     });
 
-    if (_usernameError ||
-        _emailError ||
-        _phoneError ||
-        _phoneLengthError ||
-        _cityError ||
-        _passwordError ||
-        _confirmPasswordError) {
+    // Check for specific validation errors
+    if (_usernameError) {
       _showTopNotification(
         languageManager.isArabic
-            ? 'يرجى ملء جميع الحقول المطلوبة'
-            : 'Please fill in all required fields',
+            ? 'يرجى إدخال اسم المستخدم'
+            : 'Please enter your username',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_emailError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى إدخال البريد الإلكتروني'
+            : 'Please enter your email address',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_phoneError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى إدخال رقم الهاتف'
+            : 'Please enter your phone number',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_phoneLengthError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'رقم الهاتف يجب أن يكون 9 أرقام'
+            : 'Phone number must be 9 digits',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_cityError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى اختيار المدينة'
+            : 'Please select your city',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_passwordError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى إدخال كلمة المرور'
+            : 'Please enter your password',
+        isError: true,
+      );
+      return;
+    }
+
+    if (_confirmPasswordError) {
+      _showTopNotification(
+        languageManager.isArabic
+            ? 'يرجى تأكيد كلمة المرور'
+            : 'Please confirm your password',
         isError: true,
       );
       return;
@@ -153,8 +208,8 @@ class _SignUpViewState extends State<SignUpView> {
     if (!_isPasswordValid) {
       _showTopNotification(
         languageManager.isArabic
-            ? 'كلمة المرور لا تلبي المتطلبات'
-            : 'Password does not meet requirements',
+            ? 'كلمة المرور لا تلبي المتطلبات المطلوبة'
+            : 'Password does not meet the required criteria',
         isError: true,
       );
       return;
@@ -163,8 +218,8 @@ class _SignUpViewState extends State<SignUpView> {
     if (_passwordController.text != _confirmPasswordController.text) {
       _showTopNotification(
         languageManager.isArabic
-            ? 'كلمة المرور غير متطابقة'
-            : 'Passwords do not match',
+            ? 'تأكد من كلمة المرور - كلمات المرور غير متطابقة'
+            : 'Confirm password - Passwords do not match',
         isError: true,
       );
       return;
@@ -231,51 +286,67 @@ class _SignUpViewState extends State<SignUpView> {
         print('❌ ===== REGISTRATION FAILED! =====');
         print('❌ Register failed! Showing error message...');
 
-        // Check if it's an existing email error
+        // Handle specific error cases based on status code and message
         String errorMessage = result.msg.isNotEmpty ? result.msg : '';
         print('🔍 Error message to check: $errorMessage');
         print('🔍 Error code: ${result.code}');
 
-        bool isExistingEmail = false;
-
-        // Check by error code first
         if (result.code == 422) {
-          print('📧 Status code 422 detected - likely validation error');
-          isExistingEmail = true;
-        }
-
-        // Check by error message content
-        if (!isExistingEmail && errorMessage.isNotEmpty) {
+          // Validation error - check message content
           String lowerMessage = errorMessage.toLowerCase();
-          isExistingEmail =
-              lowerMessage.contains('email') &&
+          if (lowerMessage.contains('email') &&
               (lowerMessage.contains('already') ||
                   lowerMessage.contains('exists') ||
                   lowerMessage.contains('taken') ||
                   lowerMessage.contains('duplicate') ||
                   lowerMessage.contains('in use') ||
-                  lowerMessage.contains('registered'));
+                  lowerMessage.contains('registered'))) {
+            errorMessage = languageManager.isArabic
+                ? 'هذا الإيميل مستخدم مسبقاً! يرجى استخدام إيميل آخر أو تسجيل الدخول'
+                : 'This email is already in use! Please use a different email or sign in';
+          } else if (lowerMessage.contains('username') &&
+              (lowerMessage.contains('already') ||
+                  lowerMessage.contains('taken'))) {
+            errorMessage = languageManager.isArabic
+                ? 'اسم المستخدم مستخدم مسبقاً! يرجى اختيار اسم آخر'
+                : 'Username is already taken! Please choose a different username';
+          } else if (lowerMessage.contains('phone') &&
+              (lowerMessage.contains('already') ||
+                  lowerMessage.contains('taken'))) {
+            errorMessage = languageManager.isArabic
+                ? 'رقم الهاتف مستخدم مسبقاً! يرجى استخدام رقم آخر'
+                : 'Phone number is already in use! Please use a different number';
+          } else if (lowerMessage.contains('password')) {
+            errorMessage = languageManager.isArabic
+                ? 'كلمة المرور لا تلبي المتطلبات المطلوبة'
+                : 'Password does not meet the required criteria';
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'البيانات المدخلة غير صحيحة'
+                : 'Invalid input data';
+          }
+        } else if (result.code == 409) {
+          // Conflict - duplicate data
+          errorMessage = languageManager.isArabic
+              ? 'البيانات المدخلة مستخدمة مسبقاً'
+              : 'The entered data is already in use';
+        } else if (result.code == 400) {
+          // Bad request
+          errorMessage = languageManager.isArabic
+              ? 'طلب غير صحيح - يرجى التحقق من البيانات المدخلة'
+              : 'Bad request - Please check the entered data';
+        } else {
+          // Generic error - use server message if available
+          if (errorMessage.isNotEmpty) {
+            errorMessage = result.msg;
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'فشل في إنشاء الحساب'
+                : 'Failed to create account';
+          }
         }
 
-        if (isExistingEmail) {
-          print('📧 Detected existing email error');
-          _showTopNotification(
-            languageManager.isArabic
-                ? 'هذا الإيميل مستخدم مسبقاً! يرجى استخدام إيميل آخر أو تسجيل الدخول'
-                : 'This email is already in use! Please use a different email or sign in',
-            isError: true,
-          );
-        } else {
-          print('❌ Other error type detected');
-          _showTopNotification(
-            errorMessage.isNotEmpty
-                ? errorMessage
-                : (languageManager.isArabic
-                      ? 'فشل في إنشاء الحساب'
-                      : 'Failed to create account'),
-            isError: true,
-          );
-        }
+        _showTopNotification(errorMessage, isError: true);
         print('🏁 ===== SIGNUP VIEW - REGISTRATION FAILED =====');
         return; // Stop execution here, don't navigate
       }

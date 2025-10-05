@@ -298,18 +298,57 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
         // Handle specific error cases
         if (result.code == 422) {
           // Check for specific validation errors
-          if (result.msg.toLowerCase().contains('code')) {
-            errorMessage = languageManager.isArabic
-                ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
-                : 'Verification code is invalid or expired';
-          } else if (result.msg.toLowerCase().contains('password')) {
+          String lowerMessage = result.msg.toLowerCase();
+          if (lowerMessage.contains('code') ||
+              lowerMessage.contains('verification')) {
+            if (lowerMessage.contains('invalid') ||
+                lowerMessage.contains('incorrect')) {
+              errorMessage = languageManager.isArabic
+                  ? 'رمز التحقق غير صحيح'
+                  : 'Invalid verification code';
+            } else if (lowerMessage.contains('expired') ||
+                lowerMessage.contains('expire')) {
+              errorMessage = languageManager.isArabic
+                  ? 'رمز التحقق منتهي الصلاحية'
+                  : 'Verification code has expired';
+            } else {
+              errorMessage = languageManager.isArabic
+                  ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
+                  : 'Verification code is invalid or expired';
+            }
+          } else if (lowerMessage.contains('password')) {
             errorMessage = languageManager.isArabic
                 ? 'كلمة المرور لا تلبي المتطلبات'
                 : 'Password does not meet requirements';
-          } else if (result.msg.toLowerCase().contains('email')) {
+          } else if (lowerMessage.contains('email')) {
             errorMessage = languageManager.isArabic
                 ? 'البريد الإلكتروني غير صحيح'
                 : 'Invalid email address';
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'رمز التحقق غير صحيح أو منتهي الصلاحية'
+                : 'Verification code is invalid or expired';
+          }
+        } else if (result.code == 400) {
+          errorMessage = languageManager.isArabic
+              ? 'رمز التحقق غير صحيح'
+              : 'Invalid verification code';
+        } else if (result.code == 404) {
+          errorMessage = languageManager.isArabic
+              ? 'لم يتم العثور على رمز التحقق'
+              : 'Verification code not found';
+        } else if (result.code == 429) {
+          errorMessage = languageManager.isArabic
+              ? 'تم تجاوز عدد المحاولات المسموح. يرجى المحاولة لاحقاً'
+              : 'Too many attempts. Please try again later';
+        } else {
+          // Generic error - use server message if available
+          if (result.msg.isNotEmpty) {
+            errorMessage = result.msg;
+          } else {
+            errorMessage = languageManager.isArabic
+                ? 'فشل في تغيير كلمة المرور'
+                : 'Failed to change password';
           }
         }
 
