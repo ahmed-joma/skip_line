@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/invoice_data_storage.dart';
 
 class PaymentSuccessView extends StatefulWidget {
   final double totalAmount;
   final String currency;
   final int? orderId;
+  final List<dynamic>? cartItems; // إضافة بيانات السلة
 
   const PaymentSuccessView({
     Key? key,
     required this.totalAmount,
     required this.currency,
     this.orderId,
+    this.cartItems, // إضافة المعامل الجديد
   }) : super(key: key);
 
   @override
@@ -23,6 +26,12 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
     super.initState();
     // Payment completed successfully
     print('Payment completed successfully - User remains logged in');
+    print('🎉 PaymentSuccessView - Total Amount: ${widget.totalAmount}');
+    print('🎉 PaymentSuccessView - Order ID: ${widget.orderId}');
+    print(
+      '🎉 PaymentSuccessView - Cart Items Count: ${widget.cartItems?.length ?? 0}',
+    );
+    print('🎉 PaymentSuccessView - Cart Items: ${widget.cartItems}');
   }
 
   @override
@@ -165,6 +174,21 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () async {
+                            // طباعة تشخيصية قبل الانتقال للفاتورة
+                            print('📄 Download Invoice Button Pressed');
+                            print('📄 Total Amount: ${widget.totalAmount}');
+                            print('📄 Order ID: ${widget.orderId}');
+
+                            // جلب البيانات من التخزين المؤقت
+                            final invoiceData =
+                                InvoiceDataStorage.getInvoiceData();
+                            print(
+                              '📄 Retrieved Cart Items Count: ${invoiceData['cartItems'].length}',
+                            );
+                            print(
+                              '📄 Retrieved Cart Items: ${invoiceData['cartItems']}',
+                            );
+
                             // Navigate to invoice page with order data
                             context.go(
                               '/invoice',

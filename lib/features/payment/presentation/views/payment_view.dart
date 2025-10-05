@@ -10,6 +10,8 @@ import 'widgets/payment_method_selector.dart';
 import 'widgets/credit_card_form.dart';
 import 'widgets/payment_button.dart';
 import '../../../my_cart/presentation/manager/cart/cart_cubit.dart';
+import '../../../my_cart/data/models/cart_item.dart';
+import '../../../../core/utils/invoice_data_storage.dart';
 
 class PaymentView extends StatelessWidget {
   final double totalAmount;
@@ -50,14 +52,34 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
 
   @override
   Widget build(BuildContext context) {
+    // طباعة تشخيصية عند بناء الصفحة
+    print('💳 PaymentView - Building with:');
+    print('💳 Total Amount: ${widget.totalAmount}');
+    print('💳 Cart Items Count: ${widget.cartItems?.length ?? 0}');
+    print('💳 Cart Items: ${widget.cartItems}');
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: BlocConsumer<PaymentCubit, PaymentState>(
           listener: (context, state) {
             if (state is PaymentSuccess) {
-              // مسح السلة بعد نجاح الدفع
-              context.read<CartCubit>().clearCart();
+              // طباعة تشخيصية للبيانات قبل الانتقال
+              print('🚀 Payment Success - Preparing to navigate');
+              print('🚀 Total Amount: ${widget.totalAmount}');
+              print('🚀 Order ID: ${state.orderId}');
+              print('🚀 Cart Items Count: ${widget.cartItems?.length ?? 0}');
+              print('🚀 Cart Items: ${widget.cartItems}');
+
+              // حفظ البيانات في التخزين المؤقت
+              if (widget.cartItems != null && widget.cartItems!.isNotEmpty) {
+                InvoiceDataStorage.saveInvoiceData(
+                  cartItems: widget.cartItems!.cast<CartItem>(),
+                  totalAmount: widget.totalAmount,
+                  currency: 'SAR',
+                  orderId: state.orderId ?? 0,
+                );
+              }
 
               // Navigate to payment success page
               context.go(
@@ -68,6 +90,11 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
                   'orderId': state.orderId,
                 },
               );
+
+              // مسح السلة بعد الانتقال (لتجنب التأثير على البيانات المحفوظة)
+              Future.delayed(const Duration(milliseconds: 100), () {
+                context.read<CartCubit>().clearCart();
+              });
             } else if (state is PaymentError) {
               _showErrorDialog(context, state.message);
             }
@@ -348,6 +375,35 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
     payment,
     List<dynamic> cartItems,
   ) {
+    // التحقق من وجود المنتجات في السلة
+    if (cartItems.isEmpty) {
+      print('❌ No products in cart!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'لا توجد منتجات في السلة',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor: Colors.red[600],
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+      return;
+    }
+
+    print('📦 Processing payment with ${cartItems.length} items');
+    for (int i = 0; i < cartItems.length; i++) {
+      print('   ${i + 1}. ${cartItems[i]}');
+    }
+
     // الحصول على القيم الحالية من CreditCardForm
     Map<String, String> currentValues = {};
     if (_creditCardFormKey.currentState != null) {

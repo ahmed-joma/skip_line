@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/invoice_data_storage.dart';
 
 class InvoiceView extends StatefulWidget {
   final double totalAmount;
   final String currency;
   final int? orderId;
+  final List<dynamic>? cartItems; // إضافة بيانات السلة
 
   const InvoiceView({
     super.key,
     required this.totalAmount,
     required this.currency,
     this.orderId,
+    this.cartItems, // إضافة المعامل الجديد
   });
 
   @override
@@ -28,17 +31,41 @@ class _InvoiceViewState extends State<InvoiceView> {
   }
 
   Future<void> _loadOrderData() async {
-    if (widget.orderId != null) {
-      // TODO: جلب بيانات الطلب من الـ API
-      // مؤقتاً سنستخدم بيانات وهمية
+    print('🔄 Loading order data for ID: ${widget.orderId}');
+
+    // جلب البيانات من التخزين المؤقت
+    final invoiceData = InvoiceDataStorage.getInvoiceData();
+    final cartItems = invoiceData['cartItems'] as List<dynamic>;
+
+    print('🔄 Cart items available from storage: ${cartItems.length}');
+
+    // استخدام البيانات المحلية فقط - لا نعتمد على API
+    if (cartItems.isNotEmpty) {
+      print('✅ Using local cart data from storage');
+
       setState(() {
-        orderItems = [
-          {'name': 'خيار', 'price': 1.60, 'quantity': 1},
-        ];
+        orderItems = cartItems.map((item) {
+          return {
+            'name': item.nameAr ?? item.name ?? 'Unknown Product',
+            'nameEn': item.name ?? 'Unknown Product',
+            'price': item.price ?? 0.0,
+            'quantity': item.quantity ?? 1,
+            'total': (item.price ?? 0.0) * (item.quantity ?? 1),
+          };
+        }).toList();
         isLoading = false;
       });
+
+      print('📦 Loaded ${orderItems.length} order items from storage:');
+      for (int i = 0; i < orderItems.length; i++) {
+        print(
+          '   ${i + 1}. ${orderItems[i]['name']} - ${orderItems[i]['price']} ر.س x${orderItems[i]['quantity']}',
+        );
+      }
     } else {
+      print('❌ No cart items available in storage');
       setState(() {
+        orderItems = [];
         isLoading = false;
       });
     }
@@ -50,15 +77,24 @@ class _InvoiceViewState extends State<InvoiceView> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    // طباعة تشخيصية للبيانات
+    print('🔍 Invoice View - Order Items Count: ${orderItems.length}');
+    print('🔍 Invoice View - Order Items: $orderItems');
+    print('🔍 Invoice View - Order ID: ${widget.orderId}');
+
     // Calculate subtotal, tax, and total
     double subtotal = 0.0;
     for (var item in orderItems) {
       subtotal += (item['price'] as double) * (item['quantity'] as int);
     }
 
+    print('🔍 Invoice View - Calculated Subtotal: $subtotal');
+
     double tax = subtotal * 0.15; // 15% tax
     double otherFees = 0.0;
     double finalTotal = subtotal + tax + otherFees;
+
+    print('🔍 Invoice View - Final Total: $finalTotal');
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -127,7 +163,7 @@ class _InvoiceViewState extends State<InvoiceView> {
 
                   const SizedBox(height: 24),
 
-                  // Order items
+                  // Order items - عرض المنتجات مباشرة
                   ...orderItems.map(
                     (item) => _buildOrderItem(
                       item['name'] as String,

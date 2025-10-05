@@ -272,6 +272,10 @@ class AppRouters {
           final totalAmount = extra['totalAmount'] as double? ?? 0.0;
           final currency = extra['currency'] as String? ?? 'SAR';
           final orderId = extra['orderId'] as int?;
+          print('🛣️ Router - PaymentSuccessView');
+          print('🛣️ Total Amount: $totalAmount');
+          print('🛣️ Order ID: $orderId');
+
           return PaymentSuccessView(
             totalAmount: totalAmount,
             currency: currency,
@@ -288,6 +292,10 @@ class AppRouters {
           final totalAmount = extra['totalAmount'] as double? ?? 0.0;
           final currency = extra['currency'] as String? ?? 'SAR';
           final orderId = extra['orderId'] as int?;
+          print('🛣️ Router - InvoiceView');
+          print('🛣️ Total Amount: $totalAmount');
+          print('🛣️ Order ID: $orderId');
+
           return InvoiceView(
             totalAmount: totalAmount,
             currency: currency,

@@ -61,6 +61,42 @@ class CartItem extends Equatable {
 
   double get totalPrice => price * quantity;
 
+  // دالة لتحويل CartItem إلى Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'productId': productId,
+      'name': name,
+      'nameAr': nameAr,
+      'description': description,
+      'descriptionAr': descriptionAr,
+      'price': price,
+      'weight': weight,
+      'imagePath': imagePath,
+      'category': category,
+      'categoryAr': categoryAr,
+      'quantity': quantity,
+    };
+  }
+
+  // دالة لإنشاء CartItem من Map
+  factory CartItem.fromMap(Map<String, dynamic> map) {
+    return CartItem(
+      id: map['id'] ?? '',
+      productId: map['productId'] ?? '',
+      name: map['name'] ?? '',
+      nameAr: map['nameAr'] ?? '',
+      description: map['description'] ?? '',
+      descriptionAr: map['descriptionAr'] ?? '',
+      price: (map['price'] ?? 0.0).toDouble(),
+      weight: map['weight'] ?? '',
+      imagePath: map['imagePath'] ?? '',
+      category: map['category'] ?? '',
+      categoryAr: map['categoryAr'] ?? '',
+      quantity: map['quantity'] ?? 1,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
