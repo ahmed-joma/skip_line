@@ -66,7 +66,7 @@ class PaymentHeader extends StatelessWidget {
                 const Text(
                   'Checkout',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
@@ -89,19 +89,19 @@ class PaymentHeader extends StatelessWidget {
 
             // Price
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF1E3A8A).withOpacity(0.2),
                     spreadRadius: 1,
-                    blurRadius: 8,
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -112,7 +112,7 @@ class PaymentHeader extends StatelessWidget {
                   Text(
                     '$currency ${totalWithTax.toStringAsFixed(2)}',
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -120,7 +120,7 @@ class PaymentHeader extends StatelessWidget {
                   Text(
                     'Including GST ($gstRate%)',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       color: Colors.white70,
                       fontWeight: FontWeight.w500,
                     ),

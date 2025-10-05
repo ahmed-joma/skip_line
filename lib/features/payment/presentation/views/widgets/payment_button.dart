@@ -16,20 +16,20 @@ class PaymentButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 65,
+      height: 50,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E3A8A).withOpacity(0.4),
-            spreadRadius: 3,
-            blurRadius: 15,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF1E3A8A).withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -42,14 +42,14 @@ class PaymentButton extends StatelessWidget {
             children: [
               // Background wave decoration
               Positioned(
-                right: -20,
-                top: -10,
+                right: -15,
+                top: -8,
                 child: Container(
-                  width: 100,
-                  height: 80,
+                  width: 60,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
               ),
@@ -59,15 +59,15 @@ class PaymentButton extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.lock, color: Colors.white, size: 20),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.lock, color: Colors.white, size: 18),
+                    const SizedBox(width: 8),
                     Text(
                       'Pay for the order',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ],

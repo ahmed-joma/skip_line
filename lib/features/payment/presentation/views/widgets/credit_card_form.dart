@@ -64,6 +64,33 @@ class CreditCardFormState extends State<CreditCardForm> {
     });
   }
 
+  // دالة للتحقق من صحة تاريخ الانتهاء
+  void _validateExpiryDate(String month, String year) {
+    if (month.isNotEmpty && year.isNotEmpty) {
+      final currentDate = DateTime.now();
+      final currentYear = currentDate.year % 100; // آخر رقمين من السنة الحالية
+      final currentMonth = currentDate.month;
+
+      final expiryMonth = int.tryParse(month);
+      final expiryYear = int.tryParse(year);
+
+      if (expiryMonth != null && expiryYear != null) {
+        bool isExpired = false;
+
+        if (expiryYear < currentYear) {
+          isExpired = true;
+        } else if (expiryYear == currentYear && expiryMonth < currentMonth) {
+          isExpired = true;
+        }
+
+        setState(() {
+          _fieldErrors['expiryMonth'] = isExpired;
+          _fieldErrors['expiryYear'] = isExpired;
+        });
+      }
+    }
+  }
+
   // دالة للحصول على القيم الحالية من الـ controllers
   Map<String, String> getCurrentValues() {
     return {
@@ -78,16 +105,16 @@ class CreditCardFormState extends State<CreditCardForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            spreadRadius: 2,
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
@@ -165,7 +192,7 @@ class CreditCardFormState extends State<CreditCardForm> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Cardholder Name
           _buildFormField(
@@ -173,9 +200,26 @@ class CreditCardFormState extends State<CreditCardForm> {
             child: TextFormField(
               controller: _cardholderController,
               onChanged: (value) {
-                widget.onCardholderChanged(value);
-                _validateField('cardholderName', value);
+                // تحويل النص إلى حروف كبيرة ومنع الأرقام
+                final upperValue = value.toUpperCase().replaceAll(
+                  RegExp(r'[0-9]'),
+                  '',
+                );
+                if (upperValue != value) {
+                  _cardholderController.value = TextEditingValue(
+                    text: upperValue,
+                    selection: TextSelection.collapsed(
+                      offset: upperValue.length,
+                    ),
+                  );
+                }
+                widget.onCardholderChanged(upperValue);
+                _validateField('cardholderName', upperValue);
               },
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+                UpperCaseTextFormatter(),
+              ],
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter cardholder name',
@@ -195,7 +239,7 @@ class CreditCardFormState extends State<CreditCardForm> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Expiry Date and CVV Row
           Row(
@@ -252,6 +296,11 @@ class CreditCardFormState extends State<CreditCardForm> {
                         child: TextFormField(
                           controller: _expiryYearController,
                           onChanged: (value) {
+                            // التحقق من صحة التاريخ
+                            _validateExpiryDate(
+                              _expiryMonthController.text,
+                              value,
+                            );
                             widget.onExpiryChanged(
                               widget.payment.expiryMonth,
                               value,
@@ -261,11 +310,11 @@ class CreditCardFormState extends State<CreditCardForm> {
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(4),
+                            LengthLimitingTextInputFormatter(2),
                           ],
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'YYYY',
+                            hintText: 'YY',
                             hintStyle: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -355,16 +404,16 @@ class CreditCardFormState extends State<CreditCardForm> {
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
             color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[200]!, width: 1.5),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[200]!, width: 1),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.05),
                 spreadRadius: 1,
-                blurRadius: 4,
+                blurRadius: 2,
                 offset: const Offset(0, 1),
               ),
             ],
@@ -398,6 +447,19 @@ class CardNumberInputFormatter extends TextInputFormatter {
     return TextEditingValue(
       text: buffer.toString(),
       selection: TextSelection.collapsed(offset: buffer.length),
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }
