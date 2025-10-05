@@ -279,12 +279,25 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     } catch (e) {
       print('❌ ===== VERIFICATION ERROR! =====');
       print('❌ Error during verification: $e');
-      _showTopNotification(
-        languageManager.isArabic
+
+      String errorMessage;
+      if (e.toString().contains('timeout') ||
+          e.toString().contains('Timeout')) {
+        errorMessage = languageManager.isArabic
+            ? 'اتصال بطيء - يرجى المحاولة مرة أخرى أو التحقق من الإنترنت'
+            : 'Slow connection - Please try again or check your internet';
+      } else if (e.toString().contains('connection') ||
+          e.toString().contains('Connection')) {
+        errorMessage = languageManager.isArabic
+            ? 'خطأ في الاتصال - يرجى التحقق من الإنترنت'
+            : 'Connection error - Please check your internet';
+      } else {
+        errorMessage = languageManager.isArabic
             ? 'حدث خطأ أثناء التحقق'
-            : 'Error occurred during verification',
-        isError: true,
-      );
+            : 'Error occurred during verification';
+      }
+
+      _showTopNotification(errorMessage, isError: true);
       print('🏁 ===== VERIFICATION CODE VIEW - VERIFICATION ERROR =====');
     }
   }

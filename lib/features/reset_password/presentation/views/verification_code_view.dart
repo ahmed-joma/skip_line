@@ -157,12 +157,25 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     } catch (e) {
       print('❌ ===== RESEND ERROR! =====');
       print('❌ Error during resend: $e');
-      _showTopNotification(
-        languageManager.isArabic
+
+      String errorMessage;
+      if (e.toString().contains('timeout') ||
+          e.toString().contains('Timeout')) {
+        errorMessage = languageManager.isArabic
+            ? 'اتصال بطيء - يرجى المحاولة مرة أخرى أو التحقق من الإنترنت'
+            : 'Slow connection - Please try again or check your internet';
+      } else if (e.toString().contains('connection') ||
+          e.toString().contains('Connection')) {
+        errorMessage = languageManager.isArabic
+            ? 'خطأ في الاتصال - يرجى التحقق من الإنترنت'
+            : 'Connection error - Please check your internet';
+      } else {
+        errorMessage = languageManager.isArabic
             ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
-            : 'Connection error. Please try again',
-        isError: true,
-      );
+            : 'Connection error. Please try again';
+      }
+
+      _showTopNotification(errorMessage, isError: true);
       print('🏁 ===== VERIFICATION CODE VIEW - RESEND ERROR =====');
     }
   }
@@ -358,12 +371,25 @@ class _VerificationCodeViewState extends State<VerificationCodeView> {
     } catch (e) {
       print('❌ ===== PASSWORD RESET ERROR! =====');
       print('❌ Error during password reset: $e');
-      _showTopNotification(
-        languageManager.isArabic
+
+      String errorMessage;
+      if (e.toString().contains('timeout') ||
+          e.toString().contains('Timeout')) {
+        errorMessage = languageManager.isArabic
+            ? 'اتصال بطيء - يرجى المحاولة مرة أخرى أو التحقق من الإنترنت'
+            : 'Slow connection - Please try again or check your internet';
+      } else if (e.toString().contains('connection') ||
+          e.toString().contains('Connection')) {
+        errorMessage = languageManager.isArabic
+            ? 'خطأ في الاتصال - يرجى التحقق من الإنترنت'
+            : 'Connection error - Please check your internet';
+      } else {
+        errorMessage = languageManager.isArabic
             ? 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى'
-            : 'Connection error. Please try again',
-        isError: true,
-      );
+            : 'Connection error. Please try again';
+      }
+
+      _showTopNotification(errorMessage, isError: true);
       print('🏁 ===== VERIFICATION CODE VIEW - PASSWORD RESET ERROR =====');
     }
   }

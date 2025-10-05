@@ -102,12 +102,25 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
     } catch (e) {
       print('❌ ===== SEND CODE ERROR! =====');
       print('❌ Error during send code: $e');
-      _showTopNotification(
-        languageManager.isArabic
+
+      String errorMessage;
+      if (e.toString().contains('timeout') ||
+          e.toString().contains('Timeout')) {
+        errorMessage = languageManager.isArabic
+            ? 'اتصال بطيء - يرجى المحاولة مرة أخرى أو التحقق من الإنترنت'
+            : 'Slow connection - Please try again or check your internet';
+      } else if (e.toString().contains('connection') ||
+          e.toString().contains('Connection')) {
+        errorMessage = languageManager.isArabic
+            ? 'خطأ في الاتصال - يرجى التحقق من الإنترنت'
+            : 'Connection error - Please check your internet';
+      } else {
+        errorMessage = languageManager.isArabic
             ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى'
-            : 'Unexpected error occurred. Please try again',
-        isError: true,
-      );
+            : 'Unexpected error occurred. Please try again';
+      }
+
+      _showTopNotification(errorMessage, isError: true);
       print('🏁 ===== RESET PASSWORD VIEW - SEND CODE ERROR =====');
     }
   }

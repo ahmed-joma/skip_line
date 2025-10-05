@@ -9,9 +9,15 @@ class NetworkService {
   // Initialize Dio
   static void initialize() {
     _dio.options.baseUrl = baseUrl;
-    _dio.options.connectTimeout = const Duration(seconds: 30);
-    _dio.options.receiveTimeout = const Duration(seconds: 30);
-    _dio.options.sendTimeout = const Duration(seconds: 30);
+    _dio.options.connectTimeout = const Duration(
+      seconds: 60,
+    ); // زيادة من 30 إلى 60 ثانية
+    _dio.options.receiveTimeout = const Duration(
+      seconds: 90,
+    ); // زيادة من 30 إلى 90 ثانية
+    _dio.options.sendTimeout = const Duration(
+      seconds: 60,
+    ); // زيادة من 30 إلى 60 ثانية
 
     // Default headers
     _dio.options.headers = {
@@ -32,6 +38,7 @@ class NetworkService {
 
     print('🚀 NetworkService initialized with Dio');
     print('📍 Base URL: $baseUrl');
+    print('⏱️ Timeouts: Connect=60s, Receive=90s, Send=60s');
   }
 
   // GET request
@@ -172,26 +179,26 @@ class NetworkService {
 
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
-        print('⏰ Connection Timeout');
-        return 'Connection timeout. Please check your internet connection.';
+        print('⏰ Connection Timeout (60s exceeded)');
+        return 'اتصال بطيء - يرجى المحاولة مرة أخرى أو التحقق من الإنترنت';
       case DioExceptionType.sendTimeout:
-        print('⏰ Send Timeout');
-        return 'Send timeout. Please try again.';
+        print('⏰ Send Timeout (60s exceeded)');
+        return 'إرسال البيانات بطيء - يرجى المحاولة مرة أخرى';
       case DioExceptionType.receiveTimeout:
-        print('⏰ Receive Timeout');
-        return 'Receive timeout. Please try again.';
+        print('⏰ Receive Timeout (90s exceeded)');
+        return 'استقبال البيانات بطيء - يرجى المحاولة مرة أخرى';
       case DioExceptionType.badResponse:
         print('❌ Bad Response: ${e.response?.statusCode}');
-        return 'Server error: ${e.response?.statusCode}';
+        return 'خطأ في الخادم: ${e.response?.statusCode}';
       case DioExceptionType.cancel:
         print('❌ Request Cancelled');
-        return 'Request was cancelled.';
+        return 'تم إلغاء الطلب';
       case DioExceptionType.connectionError:
         print('❌ Connection Error');
-        return 'Connection error. Please check your internet connection.';
+        return 'خطأ في الاتصال - يرجى التحقق من الإنترنت';
       default:
         print('❌ Unknown Error: ${e.message}');
-        return 'Unknown error occurred: ${e.message}';
+        return 'حدث خطأ غير متوقع: ${e.message}';
     }
   }
 }

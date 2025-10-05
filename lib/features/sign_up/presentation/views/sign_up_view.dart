@@ -353,12 +353,25 @@ class _SignUpViewState extends State<SignUpView> {
     } catch (e) {
       print('❌ ===== REGISTRATION ERROR! =====');
       print('❌ Error during register: $e');
-      _showTopNotification(
-        languageManager.isArabic
+
+      String errorMessage;
+      if (e.toString().contains('timeout') ||
+          e.toString().contains('Timeout')) {
+        errorMessage = languageManager.isArabic
+            ? 'اتصال بطيء - يرجى المحاولة مرة أخرى أو التحقق من الإنترنت'
+            : 'Slow connection - Please try again or check your internet';
+      } else if (e.toString().contains('connection') ||
+          e.toString().contains('Connection')) {
+        errorMessage = languageManager.isArabic
+            ? 'خطأ في الاتصال - يرجى التحقق من الإنترنت'
+            : 'Connection error - Please check your internet';
+      } else {
+        errorMessage = languageManager.isArabic
             ? 'حدث خطأ أثناء إنشاء الحساب'
-            : 'Error occurred during registration',
-        isError: true,
-      );
+            : 'Error occurred during registration';
+      }
+
+      _showTopNotification(errorMessage, isError: true);
       print('🏁 ===== SIGNUP VIEW - REGISTRATION ERROR =====');
       return; // Stop execution here, don't navigate
     }
