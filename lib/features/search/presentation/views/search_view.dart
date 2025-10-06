@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import '../../../../shared/constants/language_manager.dart';
 import '../manager/search/search_cubit.dart';
 import '../manager/search/search_state.dart';
 import '../../data/repo/search_repo_imple.dart';
 import '../../data/models/product_model.dart';
-import '../../../Product_Detail/data/models/product_model.dart' as detail;
-import '../../../Product_Detail/presentation/utils/navigation_helper.dart';
+import '../../../my_cart/presentation/manager/cart/cart_cubit.dart';
+import '../../../my_cart/data/models/cart_item.dart';
+import 'package:go_router/go_router.dart';
 
 class SearchView extends StatefulWidget {
   const SearchView({super.key});
@@ -19,6 +21,7 @@ class SearchView extends StatefulWidget {
 class _SearchViewState extends State<SearchView> {
   final TextEditingController _searchController = TextEditingController();
   late SearchCubit _searchCubit;
+  final Map<String, bool> _buttonPressedStates = {};
 
   @override
   void initState() {
@@ -33,6 +36,173 @@ class _SearchViewState extends State<SearchView> {
     _searchController.dispose();
     _searchCubit.close();
     super.dispose();
+  }
+
+  // دالة إضافة المنتج للسلة
+  void _addToCart(ProductModel product) {
+    try {
+      // تأثير بصري عند الضغط
+      setState(() {
+        _buttonPressedStates[product.id] = true;
+      });
+
+      // تأثير اهتزازي
+      HapticFeedback.lightImpact();
+
+      // إعادة تعيين التأثير بعد 200ms
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() {
+            _buttonPressedStates[product.id] = false;
+          });
+        }
+      });
+
+      // إنشاء CartItem
+      final cartItem = CartItem(
+        id: product.id,
+        productId: product.id,
+        name: product.name,
+        nameAr: product.nameAr,
+        description: product.description,
+        descriptionAr: product.descriptionAr,
+        price:
+            double.tryParse(product.price.replaceAll('SR', '').trim()) ?? 0.0,
+        weight: '1kg',
+        imagePath: product.imagePath,
+        category: product.category,
+        categoryAr: product.category,
+        quantity: 1,
+      );
+
+      // إضافة للسلة
+      context.read<CartCubit>().addToCart(cartItem);
+
+      // عرض الإشعار
+      _showCartNotification(product);
+    } catch (e) {
+      print('❌ خطأ في إضافة المنتج للسلة: $e');
+    }
+  }
+
+  // دالة عرض إشعار السلة
+  void _showCartNotification(ProductModel product) {
+    final languageManager = Provider.of<LanguageManager>(
+      context,
+      listen: false,
+    );
+
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4CAF50).withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // أيقونة النجاح
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Color(0xFF4CAF50),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // النص
+                Expanded(
+                  child: Text(
+                    languageManager.isArabic
+                        ? 'تم إضافة ${product.nameAr} إلى السلة'
+                        : '${product.name} added to cart',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // زر View Cart
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    overlayEntry.remove();
+                    context.go('/cart');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      languageManager.isArabic ? 'عرض السلة' : 'View Cart',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // زر الإغلاق
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    // إزالة الإشعار تلقائياً بعد 4 ثوانٍ
+    Future.delayed(const Duration(seconds: 4), () {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
+      }
+    });
   }
 
   @override
@@ -116,12 +286,17 @@ class _SearchViewState extends State<SearchView> {
                           fontSize: 16,
                         ),
                         onChanged: (value) {
-                          _searchCubit.searchProducts(value);
+                          // البحث مع تأخير صغير لتحسين الأداء
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            if (_searchController.text == value) {
+                              _searchCubit.searchProducts(value);
+                            }
+                          });
                         },
                         decoration: InputDecoration(
                           hintText: languageManager.isArabic
-                              ? 'البحث في المتجر'
-                              : 'Search Store',
+                              ? 'البحث في المنتجات...'
+                              : 'Search products...',
                           hintStyle: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 16,
@@ -135,7 +310,7 @@ class _SearchViewState extends State<SearchView> {
                               ? GestureDetector(
                                   onTap: () {
                                     _searchController.clear();
-                                    _searchCubit.clearSearch();
+                                    _searchCubit.getAllProducts();
                                   },
                                   child: Icon(
                                     Icons.close,
@@ -304,29 +479,10 @@ class _SearchViewState extends State<SearchView> {
   Widget _buildProductCard(ProductModel product, bool isArabic) {
     return GestureDetector(
       onTap: () {
-        // تحويل ProductModel إلى detail.ProductModel
-        final detailProduct = detail.ProductModel(
-          id: product.id,
-          name: product.name,
-          nameAr: product.nameAr,
-          description: product.description,
-          descriptionAr: product.descriptionAr,
-          price: double.parse(product.price.replaceAll('SR', '').trim()),
-          weight: '1kg',
-          images: [product.imagePath], // سيتم تحويله إلى URL في صفحة التفاصيل
-          category: product.category,
-          categoryAr: product.category,
-          rating: 4.5,
-          reviewCount: 128,
-          isFavorite: false,
-          nutrition: {},
-          features: [],
-          featuresAr: [],
-        );
-
-        NavigationHelper.navigateToProductDetailFromHome(
-          context,
-          detailProduct,
+        // التنقل لصفحة تفاصيل المنتج باستخدام productId من API
+        context.push(
+          '/product-detail',
+          extra: {'productId': int.parse(product.id)},
         );
       },
       child: Container(
@@ -406,17 +562,35 @@ class _SearchViewState extends State<SearchView> {
                           color: Color(0xFF123459),
                         ),
                       ),
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF123459),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: 20,
+                      GestureDetector(
+                        onTap: () => _addToCart(product),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: _buttonPressedStates[product.id] == true
+                                ? const Color(0xFF0F2A4A)
+                                : const Color(0xFF123459),
+                            shape: BoxShape.circle,
+                            boxShadow: _buttonPressedStates[product.id] == true
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF123459,
+                                      ).withOpacity(0.3),
+                                      spreadRadius: 2,
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ],

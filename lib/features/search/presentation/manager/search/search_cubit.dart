@@ -9,7 +9,8 @@ class SearchCubit extends Cubit<SearchState> {
 
   Future<void> searchProducts(String query) async {
     if (query.isEmpty) {
-      emit(SearchInitial());
+      // إذا كان البحث فارغ، اعرض جميع المنتجات
+      await getAllProducts();
       return;
     }
 
