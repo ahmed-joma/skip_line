@@ -105,12 +105,25 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         create: (context) => ScanCubit(),
         child: BlocConsumer<ScanCubit, ScanState>(
           listener: (context, state) {
+            print('🔍 ScanView - State changed: ${state.runtimeType}');
+
             if (state is ScanSuccess) {
+              print('🔍 ScanView - ScanSuccess detected');
               _showScanResult(context, state.result, isArabic);
             } else if (state is ScanError) {
+              print('🔍 ScanView - ScanError detected: ${state.message}');
               _showError(context, state.message, isArabic);
             } else if (state is ProductScanned) {
+              print(
+                '🔍 ScanView - ProductScanned detected: ${state.productName}',
+              );
               // لا نحتاج لعمل شيء هنا، البطاقة ستظهر تلقائياً
+            } else if (state is ScanCountdown) {
+              print('🔍 ScanView - ScanCountdown detected: ${state.countdown}');
+            } else if (state is ScanLoading) {
+              print('🔍 ScanView - ScanLoading detected');
+            } else if (state is ScanInitial) {
+              print('🔍 ScanView - ScanInitial detected');
             }
           },
           builder: (context, state) {
@@ -128,6 +141,15 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                 // مؤشر التحميل
                 if (state is ScanLoading) _buildLoadingIndicator(isArabic),
 
+                // مؤشر العد التنازلي
+                if (state is ScanCountdown)
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 100,
+                    left: 0,
+                    right: 0,
+                    child: _buildCountdownIndicator(state.countdown, isArabic),
+                  ),
+
                 // بطاقة المنتج الممسوح
                 if (state is ProductScanned)
                   Positioned(
@@ -138,6 +160,8 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                       productName: state.productName,
                       productCategory: state.productCategory,
                       productImage: state.productImage,
+                      productId: state.productId,
+                      productPrice: state.productPrice,
                       onAddPressed: () {
                         context.go(
                           '/product-details2',
@@ -185,32 +209,41 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
       );
     }
 
-    return MobileScanner(
-      controller: _scannerController!,
-      onDetect: (capture) {
-        final List<Barcode> barcodes = capture.barcodes;
-        if (barcodes.isNotEmpty) {
-          final barcode = barcodes.first;
-          if (barcode.rawValue != null) {
-            context.read<ScanCubit>().processProductScan(barcode.rawValue!);
+    return AbsorbPointer(
+      absorbing: false, // السماح للمسح بالعمل
+      child: MobileScanner(
+        controller: _scannerController!,
+        onDetect: (capture) {
+          final List<Barcode> barcodes = capture.barcodes;
+          if (barcodes.isNotEmpty) {
+            final barcode = barcodes.first;
+            if (barcode.rawValue != null) {
+              context.read<ScanCubit>().processProductScan(barcode.rawValue!);
+            }
           }
-        }
-      },
+        },
+      ),
     );
   }
 
   Widget _buildControlLayer(BuildContext context, bool isArabic) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // شريط علوي
-          _buildTopBar(context, isArabic),
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: SafeArea(
+        child: Column(
+          children: [
+            // شريط علوي
+            _buildTopBar(context, isArabic),
 
-          const Spacer(),
+            const Spacer(),
 
-          // شريط سفلي
-          _buildBottomBar(context, isArabic),
-        ],
+            // شريط سفلي
+            _buildBottomBar(context, isArabic),
+          ],
+        ),
       ),
     );
   }
@@ -223,17 +256,25 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
           const Spacer(),
 
           // زر الفلاش
-          GestureDetector(
-            onTap: () {
-              _scannerController?.toggleTorch();
-            },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                _scannerController?.toggleTorch();
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.flash_on,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
-              child: const Icon(Icons.flash_on, color: Colors.white, size: 20),
             ),
           ),
         ],
@@ -262,22 +303,77 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
 
           const SizedBox(height: 24),
 
-          // زر إدخال يدوي
-          GestureDetector(
-            onTap: () => _showManualInput(context, isArabic),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
+          // زر المسح العشوائي
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _simulateRandomScan(context),
+              borderRadius: BorderRadius.circular(25),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4CAF50).withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.refresh, color: Colors.white, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      isArabic ? 'مسح مرة أخرى' : 'Scan Again',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Text(
-                isArabic ? 'إدخال يدوي' : 'Manual Input',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // زر إدخال يدوي
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _showManualInput(context, isArabic),
+              borderRadius: BorderRadius.circular(25),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                ),
+                child: Text(
+                  isArabic ? 'إدخال يدوي' : 'Manual Input',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -291,6 +387,35 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     return ScanOverlay(
       pulseAnimation: _pulseAnimation,
       scanLineAnimation: _scanLineAnimation,
+    );
+  }
+
+  Widget _buildCountdownIndicator(int countdown, bool isArabic) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.timer, color: Colors.white, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              isArabic
+                  ? 'سيظهر منتج خلال $countdown ثانية...'
+                  : 'Product will appear in $countdown seconds...',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -331,6 +456,19 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+  void _simulateRandomScan(BuildContext context) {
+    print('🎲 بدء مسح جديد يدوي...');
+    print('🎲 Context: $context');
+    print('🎲 ScanCubit: ${context.read<ScanCubit>()}');
+
+    try {
+      context.read<ScanCubit>().startNewScan();
+      print('🎲 تم استدعاء startNewScan بنجاح');
+    } catch (e) {
+      print('❌ خطأ في استدعاء startNewScan: $e');
+    }
   }
 
   void _showManualInput(BuildContext context, bool isArabic) {
