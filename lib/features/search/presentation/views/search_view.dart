@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../shared/constants/language_manager.dart';
 import '../manager/search/search_cubit.dart';
 import '../manager/search/search_state.dart';
@@ -510,19 +511,33 @@ class _SearchViewState extends State<SearchView> {
                 ),
                 color: Colors.grey[50],
               ),
-              child: Center(
-                child: Image.asset(
-                  product.imagePath,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: product.imagePath,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF123459),
+                        ),
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Icon(
                       Icons.image_not_supported,
-                      size: 50,
-                      color: Colors.grey[400],
-                    );
-                  },
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                  ),
                 ),
               ),
             ),
