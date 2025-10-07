@@ -25,8 +25,8 @@ class _SplashScreenViewState extends State<SplashScreenView>
       _initializeAnimation();
     });
 
-    // Navigate after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
+    // Navigate after 5 seconds
+    Future.delayed(const Duration(seconds: 10), () {
       if (mounted) {
         // Navigate to onboarding screen
         context.go('/onboarding');
