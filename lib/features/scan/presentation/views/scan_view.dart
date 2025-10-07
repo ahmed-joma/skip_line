@@ -300,84 +300,6 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
             ),
             textAlign: TextAlign.center,
           ),
-
-          const SizedBox(height: 24),
-
-          // زر المسح العشوائي
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _simulateRandomScan(context),
-              borderRadius: BorderRadius.circular(25),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF4CAF50).withOpacity(0.3),
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.refresh, color: Colors.white, size: 24),
-                    const SizedBox(width: 12),
-                    Text(
-                      isArabic ? 'مسح مرة أخرى' : 'Scan Again',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // زر إدخال يدوي
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _showManualInput(context, isArabic),
-              borderRadius: BorderRadius.circular(25),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
-                ),
-                child: Text(
-                  isArabic ? 'إدخال يدوي' : 'Manual Input',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -455,47 +377,6 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
   void _showError(BuildContext context, String message, bool isArabic) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
-  }
-
-  void _simulateRandomScan(BuildContext context) {
-    print('🎲 بدء مسح جديد يدوي...');
-    print('🎲 Context: $context');
-    print('🎲 ScanCubit: ${context.read<ScanCubit>()}');
-
-    try {
-      context.read<ScanCubit>().startNewScan();
-      print('🎲 تم استدعاء startNewScan بنجاح');
-    } catch (e) {
-      print('❌ خطأ في استدعاء startNewScan: $e');
-    }
-  }
-
-  void _showManualInput(BuildContext context, bool isArabic) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isArabic ? 'إدخال يدوي' : 'Manual Input'),
-        content: TextField(
-          decoration: InputDecoration(
-            hintText: isArabic ? 'أدخل رمز المنتج' : 'Enter product code',
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(isArabic ? 'إلغاء' : 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // معالجة الإدخال اليدوي
-            },
-            child: Text(isArabic ? 'تأكيد' : 'Confirm'),
-          ),
-        ],
-      ),
     );
   }
 }

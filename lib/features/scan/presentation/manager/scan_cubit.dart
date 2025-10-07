@@ -141,9 +141,4 @@ class ScanCubit extends Cubit<ScanState> {
     print('🔄 إعادة تشغيل العد التنازلي للمنتج التالي...');
     _startCountdown();
   }
-
-  void startNewScan() {
-    print('🎲 بدء مسح جديد يدوي...');
-    processProductScan('manual_scan');
-  }
 }
