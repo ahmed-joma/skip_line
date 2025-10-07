@@ -1376,10 +1376,11 @@ class _HomeViewState extends State<HomeView> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () async {
-                          Navigator.pop(context);
                           if (isLoggedIn) {
                             // Logout
-                            print('🎯 ===== HOME VIEW - STARTING LOGOUT =====');
+                            print(
+                              '🎯 ===== HOME VIEW - STARTING LOGOUT (DRAWER) =====',
+                            );
                             print('🔄 Calling AuthService.logout()...');
 
                             final result = await AuthService().logout();
@@ -1393,6 +1394,9 @@ class _HomeViewState extends State<HomeView> {
                                   context,
                                   listen: false,
                                 );
+
+                            // إغلاق الـ Drawer أولاً
+                            Navigator.pop(context);
 
                             if (result.isSuccess) {
                               print('🎉 ===== LOGOUT SUCCESSFUL! =====');
@@ -1433,10 +1437,11 @@ class _HomeViewState extends State<HomeView> {
                             print('🔄 Refreshing UI...');
                             setState(() {}); // Refresh UI
                             print(
-                              '🏁 ===== HOME VIEW - LOGOUT COMPLETED =====',
+                              '🏁 ===== HOME VIEW - LOGOUT COMPLETED (DRAWER) =====',
                             );
                           } else {
                             // Sign In
+                            Navigator.pop(context);
                             context.go('/signin');
                           }
                         },
