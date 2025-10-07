@@ -66,7 +66,33 @@ class CreditCardFormState extends State<CreditCardForm> {
 
   // دالة للتحقق من صحة تاريخ الانتهاء
   void _validateExpiryDate(String month, String year) {
-    if (month.isNotEmpty && year.isNotEmpty) {
+    bool monthError = false;
+    bool yearError = false;
+
+    // التحقق من الشهر (MM)
+    if (month.isNotEmpty) {
+      final expiryMonth = int.tryParse(month);
+      if (expiryMonth != null) {
+        // الشهر يجب أن يكون بين 01 و 12
+        if (expiryMonth < 1 || expiryMonth > 12) {
+          monthError = true;
+        }
+      }
+    }
+
+    // التحقق من السنة (YY)
+    if (year.isNotEmpty) {
+      final expiryYear = int.tryParse(year);
+      if (expiryYear != null) {
+        // السنة يجب أن تكون بين 26 و 30 (2026-2030)
+        if (expiryYear < 26 || expiryYear > 30) {
+          yearError = true;
+        }
+      }
+    }
+
+    // التحقق من انتهاء الصلاحية إذا كان كلاهما مكتمل
+    if (month.isNotEmpty && year.isNotEmpty && !monthError && !yearError) {
       final currentDate = DateTime.now();
       final currentYear = currentDate.year % 100; // آخر رقمين من السنة الحالية
       final currentMonth = currentDate.month;
@@ -83,11 +109,28 @@ class CreditCardFormState extends State<CreditCardForm> {
           isExpired = true;
         }
 
-        setState(() {
-          _fieldErrors['expiryMonth'] = isExpired;
-          _fieldErrors['expiryYear'] = isExpired;
-        });
+        monthError = isExpired;
+        yearError = isExpired;
       }
+    }
+
+    setState(() {
+      _fieldErrors['expiryMonth'] = monthError;
+      _fieldErrors['expiryYear'] = yearError;
+    });
+  }
+
+  // دالة للحصول على رسالة الخطأ
+  String? _getErrorMessage(String fieldName) {
+    if (!_fieldErrors[fieldName]!) return null;
+
+    switch (fieldName) {
+      case 'expiryMonth':
+        return 'الشهر يجب أن يكون بين 01 و 12';
+      case 'expiryYear':
+        return 'السنة يجب أن تكون بين 26 و 30';
+      default:
+        return null;
     }
   }
 
@@ -249,12 +292,18 @@ class CreditCardFormState extends State<CreditCardForm> {
                 flex: 2,
                 child: _buildFormField(
                   label: 'Expiry date',
+                  errorField: 'expiryMonth', // استخدام خطأ الشهر للعرض
                   child: Row(
                     children: [
                       Expanded(
                         child: TextFormField(
                           controller: _expiryMonthController,
                           onChanged: (value) {
+                            // التحقق من صحة التاريخ فوراً
+                            _validateExpiryDate(
+                              value,
+                              _expiryYearController.text,
+                            );
                             widget.onExpiryChanged(
                               value,
                               widget.payment.expiryYear,
@@ -390,7 +439,11 @@ class CreditCardFormState extends State<CreditCardForm> {
     );
   }
 
-  Widget _buildFormField({required String label, required Widget child}) {
+  Widget _buildFormField({
+    required String label,
+    required Widget child,
+    String? errorField,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -408,7 +461,12 @@ class CreditCardFormState extends State<CreditCardForm> {
           decoration: BoxDecoration(
             color: Colors.grey[50],
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[200]!, width: 1),
+            border: Border.all(
+              color: (errorField != null && _fieldErrors[errorField]!)
+                  ? Colors.red
+                  : Colors.grey[200]!,
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.05),
@@ -420,6 +478,19 @@ class CreditCardFormState extends State<CreditCardForm> {
           ),
           child: child,
         ),
+        // عرض رسالة الخطأ إذا كانت موجودة
+        if (errorField != null && _fieldErrors[errorField]!)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              _getErrorMessage(errorField) ?? '',
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
       ],
     );
   }

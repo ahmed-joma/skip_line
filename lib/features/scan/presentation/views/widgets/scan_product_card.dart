@@ -116,6 +116,50 @@ class ScanProductCard extends StatelessWidget {
     }
   }
 
+  // دالة الانتقال لتفاصيل المنتج
+  void _navigateToProductDetails(BuildContext context) {
+    try {
+      // تأثير هابتي
+      HapticFeedback.lightImpact();
+
+      print('🔍 ===== NAVIGATING TO PRODUCT DETAILS =====');
+      print('🔍 Product Name: $productName');
+      print('🔍 Product ID: $productId');
+      print('🔍 Product ID Type: ${productId.runtimeType}');
+      print('🔍 Product Category: $productCategory');
+      print('🔍 Product Price: $productPrice');
+      print('🔍 Product Image: $productImage');
+
+      // التحقق من صحة productId
+      if (productId <= 0) {
+        print('❌ Invalid Product ID: $productId');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('خطأ: معرف المنتج غير صحيح'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // الانتقال لصفحة تفاصيل المنتج مع productId
+      print('🚀 Navigating to /product-detail with productId: $productId');
+      context.push('/product-detail', extra: {'productId': productId});
+
+      print('✅ Navigation completed successfully');
+    } catch (e) {
+      print('❌ خطأ في الانتقال لتفاصيل المنتج: $e');
+      print('❌ Error type: ${e.runtimeType}');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطأ في الانتقال: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   // دالة عرض إشعار السلة
   void _showCartNotification(BuildContext context) {
     final languageManager = Provider.of<LanguageManager>(
@@ -348,6 +392,26 @@ class ScanProductCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.add, color: Colors.white, size: 20),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // زر تفاصيل المنتج
+              GestureDetector(
+                onTap: () => _navigateToProductDetails(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4CAF50), // أخضر
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.info_outline,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
 
