@@ -59,9 +59,12 @@ class CreditCardFormState extends State<CreditCardForm> {
   }
 
   void _validateField(String fieldName, String value) {
-    setState(() {
-      _fieldErrors[fieldName] = value.isEmpty;
-    });
+    // لا نعيد تعيين الخطأ إذا كان موجوداً بالفعل من التحقق المخصص
+    if (!_fieldErrors[fieldName]!) {
+      setState(() {
+        _fieldErrors[fieldName] = value.isEmpty;
+      });
+    }
   }
 
   // دالة للتحقق من صحة تاريخ الانتهاء
@@ -84,9 +87,13 @@ class CreditCardFormState extends State<CreditCardForm> {
     if (year.isNotEmpty) {
       final expiryYear = int.tryParse(year);
       if (expiryYear != null) {
+        print('🔍 Validating year: $expiryYear');
         // السنة يجب أن تكون بين 26 و 30 (2026-2030)
         if (expiryYear < 26 || expiryYear > 30) {
           yearError = true;
+          print('❌ Year validation failed: $expiryYear is not between 26-30');
+        } else {
+          print('✅ Year validation passed: $expiryYear');
         }
       }
     }
@@ -118,6 +125,11 @@ class CreditCardFormState extends State<CreditCardForm> {
       _fieldErrors['expiryMonth'] = monthError;
       _fieldErrors['expiryYear'] = yearError;
     });
+
+    print('🔍 Final validation results:');
+    print('🔍 Month error: $monthError');
+    print('🔍 Year error: $yearError');
+    print('🔍 Field errors: $_fieldErrors');
   }
 
   // دالة للحصول على رسالة الخطأ
