@@ -32,47 +32,59 @@ class SearchRepoImpl implements SearchRepo {
       if (result.isSuccess && result.data != null) {
         print('✅ تم جلب المنتجات بنجاح من API');
 
-        // دمج Best Sellers و Exclusive Offers في قائمة واحدة
+        // دمج Best Sellers و Exclusive Offers في قائمة واحدة مع تجنب التكرار
         final allProducts = <ProductModel>[];
+        final addedProductIds = <String>{};
 
         // إضافة Best Sellers
         for (final product in result.data!.bestSellers) {
-          allProducts.add(
-            ProductModel(
-              id: product.id.toString(),
-              name: product.nameEn,
-              nameAr: product.nameAr,
-              imagePath: product.imageUrl,
-              description: product.descriptionEn ?? '',
-              descriptionAr: product.descriptionAr ?? '',
-              price: product.salePrice,
-              category: 'best_seller',
-            ),
-          );
+          final productId = product.id.toString();
+          if (!addedProductIds.contains(productId)) {
+            allProducts.add(
+              ProductModel(
+                id: productId,
+                name: product.nameEn,
+                nameAr: product.nameAr,
+                imagePath: product.imageUrl,
+                description: product.descriptionEn ?? '',
+                descriptionAr: product.descriptionAr ?? '',
+                price: product.salePrice,
+                category: 'best_seller',
+              ),
+            );
+            addedProductIds.add(productId);
+          }
         }
 
-        // إضافة Exclusive Offers
+        // إضافة Exclusive Offers (تجنب التكرار)
         for (final product in result.data!.exclusiveOffers) {
-          allProducts.add(
-            ProductModel(
-              id: product.id.toString(),
-              name: product.nameEn,
-              nameAr: product.nameAr,
-              imagePath: product.imageUrl,
-              description: product.descriptionEn ?? '',
-              descriptionAr: product.descriptionAr ?? '',
-              price: product.salePrice,
-              category: 'exclusive_offer',
-            ),
-          );
+          final productId = product.id.toString();
+          if (!addedProductIds.contains(productId)) {
+            allProducts.add(
+              ProductModel(
+                id: productId,
+                name: product.nameEn,
+                nameAr: product.nameAr,
+                imagePath: product.imageUrl,
+                description: product.descriptionEn ?? '',
+                descriptionAr: product.descriptionAr ?? '',
+                price: product.salePrice,
+                category: 'exclusive_offer',
+              ),
+            );
+            addedProductIds.add(productId);
+          }
         }
 
         // حفظ المنتجات في الذاكرة للبحث السريع
         _allProducts = allProducts;
 
-        print('📦 تم تحميل ${allProducts.length} منتج');
+        print('📦 تم تحميل ${allProducts.length} منتج فريد (بدون تكرار)');
         print('   - Best Sellers: ${result.data!.bestSellers.length}');
         print('   - Exclusive Offers: ${result.data!.exclusiveOffers.length}');
+        print(
+          '   - تم تجنب التكرار باستخدام Set: ${addedProductIds.length} منتج فريد',
+        );
 
         return allProducts;
       } else {
