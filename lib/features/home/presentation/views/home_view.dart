@@ -539,11 +539,11 @@ class _HomeViewState extends State<HomeView> {
                       break;
                     case 2:
                       title = languageManager.isArabic
-                          ? 'توصيل سريع'
-                          : 'Fast\nDelivery';
+                          ? 'تسوق أسرع'
+                          : 'Faster\nShopping';
                       subtitle = languageManager.isArabic
-                          ? 'خلال 30 دقيقة'
-                          : 'Within 30\nMinutes';
+                          ? 'وفر وقتك وجهدك'
+                          : 'Save Time\n& Effort';
                       backgroundColor = const Color(0xFFF8F9FA);
                       break;
                     default:
