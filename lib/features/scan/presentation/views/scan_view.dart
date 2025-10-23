@@ -209,20 +209,29 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
       );
     }
 
-    return AbsorbPointer(
-      absorbing: false, // السماح للمسح بالعمل
-      child: MobileScanner(
-        controller: _scannerController!,
-        onDetect: (capture) {
-          final List<Barcode> barcodes = capture.barcodes;
-          if (barcodes.isNotEmpty) {
-            final barcode = barcodes.first;
-            if (barcode.rawValue != null) {
-              context.read<ScanCubit>().processProductScan(barcode.rawValue!);
-            }
-          }
-        },
-      ),
+    return Stack(
+      children: [
+        // الكاميرا الحقيقية
+        AbsorbPointer(
+          absorbing: false,
+          child: MobileScanner(
+            controller: _scannerController!,
+            onDetect: (capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              if (barcodes.isNotEmpty) {
+                final barcode = barcodes.first;
+                if (barcode.rawValue != null) {
+                  context.read<ScanCubit>().processProductScan(
+                    barcode.rawValue!,
+                  );
+                }
+              }
+            },
+          ),
+        ),
+        // طبقة سوداء داكنة جداً جداً لتغميق الخلفية
+        Container(color: Colors.black.withOpacity(0.95)),
+      ],
     );
   }
 
