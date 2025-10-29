@@ -61,6 +61,11 @@ class _ChatInputFieldState extends State<ChatInputField> {
               textDirection: widget.isArabic
                   ? TextDirection.rtl
                   : TextDirection.ltr,
+              textAlign: widget.isArabic ? TextAlign.right : TextAlign.left,
+              keyboardType: TextInputType.multiline,
+              enableSuggestions: true,
+              autocorrect: true,
+              textCapitalization: TextCapitalization.sentences,
               style: const TextStyle(color: Colors.black, fontSize: 16),
               decoration: InputDecoration(
                 hintText: widget.isArabic
@@ -74,6 +79,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 ),
               ),
               maxLines: null,
+              minLines: 1,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _handleSubmit(),
               onChanged: (_) => _onTextChanged(),

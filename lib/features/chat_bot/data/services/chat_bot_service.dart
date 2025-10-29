@@ -359,6 +359,38 @@ class ChatBotService {
       text:
           '🔐 مشكلة في تسجيل الدخول؟\n\n✅ تحقق من:\n\n1️⃣ البريد الإلكتروني\n   • هل كتبته بشكل صحيح؟\n   • لا توجد مسافات زائدة؟\n\n2️⃣ كلمة السر\n   • هل هي صحيحة؟\n   • تحقق من Caps Lock\n\n3️⃣ الحساب مفعّل؟\n   • تحقق من بريدك الإلكتروني\n   • ابحث عن رسالة التفعيل\n\n4️⃣ نسيت كلمة السر؟\n   • اضغط "نسيت كلمة السر"\n\n5️⃣ حساب جديد؟\n   • اضغط "إنشاء حساب جديد"\n\nهل تحتاج مساعدة أكثر؟ 🤝',
     ),
+
+    // أسئلة عن المكونات والمنتجات
+    'مكونات البيتزا': ChatResponse(
+      text:
+          '🍕 مكونات البيتزا الأساسية:\n\n🥖 العجينة:\n   • دقيق\n   • خميرة\n   • زيت\n   • ملح\n   • ماء دافئ\n\n🧀 الصلصة:\n   • طماطم معصورة\n   • بهارات (أوريغانو، ريحان)\n   • ثوم\n   • ملح وفلفل\n\n🧀 الجبن:\n   • جبنة موتزاريلا\n   • جبنة شيدر (اختياري)\n\n🥬 الخضار:\n   • فلفل حلو\n   • بصل\n   • فطر\n   • زيتون\n\n🍖 البروتينات (اختياري):\n   • بيبروني\n   • لحم مفروم\n   • دجاج\n\n💡 نصيحة: استخدم منتجات طازجة من SkipLine لبيتزا لذيذة!\n\nأي مكون تريد إضافته لسلة التسوق؟ 🛒',
+      suggestions: [
+        ChatSuggestion(id: '1', text: 'دقيق وخميرة', icon: '🥖'),
+        ChatSuggestion(id: '2', text: 'جبنة موتزاريلا', icon: '🧀'),
+        ChatSuggestion(id: '3', text: 'طماطم معصورة', icon: '🍅'),
+      ],
+    ),
+    'بدائل الحليب السعودي': ChatResponse(
+      text:
+          '🥛 بدائل حليب السعودية:\n\n✅ حليب مراعي:\n   • نفس الجودة والنكهة\n   • متوفر بجميع المقاسات\n   • سعر مناسب\n\n✅ حليب نادك:\n   • جودة عالية\n   • طبيعي 100%\n   • متوفر دائماً\n\n✅ حليب علالين:\n   • نكهة مميزة\n   • غني بالكالسيوم\n   • سعر مناسب\n\n✅ حليب الصافي:\n   • جودة ممتازة\n   • طازج دائماً\n   • متوفر بجميع المقاسات\n\n✅ حليب الماركات العالمية:\n   • حليب Danone\n   • حليب Almarai (اختياري)\n\n💡 نصيحة: جميع البدائل متوفرة في SkipLine بأسعار مناسبة!\n\nأي نوع تفضل؟ 🛒',
+      suggestions: [
+        ChatSuggestion(id: '1', text: 'حليب مراعي', icon: '🥛'),
+        ChatSuggestion(id: '2', text: 'حليب نادك', icon: '🥛'),
+        ChatSuggestion(id: '3', text: 'حليب علالين', icon: '🥛'),
+      ],
+    ),
+    'مكونات الكيك': ChatResponse(
+      text:
+          '🍰 مكونات الكيك الأساسية:\n\n🥚 المكونات الجافة:\n   • دقيق أبيض\n   • سكر أبيض\n   • بيكنج باودر\n   • بيكنج صودا\n   • ملح\n\n🥛 المكونات السائلة:\n   • بيض\n   • حليب\n   • زبدة أو زيت\n   • فانيليا\n\n🍫 الإضافات (اختياري):\n   • كاكاو (لكيك الشوكولاتة)\n   • شوكولاتة\n   • مكسرات\n   • فواكه مجففة\n\n🎂 للتزيين:\n   • كريمة\n   • فراولة\n   • شوكولاتة\n\n💡 نصيحة: استخدم مكونات طازجة من SkipLine لأفضل نتيجة!\n\nأي مكون تريد البحث عنه؟ 🔍',
+    ),
+    'مكونات السلطة': ChatResponse(
+      text:
+          '🥗 مكونات السلطة الأساسية:\n\n🥬 الخضار الأساسية:\n   • خس\n   • بندورة (طماطم)\n   • خيار\n   • فلفل حلو\n   • بصل\n\n🧀 البروتينات:\n   • جبنة فيتا\n   • جبنة شيدر\n   • زيتون\n   • بيض مسلوق\n\n🥑 الإضافات (اختياري):\n   • أفوكادو\n   • مكسرات\n   • زبيب\n   • فلفل حار\n\n🥄 الصلصة:\n   • زيت زيتون\n   • خل\n   • ليمون\n   • ملح وفلفل\n   • بهارات\n\n💡 نصيحة: استخدم خضار طازجة من SkipLine لسلطة لذيذة!\n\nأي مكون تريد إضافته؟ 🛒',
+    ),
+    'بدائل القهوة': ChatResponse(
+      text:
+          '☕ بدائل القهوة:\n\n✅ قهوة نسكافيه:\n   • سريعة التحضير\n   • نكهة قوية\n   • متوفر بجميع الأنواع\n\n✅ قهوة الاسبريسو:\n   • نكهة إيطالية أصيلة\n   • قوية ورائعة\n   • متوفر بودرة أو كبسولات\n\n✅ قهوة عربية:\n   • الهيل\n   • القهوة السعودية\n   • القهوة التركية\n\n✅ القهوة الباردة:\n   • قهوة مثلجة\n   • الكابتشينو البارد\n\n✅ بدائل صحية:\n   • قهوة خالية من الكافيين\n   • قهوة الحبوب الكاملة\n\n💡 نصيحة: جميع أنواع القهوة متوفرة في SkipLine!\n\nأي نوع تفضل؟ ☕',
+    ),
   };
 
   static final Map<String, ChatResponse> _englishResponses = {
@@ -645,6 +677,38 @@ class ChatBotService {
       text:
           '⚠️ App crashing? Try these solutions:\n\n1️⃣ Restart the app\n   • Close completely and reopen\n\n2️⃣ Clear cache\n   • Device Settings > Apps > Skip Line\n   • Clear cache data\n\n3️⃣ Update the app\n   • Check for updates\n\n4️⃣ Restart device\n   • Sometimes this solves it!\n\n5️⃣ Reinstall the app\n   • Delete and install again\n\nIf problem persists, contact us! 📞',
     ),
+
+    // Product Ingredients and Alternatives
+    'pizza ingredients': ChatResponse(
+      text:
+          '🍕 Pizza Ingredients:\n\n🥖 Dough:\n   • Flour\n   • Yeast\n   • Oil\n   • Salt\n   • Warm water\n\n🧀 Sauce:\n   • Crushed tomatoes\n   • Herbs (oregano, basil)\n   • Garlic\n   • Salt and pepper\n\n🧀 Cheese:\n   • Mozzarella\n   • Cheddar (optional)\n\n🥬 Vegetables:\n   • Bell peppers\n   • Onions\n   • Mushrooms\n   • Olives\n\n🍖 Proteins (optional):\n   • Pepperoni\n   • Ground meat\n   • Chicken\n\n💡 Tip: Use fresh products from SkipLine for delicious pizza!\n\nWhich ingredient do you want to add to cart? 🛒',
+      suggestions: [
+        ChatSuggestion(id: '1', text: 'Flour and yeast', icon: '🥖'),
+        ChatSuggestion(id: '2', text: 'Mozzarella cheese', icon: '🧀'),
+        ChatSuggestion(id: '3', text: 'Crushed tomatoes', icon: '🍅'),
+      ],
+    ),
+    'milk alternatives': ChatResponse(
+      text:
+          '🥛 Saudi Milk Alternatives:\n\n✅ Almarai Milk:\n   • Same quality and taste\n   • Available in all sizes\n   • Good price\n\n✅ Nadec Milk:\n   • High quality\n   • 100% natural\n   • Always available\n\n✅ Al Ain Milk:\n   • Distinctive flavor\n   • Rich in calcium\n   • Good price\n\n✅ Al Safi Milk:\n   • Excellent quality\n   • Always fresh\n   • Available in all sizes\n\n✅ International Brands:\n   • Danone milk\n   • Other premium brands\n\n💡 Tip: All alternatives available on SkipLine at good prices!\n\nWhich type do you prefer? 🛒',
+      suggestions: [
+        ChatSuggestion(id: '1', text: 'Almarai milk', icon: '🥛'),
+        ChatSuggestion(id: '2', text: 'Nadec milk', icon: '🥛'),
+        ChatSuggestion(id: '3', text: 'Al Ain milk', icon: '🥛'),
+      ],
+    ),
+    'cake ingredients': ChatResponse(
+      text:
+          '🍰 Cake Ingredients:\n\n🥚 Dry Ingredients:\n   • White flour\n   • White sugar\n   • Baking powder\n   • Baking soda\n   • Salt\n\n🥛 Liquid Ingredients:\n   • Eggs\n   • Milk\n   • Butter or oil\n   • Vanilla\n\n🍫 Additions (optional):\n   • Cocoa (for chocolate cake)\n   • Chocolate\n   • Nuts\n   • Dried fruits\n\n🎂 For Decoration:\n   • Cream\n   • Strawberries\n   • Chocolate\n\n💡 Tip: Use fresh ingredients from SkipLine for best results!\n\nWhich ingredient do you want to search for? 🔍',
+    ),
+    'salad ingredients': ChatResponse(
+      text:
+          '🥗 Salad Ingredients:\n\n🥬 Basic Vegetables:\n   • Lettuce\n   • Tomatoes\n   • Cucumber\n   • Bell peppers\n   • Onions\n\n🧀 Proteins:\n   • Feta cheese\n   • Cheddar cheese\n   • Olives\n   • Boiled eggs\n\n🥑 Additions (optional):\n   • Avocado\n   • Nuts\n   • Raisins\n   • Hot peppers\n\n🥄 Dressing:\n   • Olive oil\n   • Vinegar\n   • Lemon\n   • Salt and pepper\n   • Herbs\n\n💡 Tip: Use fresh vegetables from SkipLine for delicious salad!\n\nWhich ingredient do you want to add? 🛒',
+    ),
+    'coffee alternatives': ChatResponse(
+      text:
+          '☕ Coffee Alternatives:\n\n✅ Nescafe:\n   • Instant preparation\n   • Strong flavor\n   • Available in all types\n\n✅ Espresso Coffee:\n   • Authentic Italian flavor\n   • Strong and wonderful\n   • Available in powder or capsules\n\n✅ Arabic Coffee:\n   • Cardamom\n   • Saudi coffee\n   • Turkish coffee\n\n✅ Cold Coffee:\n   • Iced coffee\n   • Cold cappuccino\n\n✅ Healthy Alternatives:\n   • Decaf coffee\n   • Whole grain coffee\n\n💡 Tip: All coffee types available on SkipLine!\n\nWhich type do you prefer? ☕',
+    ),
   };
 
   static ChatResponse getResponse(String message, {bool isArabic = true}) {
@@ -670,7 +734,77 @@ class ChatBotService {
     }
 
     if (isArabic) {
-      // البحث في الكلمات العربية
+      // البحث عن المكونات والبدائل أولاً (أولوية عالية)
+      // البحث عن مكونات البيتزا (يفهم الجمل الكاملة مثل "ما هي مكونات البيتزا" أو فقط "بيتزا")
+      if (lowerMessage.contains('مكونات') && lowerMessage.contains('بيتزا')) {
+        print('✅ Found "مكونات البيتزا" - returning pizza ingredients');
+        return responses['مكونات البيتزا']!;
+      }
+      if (lowerMessage.contains('بيتزا') || lowerMessage.contains('pizza')) {
+        print('✅ Found pizza keyword - returning pizza ingredients');
+        return responses['مكونات البيتزا']!;
+      }
+
+      // البحث عن بدائل الحليب (يفهم "بديل حليب" أو فقط "حليب" مع كلمات بديل)
+      // تحسين البحث ليكون أكثر مرونة ودقة
+      final hasMilkKeyword =
+          lowerMessage.contains('حليب') || lowerMessage.contains('milk');
+      final hasSaudiKeyword =
+          lowerMessage.contains('السعودي') || lowerMessage.contains('saudi');
+      final hasAlternativeKeyword =
+          lowerMessage.contains('بديل') ||
+          lowerMessage.contains('بدائل') ||
+          lowerMessage.contains('alternative');
+
+      if (hasMilkKeyword) {
+        print('🔍 Found milk keyword in message: $lowerMessage');
+        // البحث عن الجمل الكاملة مثل "ما هو بدائل الحليب السعودي"
+        // إذا ذكر "بديل" أو "بدائل" مع "حليب" (مع أو بدون السعودي)
+        if (hasAlternativeKeyword) {
+          print(
+            '✅ Found milk alternatives keyword (contains: بديل/بدائل + حليب) - returning alternatives',
+          );
+          return responses['بدائل الحليب السعودي']!;
+        }
+        // إذا ذكر "حليب السعودي" (حتى لو بدون كلمة "بديل")
+        if (hasSaudiKeyword && hasMilkKeyword) {
+          print(
+            '✅ Found Saudi milk keyword (contains: حليب + السعودي) - returning alternatives',
+          );
+          return responses['بدائل الحليب السعودي']!;
+        }
+      }
+
+      // البحث عن مكونات الكيك (يفهم الجمل الكاملة مثل "ما هي مكونات الكيك" أو فقط "كيك")
+      if (lowerMessage.contains('مكونات') && lowerMessage.contains('كيك')) {
+        print('✅ Found "مكونات الكيك" - returning cake ingredients');
+        return responses['مكونات الكيك']!;
+      }
+      if (lowerMessage.contains('كيك') ||
+          lowerMessage.contains('كيكة') ||
+          lowerMessage.contains('cake')) {
+        print('✅ Found cake keyword - returning cake ingredients');
+        return responses['مكونات الكيك']!;
+      }
+
+      // البحث عن مكونات السلطة
+      if (lowerMessage.contains('سلطة') || lowerMessage.contains('salad')) {
+        print('✅ Found salad keyword - returning salad ingredients');
+        return responses['مكونات السلطة']!;
+      }
+
+      // البحث عن بدائل القهوة (يفهم "بدائل قهوة" أو فقط "قهوة" مع كلمات بديل)
+      if (lowerMessage.contains('قهوة') || lowerMessage.contains('coffee')) {
+        // إذا ذكر "بديل" أو "بدائل" مع "قهوة"، نعطيه البدائل
+        if (lowerMessage.contains('بديل') ||
+            lowerMessage.contains('بدائل') ||
+            lowerMessage.contains('alternative')) {
+          print('✅ Found coffee alternatives keyword');
+          return responses['بدائل القهوة']!;
+        }
+      }
+
+      // البحث في الكلمات العربية العامة
       if (lowerMessage.contains('بحث') || lowerMessage.contains('منتج')) {
         return responses['search']!;
       }
@@ -687,22 +821,62 @@ class ChatBotService {
         return responses['help']!;
       }
       // كلمات مفتاحية جديدة - التسوق والسلة
-      if (lowerMessage.contains('أضيف') ||
-          lowerMessage.contains('اضافة') ||
-          lowerMessage.contains('إضافة')) {
+      // البحث عن إضافة منتج للسلة
+      if ((lowerMessage.contains('أضيف') ||
+              lowerMessage.contains('اضافة') ||
+              lowerMessage.contains('إضافة') ||
+              lowerMessage.contains('اضف') ||
+              lowerMessage.contains('أضف') ||
+              lowerMessage.contains('add')) &&
+          (lowerMessage.contains('سلة') ||
+              lowerMessage.contains('السلة') ||
+              lowerMessage.contains('cart') ||
+              lowerMessage.contains('منتج') ||
+              lowerMessage.contains('product'))) {
+        print('✅ Found add to cart keyword');
         return responses['كيف أضيف منتج للسلة']!;
       }
-      if (lowerMessage.contains('سلة') && !lowerMessage.contains('أضيف')) {
+
+      // البحث عن السلة
+      if ((lowerMessage.contains('سلة') ||
+              lowerMessage.contains('السلة') ||
+              lowerMessage.contains('cart') ||
+              lowerMessage.contains('عربة')) &&
+          !lowerMessage.contains('أضيف') &&
+          !lowerMessage.contains('add')) {
         return responses['سلة التسوق']!;
       }
-      if (lowerMessage.contains('كمية') ||
-          lowerMessage.contains('عدل') ||
-          lowerMessage.contains('تعديل')) {
+
+      // البحث عن تعديل الكمية
+      if ((lowerMessage.contains('كمية') ||
+              lowerMessage.contains('الكمية') ||
+              lowerMessage.contains('quantity')) &&
+          (lowerMessage.contains('عدل') ||
+              lowerMessage.contains('تعديل') ||
+              lowerMessage.contains('غير') ||
+              lowerMessage.contains('تغير') ||
+              lowerMessage.contains('تغيير') ||
+              lowerMessage.contains('edit') ||
+              lowerMessage.contains('change') ||
+              lowerMessage.contains('modify'))) {
+        print('✅ Found edit quantity keyword');
         return responses['كيف أعدل الكمية']!;
       }
-      if (lowerMessage.contains('حذف') ||
-          lowerMessage.contains('مسح') ||
-          lowerMessage.contains('إزالة')) {
+
+      // البحث عن حذف منتج من السلة
+      if ((lowerMessage.contains('حذف') ||
+              lowerMessage.contains('مسح') ||
+              lowerMessage.contains('إزالة') ||
+              lowerMessage.contains('ازالة') ||
+              lowerMessage.contains('delete') ||
+              lowerMessage.contains('remove')) &&
+          (lowerMessage.contains('منتج') ||
+              lowerMessage.contains('سلعة') ||
+              lowerMessage.contains('item') ||
+              lowerMessage.contains('product') ||
+              lowerMessage.contains('سلة') ||
+              lowerMessage.contains('cart'))) {
+        print('✅ Found delete item keyword');
         return responses['كيف أحذف منتج من السلة']!;
       }
       if (lowerMessage.contains('قائمة') && lowerMessage.contains('تسوق')) {
@@ -715,7 +889,15 @@ class ChatBotService {
       // كلمات مفتاحية - الماسح
       if (lowerMessage.contains('ماسح') ||
           lowerMessage.contains('سكانر') ||
-          lowerMessage.contains('باركود')) {
+          lowerMessage.contains('scanner') ||
+          lowerMessage.contains('باركود') ||
+          lowerMessage.contains('barcode') ||
+          lowerMessage.contains('qr') ||
+          lowerMessage.contains('QR') ||
+          (lowerMessage.contains('استخدم') && lowerMessage.contains('ماسح')) ||
+          (lowerMessage.contains('استعمال') && lowerMessage.contains('ماسح')) ||
+          (lowerMessage.contains('use') && lowerMessage.contains('scanner'))) {
+        print('✅ Found scanner keyword');
         return responses['كيف أستخدم الماسح']!;
       }
       if (lowerMessage.contains('مسح عشوائي') ||
@@ -724,38 +906,95 @@ class ChatBotService {
       }
 
       // كلمات مفتاحية - الحساب والأمان
-      if (lowerMessage.contains('كلمة السر') ||
-          lowerMessage.contains('الباسورد') ||
-          lowerMessage.contains('password')) {
+      // البحث عن تغيير كلمة السر
+      if ((lowerMessage.contains('كلمة السر') ||
+              lowerMessage.contains('كلمة سر') ||
+              lowerMessage.contains('الباسورد') ||
+              lowerMessage.contains('password')) &&
+          (lowerMessage.contains('غير') ||
+              lowerMessage.contains('تغير') ||
+              lowerMessage.contains('تغيير') ||
+              lowerMessage.contains('change') ||
+              lowerMessage.contains('modify'))) {
+        print('✅ Found change password keyword');
         return responses['كيف أغير كلمة السر']!;
       }
-      if (lowerMessage.contains('نسيت') &&
-          (lowerMessage.contains('كلمة') || lowerMessage.contains('سر'))) {
+
+      // البحث عن نسيان كلمة السر
+      if ((lowerMessage.contains('نسيت') ||
+              lowerMessage.contains('forgot') ||
+              lowerMessage.contains('نسيان')) &&
+          (lowerMessage.contains('كلمة') ||
+              lowerMessage.contains('سر') ||
+              lowerMessage.contains('password'))) {
+        print('✅ Found forgot password keyword');
         return responses['نسيت كلمة السر']!;
       }
-      if (lowerMessage.contains('حمي') ||
-          lowerMessage.contains('أمان') ||
-          lowerMessage.contains('حماية')) {
+
+      // البحث عن حماية الحساب
+      if ((lowerMessage.contains('حمي') ||
+              lowerMessage.contains('أمان') ||
+              lowerMessage.contains('حماية') ||
+              lowerMessage.contains('security') ||
+              lowerMessage.contains('protect')) &&
+          (lowerMessage.contains('حساب') || lowerMessage.contains('account'))) {
+        print('✅ Found account security keyword');
         return responses['كيف أحمي حسابي']!;
       }
 
       // كلمات مفتاحية - العروض والخصومات
-      if (lowerMessage.contains('خصم') || lowerMessage.contains('تخفيض')) {
+      if ((lowerMessage.contains('خصم') ||
+              lowerMessage.contains('تخفيض') ||
+              lowerMessage.contains('discount') ||
+              lowerMessage.contains('offer')) &&
+          (lowerMessage.contains('أحصل') ||
+              lowerMessage.contains('احصل') ||
+              lowerMessage.contains('get') ||
+              lowerMessage.contains('كيف') ||
+              lowerMessage.contains('how'))) {
+        print('✅ Found discount keyword');
         return responses['كيف أحصل على خصم']!;
       }
-      if (lowerMessage.contains('كوبون') || lowerMessage.contains('كود')) {
+
+      if ((lowerMessage.contains('كوبون') ||
+              lowerMessage.contains('coupon') ||
+              lowerMessage.contains('كود') ||
+              lowerMessage.contains('code')) &&
+          (lowerMessage.contains('استخدم') ||
+              lowerMessage.contains('استعمال') ||
+              lowerMessage.contains('use') ||
+              lowerMessage.contains('كيف') ||
+              lowerMessage.contains('how'))) {
+        print('✅ Found coupon keyword');
         return responses['كيف أستخدم كوبون خصم']!;
       }
 
-      // كلمات مفتاحية - الإعدادات
+      // كلمات مفتاحية - الإعدادات واللغة
+      // البحث عن كلمات متعلقة باللغة (لغة، تغيير لغة، تغير لغة، تبديل لغة، وغيرها)
       if (lowerMessage.contains('لغة') ||
           lowerMessage.contains('عربي') ||
-          lowerMessage.contains('انجليزي')) {
+          lowerMessage.contains('انجليزي') ||
+          lowerMessage.contains('إنجليزي') ||
+          lowerMessage.contains('عربية') ||
+          lowerMessage.contains('english') ||
+          lowerMessage.contains('arabic') ||
+          (lowerMessage.contains('غير') && lowerMessage.contains('لغ')) ||
+          (lowerMessage.contains('تغير') && lowerMessage.contains('لغ')) ||
+          (lowerMessage.contains('تبديل') && lowerMessage.contains('لغ')) ||
+          (lowerMessage.contains('تغيير') && lowerMessage.contains('لغ')) ||
+          (lowerMessage.contains('switch') &&
+              lowerMessage.contains('language'))) {
+        print('✅ Found language keyword - returning language response');
         return responses['كيف أغير اللغة']!;
       }
+
+      // البحث عن كلمات متعلقة بالدعم والتواصل
       if (lowerMessage.contains('دعم') ||
           lowerMessage.contains('تواصل') ||
-          lowerMessage.contains('اتصال')) {
+          lowerMessage.contains('اتصال') ||
+          lowerMessage.contains('خدمة العملاء') ||
+          lowerMessage.contains('خدمات') ||
+          lowerMessage.contains('مساعدة فنية')) {
         return responses['كيف أتواصل مع الدعم']!;
       }
 
@@ -782,6 +1021,19 @@ class ChatBotService {
           lowerMessage.contains('دخول') ||
           lowerMessage.contains('login')) {
         return responses['لا أستطيع تسجيل الدخول']!;
+      }
+
+      // البحث العام عن المكونات (تم حذف التكرار - البحث موجود في البداية)
+      if ((lowerMessage.contains('مكونات') ||
+              lowerMessage.contains('مكون') ||
+              lowerMessage.contains('ingredients')) &&
+          !lowerMessage.contains('بيتزا') &&
+          !lowerMessage.contains('كيك') &&
+          !lowerMessage.contains('سلطة')) {
+        // إذا كان السؤال عن مكونات شيء معين لكن غير محدد، نعطي رد البيتزا كمثال
+        if (lowerMessage.contains('كيف') || lowerMessage.contains('what')) {
+          return responses['مكونات البيتزا']!;
+        }
       }
 
       // كلمات مفتاحية - إضافية
@@ -864,13 +1116,29 @@ class ChatBotService {
         return responses['use coupon code']!;
       }
 
-      // كلمات مفتاحية - Settings
+      // كلمات مفتاحية - Settings and Language
+      // Search for language-related keywords
       if (lowerMessage.contains('language') ||
-          lowerMessage.contains('change language')) {
+          lowerMessage.contains('arabic') ||
+          lowerMessage.contains('english') ||
+          lowerMessage.contains('change language') ||
+          lowerMessage.contains('switch language') ||
+          lowerMessage.contains('لغة') ||
+          lowerMessage.contains('عربي') ||
+          (lowerMessage.contains('change') &&
+              lowerMessage.contains('language')) ||
+          (lowerMessage.contains('switch') &&
+              lowerMessage.contains('language'))) {
+        print('✅ Found language keyword - returning language response');
         return responses['change language']!;
       }
+
+      // Search for support-related keywords
       if (lowerMessage.contains('support') ||
-          lowerMessage.contains('contact')) {
+          lowerMessage.contains('contact') ||
+          lowerMessage.contains('help desk') ||
+          lowerMessage.contains('customer service') ||
+          lowerMessage.contains('service')) {
         return responses['contact support']!;
       }
 
@@ -889,6 +1157,45 @@ class ChatBotService {
           lowerMessage.contains('crashes') ||
           lowerMessage.contains('app crashes')) {
         return responses['app crashes']!;
+      }
+
+      // كلمات مفتاحية - Product Ingredients and Alternatives
+      // Search for pizza ingredients (يعمل مع "ingredients pizza" أو فقط "pizza")
+      if (lowerMessage.contains('pizza') || lowerMessage.contains('بيتزا')) {
+        print('✅ Found pizza keyword - returning pizza ingredients');
+        return responses['pizza ingredients']!;
+      }
+
+      // Search for milk alternatives
+      if ((lowerMessage.contains('alternatives') ||
+              lowerMessage.contains('alternative') ||
+              lowerMessage.contains('بدائل')) &&
+          (lowerMessage.contains('milk') ||
+              lowerMessage.contains('حليب') ||
+              lowerMessage.contains('saudi milk'))) {
+        print('✅ Found milk alternatives keyword');
+        return responses['milk alternatives']!;
+      }
+
+      // Search for cake ingredients
+      if (lowerMessage.contains('cake') || lowerMessage.contains('كيك')) {
+        print('✅ Found cake keyword - returning cake ingredients');
+        return responses['cake ingredients']!;
+      }
+
+      // Search for salad ingredients
+      if (lowerMessage.contains('salad') || lowerMessage.contains('سلطة')) {
+        print('✅ Found salad keyword - returning salad ingredients');
+        return responses['salad ingredients']!;
+      }
+
+      // Search for coffee alternatives
+      if ((lowerMessage.contains('alternatives') ||
+              lowerMessage.contains('alternative') ||
+              lowerMessage.contains('بدائل')) &&
+          (lowerMessage.contains('coffee') || lowerMessage.contains('قهوة'))) {
+        print('✅ Found coffee alternatives keyword');
+        return responses['coffee alternatives']!;
       }
 
       // رد افتراضي إنجليزي
