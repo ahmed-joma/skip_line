@@ -25,9 +25,24 @@ class PaymentView extends StatelessWidget {
     // طباعة السعر للتأكد من استلامه
     print('PaymentView received totalAmount: $totalAmount');
 
+    // التحقق من صحة totalAmount
+    final safeTotalAmount =
+        totalAmount.isNaN || totalAmount.isInfinite || totalAmount < 0
+        ? 0.0
+        : totalAmount;
+
+    if (totalAmount != safeTotalAmount) {
+      print(
+        '⚠️ Invalid totalAmount: $totalAmount, using safe value: $safeTotalAmount',
+      );
+    }
+
     return BlocProvider(
-      create: (context) => PaymentCubit()..loadPayment(totalAmount),
-      child: PaymentViewContent(totalAmount: totalAmount, cartItems: cartItems),
+      create: (context) => PaymentCubit()..loadPayment(safeTotalAmount),
+      child: PaymentViewContent(
+        totalAmount: safeTotalAmount,
+        cartItems: cartItems,
+      ),
     );
   }
 }
@@ -110,7 +125,7 @@ class _PaymentViewContentState extends State<PaymentViewContent> {
                     PaymentHeader(
                       totalAmount: widget.totalAmount,
                       currency: state.payment.currency,
-                      gstRate: 15,
+                      vatRate: 15,
                     ),
 
                     const SizedBox(height: 30),

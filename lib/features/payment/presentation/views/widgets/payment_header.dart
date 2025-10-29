@@ -4,20 +4,27 @@ import 'package:go_router/go_router.dart';
 class PaymentHeader extends StatelessWidget {
   final double totalAmount;
   final String currency;
-  final int gstRate;
+  final int vatRate;
 
   const PaymentHeader({
     Key? key,
     required this.totalAmount,
     required this.currency,
-    required this.gstRate,
+    required this.vatRate,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // التحقق من صحة القيم
+    final safeTotalAmount =
+        (totalAmount.isNaN || totalAmount.isInfinite || totalAmount < 0)
+        ? 0.0
+        : totalAmount;
+    final safeVatRate = vatRate.clamp(0, 100);
+
     // حساب السعر مع الضريبة
-    final taxAmount = totalAmount * (gstRate / 100);
-    final totalWithTax = totalAmount + taxAmount;
+    final taxAmount = safeTotalAmount * (safeVatRate / 100);
+    final totalWithTax = safeTotalAmount + taxAmount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +125,7 @@ class PaymentHeader extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Including GST ($gstRate%)',
+                    'Including VAT ($vatRate%)',
                     style: const TextStyle(
                       fontSize: 10,
                       color: Colors.white70,

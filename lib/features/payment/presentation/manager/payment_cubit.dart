@@ -10,14 +10,39 @@ class PaymentCubit extends Cubit<PaymentState> {
   PaymentCubit() : super(PaymentInitial());
 
   void loadPayment(double totalAmount) {
+    // التحقق من صحة القيم
+    if (totalAmount.isNaN || totalAmount.isInfinite || totalAmount < 0) {
+      print('❌ Invalid totalAmount: $totalAmount');
+      emit(PaymentError('Invalid total amount'));
+      return;
+    }
+
     // حساب الضريبة 15%
-    double gstRate = 0.15;
-    double gstAmount = totalAmount * gstRate;
-    double subtotalAmount = totalAmount - gstAmount;
+    const double vatRate = 0.15;
+    final double vatAmount = totalAmount * vatRate;
+    final double subtotalAmount = totalAmount - vatAmount;
+
+    // التحقق من صحة الحسابات
+    if (vatAmount.isNaN ||
+        vatAmount.isInfinite ||
+        subtotalAmount.isNaN ||
+        subtotalAmount.isInfinite) {
+      print(
+        '❌ Invalid calculated values - vatAmount: $vatAmount, subtotalAmount: $subtotalAmount',
+      );
+      emit(PaymentError('Invalid calculated values'));
+      return;
+    }
+
+    print('💰 Payment calculation:');
+    print('   Total Amount: $totalAmount');
+    print('   VAT Rate: ${vatRate * 100}%');
+    print('   VAT Amount: $vatAmount');
+    print('   Subtotal Amount: $subtotalAmount');
 
     final payment = PaymentModel(
       totalAmount: totalAmount,
-      gstAmount: gstAmount,
+      vatAmount: vatAmount,
       subtotalAmount: subtotalAmount,
     );
 

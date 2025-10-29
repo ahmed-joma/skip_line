@@ -1,6 +1,6 @@
 class PaymentModel {
   final double totalAmount;
-  final double gstAmount;
+  final double vatAmount;
   final double subtotalAmount;
   final String currency;
   final String paymentMethod;
@@ -13,7 +13,7 @@ class PaymentModel {
 
   PaymentModel({
     required this.totalAmount,
-    required this.gstAmount,
+    required this.vatAmount,
     required this.subtotalAmount,
     this.currency = 'SR',
     this.paymentMethod = 'Credit card',
@@ -27,7 +27,7 @@ class PaymentModel {
 
   PaymentModel copyWith({
     double? totalAmount,
-    double? gstAmount,
+    double? vatAmount,
     double? subtotalAmount,
     String? currency,
     String? paymentMethod,
@@ -40,7 +40,7 @@ class PaymentModel {
   }) {
     return PaymentModel(
       totalAmount: totalAmount ?? this.totalAmount,
-      gstAmount: gstAmount ?? this.gstAmount,
+      vatAmount: vatAmount ?? this.vatAmount,
       subtotalAmount: subtotalAmount ?? this.subtotalAmount,
       currency: currency ?? this.currency,
       paymentMethod: paymentMethod ?? this.paymentMethod,
